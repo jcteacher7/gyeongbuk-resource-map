@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, interactive-widget=resizes-visual">
+<meta name="theme-color" content="#E6F5F2">
+<title>경상북도 자원 지도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" href="css/app.css?v=3">
+</head>
+<body>
+<div id="stage" class="stage">
+  <section id="enter" class="screen"></section>
+
+  <section id="main" class="screen" hidden>
+    <header class="top">
+      <div class="logo"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22 C12 22 5 14.5 5 9.5 A7 7 0 0 1 19 9.5 C19 14.5 12 22 12 22 Z"></path><circle cx="12" cy="9.5" r="2.6"></circle></svg><span>경상북도 자원 지도</span></div>
+      <button type="button" id="who" class="who" data-act="who"></button>
+      <nav id="tabs" class="tabs"></nav>
+      <div id="sync" class="sync"><span class="dot"></span><span id="syncText">연결 중…</span></div>
+    </header>
+
+    <div id="view-map" class="view map-view">
+      <div class="mapwrap">
+        <div id="mapbox" class="mapbox"></div>
+        <button type="button" id="arrowBtn" class="btn coral arrow-btn"></button>
+        <div id="arrowBanner" class="arrow-banner" hidden></div>
+      </div>
+      <aside id="panel" class="panel"></aside>
+    </div>
+    <div id="view-tag" class="view" hidden></div>
+    <div id="view-chat" class="view" hidden></div>
+  </section>
+
+  <div id="modal" class="modal" hidden></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</div>
+<noscript>이 앱은 자바스크립트가 켜져 있어야 써요.</noscript>
+<script type="module" src="js/app.js?v=3"></script>
+</body>
+</html>
