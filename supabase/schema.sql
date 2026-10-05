@@ -39,6 +39,9 @@ create policy "gb delete" on public.gb_entries for delete using (true);
 grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on table public.gb_entries to anon, authenticated;
 
+-- 앱이 새 표를 바로 알아보게 합니다.
+notify pgrst, 'reload schema';
+
 -- 2) 사진 저장 공간(공개 읽기, 한 장 2MB 까지, jpg/png/webp 만) ---------------
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('gb-photos', 'gb-photos', true, 2097152, array['image/jpeg', 'image/png', 'image/webp'])
