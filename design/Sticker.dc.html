@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>스티커 지도 느낌</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Jua&display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit}
+@keyframes flowB{to{stroke-dashoffset:-24}}
+@keyframes bobB{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes popB{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
+.flowB{animation:flowB .9s linear infinite}
+.bobB{animation:bobB 1.4s ease-in-out infinite}
+.popB{animation:popB .45s cubic-bezier(.3,1.4,.5,1) both}
+@media (prefers-reduced-motion: reduce){.flowB,.bobB,.popB{animation:none}}
+</style>
+</helmet>
+<div style="position:relative;width:1280px;height:800px;overflow:hidden;background:#E9E2FF;font-family:'Jua',sans-serif;color:#26233A">
+
+  <div style="position:absolute;left:40px;right:40px;top:20px;height:64px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:26px">
+      <div style="display:flex;align-items:center;gap:12px;height:60px;padding:0 26px;background:#FF8FB1;border:4px solid #26233A;border-radius:16px;box-shadow:4px 4px 0 #26233A;transform:rotate(-2deg);font-family:'Do Hyeon',sans-serif;font-size:38px;color:#26233A;box-sizing:border-box">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22 C12 22 5 14.5 5 9.5 A7 7 0 0 1 19 9.5 C19 14.5 12 22 12 22 Z"></path><circle cx="12" cy="9.5" r="2.6"></circle></svg>
+        <span>경상북도 자원 지도</span>
+      </div>
+      <div style="display:flex;align-items:center;height:48px;padding:0 20px;background:#6FE0B4;border:3px solid #26233A;border-radius:14px;box-shadow:3px 3px 0 #26233A;font-size:22px;color:#26233A;box-sizing:border-box">1모둠 · 홍길동</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <button type="button" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 24px;background:#FFD84D;border:3px solid #26233A;border-radius:14px;box-shadow:4px 4px 0 #26233A;font-size:22px;color:#26233A;cursor:pointer;box-sizing:border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5 V19 M5 12 H19"></path></svg>자원 올리기</button>
+      <button type="button" style="display:flex;align-items:center;gap:10px;height:52px;padding:0 24px;background:#B9A6FF;border:3px solid #26233A;border-radius:14px;box-shadow:4px 4px 0 #26233A;font-size:22px;color:#26233A;cursor:pointer;box-sizing:border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 H19 M13 6 L19 12 L13 18"></path></svg>화살표 잇기</button>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:40px;top:116px;width:860px;height:660px;border-radius:30px;overflow:hidden;box-shadow:8px 8px 0 #26233A">
+    <svg width="860" height="660" viewBox="0 0 860 660" style="position:absolute;left:0;top:0;display:block" role="img" aria-label="경상북도 지도">
+      <defs>
+        <pattern id="dotsB" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="2.4" fill="#fff" opacity=".55"></circle></pattern>
+        <marker id="ahB" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#26233A"></path></marker>
+        <marker id="ahBs" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="2.6" markerHeight="2.6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#FF8FB1" stroke="#26233A" stroke-width="1.6" stroke-linejoin="round"></path></marker>
+      </defs>
+      <rect x="3" y="3" width="854" height="654" rx="27" fill="#8FD0FF" stroke="#26233A" stroke-width="6"></rect>
+      <rect x="3" y="3" width="854" height="654" rx="27" fill="url(#dotsB)"></rect>
+
+      <g transform="translate(780 100)">
+        <g stroke="#26233A" stroke-width="4" stroke-linecap="round">
+          <path d="M0 -40 V-33"></path>
+          <path d="M0 -40 V-33" transform="rotate(45)"></path>
+          <path d="M0 -40 V-33" transform="rotate(90)"></path>
+          <path d="M0 -40 V-33" transform="rotate(135)"></path>
+          <path d="M0 -40 V-33" transform="rotate(180)"></path>
+          <path d="M0 -40 V-33" transform="rotate(225)"></path>
+          <path d="M0 -40 V-33" transform="rotate(270)"></path>
+          <path d="M0 -40 V-33" transform="rotate(315)"></path>
+        </g>
+        <circle r="27" fill="#FFD84D" stroke="#26233A" stroke-width="4"></circle>
+        <circle cx="-9" cy="-4" r="2.8" fill="#26233A"></circle>
+        <circle cx="9" cy="-4" r="2.8" fill="#26233A"></circle>
+        <path d="M-9 6 Q0 15 9 6" fill="none" stroke="#26233A" stroke-width="3" stroke-linecap="round"></path>
+      </g>
+
+      <g fill="#fff" stroke="#26233A" stroke-width="2.5" stroke-linejoin="round">
+        <path transform="translate(610 150)" d="M0 -11 Q2 -2 11 0 Q2 2 0 11 Q-2 2 -11 0 Q-2 -2 0 -11 Z"></path>
+        <path transform="translate(668 316)" d="M0 -11 Q2 -2 11 0 Q2 2 0 11 Q-2 2 -11 0 Q-2 -2 0 -11 Z"></path>
+        <path transform="translate(640 70)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"></path>
+        <path transform="translate(720 330)" d="M0 -9 Q2 -2 9 0 Q2 2 0 9 Q-2 2 -9 0 Q-2 -2 0 -9 Z"></path>
+        <path transform="translate(60 600)" d="M0 -11 Q2 -2 11 0 Q2 2 0 11 Q-2 2 -11 0 Q-2 -2 0 -11 Z"></path>
+      </g>
+
+      <ellipse cx="720" cy="230" rx="34" ry="22" fill="#FFD84D" stroke="#26233A" stroke-width="4"></ellipse>
+      <ellipse cx="716" cy="228" rx="16" ry="9" fill="#6FE0B4"></ellipse>
+      <text x="720" y="278" text-anchor="middle" fill="#26233A" style="font-family:'Do Hyeon',sans-serif;font-size:22px">울릉도</text>
+      <ellipse cx="800" cy="214" rx="8" ry="6" fill="#FFD84D" stroke="#26233A" stroke-width="3"></ellipse>
+      <ellipse cx="814" cy="224" rx="5" ry="4" fill="#FFD84D" stroke="#26233A" stroke-width="3"></ellipse>
+      <text x="806" y="252" text-anchor="middle" fill="#26233A" style="font-family:'Do Hyeon',sans-serif;font-size:22px">독도</text>
+
+      <path d="M115 135 Q130 100 215 78 Q300 56 385 67 Q470 78 507.5 119 Q545 160 555 215 Q565 270 552.5 315 Q540 360 570 400 Q600 440 570 480 Q540 520 480 540 Q420 560 355 570 Q290 580 230 550 Q170 520 145 460 Q120 400 107.5 335 Q95 270 97.5 220 Q100 170 115 135 Z" transform="translate(6 8)" fill="#26233A" stroke="#26233A" stroke-width="26" stroke-linejoin="round"></path>
+      <path d="M115 135 Q130 100 215 78 Q300 56 385 67 Q470 78 507.5 119 Q545 160 555 215 Q565 270 552.5 315 Q540 360 570 400 Q600 440 570 480 Q540 520 480 540 Q420 560 355 570 Q290 580 230 550 Q170 520 145 460 Q120 400 107.5 335 Q95 270 97.5 220 Q100 170 115 135 Z" fill="#fff" stroke="#fff" stroke-width="26" stroke-linejoin="round"></path>
+      <path d="M115 135 Q130 100 215 78 Q300 56 385 67 Q470 78 507.5 119 Q545 160 555 215 Q565 270 552.5 315 Q540 360 570 400 Q600 440 570 480 Q540 520 480 540 Q420 560 355 570 Q290 580 230 550 Q170 520 145 460 Q120 400 107.5 335 Q95 270 97.5 220 Q100 170 115 135 Z" fill="#FFD84D" stroke="#26233A" stroke-width="5" stroke-linejoin="round"></path>
+
+      <ellipse cx="190" cy="415" rx="62" ry="44" fill="#6FE0B4"></ellipse>
+      <ellipse cx="330" cy="505" rx="90" ry="40" fill="#6FE0B4"></ellipse>
+      <ellipse cx="340" cy="215" rx="46" ry="26" fill="#6FE0B4"></ellipse>
+
+      <path d="M490 215 L512 178 L534 215 Z" fill="#B9A6FF" stroke="#26233A" stroke-width="4" stroke-linejoin="round"></path>
+      <path d="M504 192 L512 178 L520 192 L516 189 L512 193 L508 189 Z" fill="#fff" stroke="#26233A" stroke-width="2" stroke-linejoin="round"></path>
+      <path d="M505 250 L523 220 L541 250 Z" fill="#B9A6FF" stroke="#26233A" stroke-width="4" stroke-linejoin="round"></path>
+
+      <g transform="translate(140 225)"><path d="M0 14 V26" stroke="#26233A" stroke-width="4.5" stroke-linecap="round"></path><circle cx="0" cy="0" r="14" fill="#6FE0B4" stroke="#26233A" stroke-width="4"></circle></g>
+      <g transform="translate(330 215)"><path d="M0 14 V26" stroke="#26233A" stroke-width="4.5" stroke-linecap="round"></path><circle cx="0" cy="0" r="14" fill="#6FE0B4" stroke="#26233A" stroke-width="4"></circle></g>
+      <g transform="translate(160 360)"><path d="M0 14 V26" stroke="#26233A" stroke-width="4.5" stroke-linecap="round"></path><circle cx="0" cy="0" r="14" fill="#6FE0B4" stroke="#26233A" stroke-width="4"></circle></g>
+      <g transform="translate(250 395)"><path d="M0 14 V26" stroke="#26233A" stroke-width="4.5" stroke-linecap="round"></path><circle cx="0" cy="0" r="14" fill="#6FE0B4" stroke="#26233A" stroke-width="4"></circle></g>
+      <g transform="translate(180 470)"><path d="M0 14 V26" stroke="#26233A" stroke-width="4.5" stroke-linecap="round"></path><circle cx="0" cy="0" r="14" fill="#6FE0B4" stroke="#26233A" stroke-width="4"></circle></g>
+      <g transform="translate(230 505)"><path d="M0 14 V26" stroke="#26233A" stroke-width="4.5" stroke-linecap="round"></path><circle cx="0" cy="0" r="14" fill="#6FE0B4" stroke="#26233A" stroke-width="4"></circle></g>
+
+      <path class="flowB" d="M200 183 Q194 222 214 246" fill="none" stroke="#26233A" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 10" marker-end="url(#ahB)"></path>
+      <path class="flowB" d="M398 152 Q470 200 481 286" fill="none" stroke="#26233A" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 10" marker-end="url(#ahB)"></path>
+      <path d="M296 304 Q350 400 410 342" fill="none" stroke="#26233A" stroke-width="17" stroke-linecap="round"></path>
+      <path d="M296 304 Q350 400 410 342" fill="none" stroke="#FF8FB1" stroke-width="9" stroke-linecap="round" marker-end="url(#ahBs)"></path>
+    </svg>
+
+    <div style="position:absolute;left:125px;top:121px;width:150px;height:58px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px 0 8px;background:#fff;border:3px solid #26233A;border-radius:18px;box-shadow:4px 4px 0 #26233A;transform:rotate(-2deg);font-family:'Do Hyeon',sans-serif;font-size:26px;color:#26233A">
+      <span style="width:40px;height:40px;border-radius:50%;background:#B9A6FF;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"></circle><circle cx="16" cy="15" r="3.5"></circle><circle cx="12" cy="9" r="3.5"></circle><path d="M12 5.5 L14.5 2.5"></path></svg></span>
+      <span>문경</span>
+    </div>
+    <div style="position:absolute;left:315px;top:91px;width:150px;height:58px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px 0 8px;background:#fff;border:3px solid #26233A;border-radius:18px;box-shadow:4px 4px 0 #26233A;transform:rotate(2deg);font-family:'Do Hyeon',sans-serif;font-size:26px;color:#26233A">
+      <span style="width:40px;height:40px;border-radius:50%;background:#6FE0B4;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 C5 9 11 5 19 5 C19 13 15 19 5 19 Z"></path><path d="M5 19 L14 10"></path></svg></span>
+      <span>봉화</span>
+    </div>
+    <div style="position:absolute;left:140px;top:261px;width:150px;height:58px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px 0 8px;background:#fff;border:3px solid #26233A;border-radius:18px;box-shadow:4px 4px 0 #26233A;transform:rotate(-2deg);font-family:'Do Hyeon',sans-serif;font-size:26px;color:#26233A">
+      <span style="width:40px;height:40px;border-radius:50%;background:#FFD84D;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 V8"></path><ellipse cx="9" cy="10" rx="2" ry="3.2" transform="rotate(-25 9 10)"></ellipse><ellipse cx="15" cy="10" rx="2" ry="3.2" transform="rotate(25 15 10)"></ellipse><ellipse cx="9" cy="15.5" rx="2" ry="3.2" transform="rotate(-25 9 15.5)"></ellipse><ellipse cx="15" cy="15.5" rx="2" ry="3.2" transform="rotate(25 15 15.5)"></ellipse><ellipse cx="12" cy="5" rx="1.8" ry="2.8"></ellipse></svg></span>
+      <span>상주</span>
+    </div>
+    <div style="position:absolute;left:425px;top:301px;width:150px;height:58px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:0 14px 0 8px;background:#fff;border:3px solid #26233A;border-radius:18px;box-shadow:4px 4px 0 #26233A;transform:rotate(3deg);font-family:'Do Hyeon',sans-serif;font-size:26px;color:#26233A">
+      <span style="width:40px;height:40px;border-radius:50%;background:#FF8FB1;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;flex:none;box-sizing:border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="14" rx="6" ry="4"></ellipse><circle cx="5" cy="8.5" r="2.2"></circle><circle cx="19" cy="8.5" r="2.2"></circle><path d="M8.5 12 L6 10 M15.5 12 L18 10 M7 16.5 L4 19 M9.5 17.7 L8 21 M17 16.5 L20 19 M14.5 17.7 L16 21"></path><path d="M10.5 11 V9.5 M13.5 11 V9.5"></path></svg></span>
+      <span>영덕</span>
+    </div>
+
+    <div class="bobB" style="position:absolute;left:332px;top:341px;width:40px;height:40px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#FFD84D;border:3px solid #26233A;border-radius:50%;box-shadow:3px 3px 0 #26233A">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6 H19 A2 2 0 0 1 21 8 V14 A2 2 0 0 1 19 16 H12 L8 20 V16 H5 A2 2 0 0 1 3 14 V8 A2 2 0 0 1 5 6 Z"></path></svg>
+    </div>
+  </div>
+
+  <div class="popB" style="position:absolute;left:340px;top:522px;width:500px;height:248px;box-sizing:border-box;display:flex;flex-direction:column;background:#fff;border:4px solid #26233A;border-radius:24px;box-shadow:8px 8px 0 #26233A">
+    <div style="position:absolute;left:36px;top:-14px;width:24px;height:24px;background:#FF8FB1;border-left:4px solid #26233A;border-top:4px solid #26233A;border-top-left-radius:4px;transform:rotate(45deg)"></div>
+    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;height:56px;flex:none;padding:0 6px 0 22px;background:#FF8FB1;border-bottom:4px solid #26233A;border-radius:20px 20px 0 0;color:#26233A;font-family:'Do Hyeon',sans-serif;font-size:32px">
+      <div style="display:flex;align-items:center;gap:10px"><span>상주</span><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 H19 M13 6 L19 12 L13 18"></path></svg><span>영덕</span></div>
+      <button type="button" aria-label="닫기" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#FFD84D;border:3px solid #26233A;border-radius:12px;box-shadow:2px 2px 0 #26233A;cursor:pointer;box-sizing:border-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="3.2" stroke-linecap="round"><path d="M6 6 L18 18 M18 6 L6 18"></path></svg></button>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;padding:12px 22px 14px">
+      <div style="font-size:22px;line-height:1.5;color:#26233A">상주는 들판이 넓어 쌀이 많고, 영덕은 바다가 가까워 대게가 많아요. 서로 부족한 것을 주고받으면 좋아요.</div>
+      <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:18px;color:#4A4668">1모둠 · 홍길동이 남겼어요</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button type="button" style="height:44px;padding:0 20px;background:#6FE0B4;border:3px solid #26233A;border-radius:12px;box-shadow:3px 3px 0 #26233A;font-size:20px;color:#26233A;cursor:pointer;box-sizing:border-box">고치기</button>
+          <a href="#" style="display:flex;align-items:center;gap:6px;height:44px;padding:0 18px;background:#fff;border:3px solid #26233A;border-radius:12px;box-shadow:3px 3px 0 #26233A;font-size:20px;color:#26233A;text-decoration:none;box-sizing:border-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="10" height="6" rx="3" transform="rotate(-45 8 12)"></rect><rect x="11" y="9" width="10" height="6" rx="3" transform="rotate(-45 16 12)"></rect></svg>자료 보기</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:930px;top:116px;width:310px;height:660px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;padding:22px;background:#fff;border:4px solid #26233A;border-radius:24px;box-shadow:6px 6px 0 #26233A">
+    <div style="display:flex;align-items:center;height:40px"><div style="display:flex;align-items:center;height:40px;padding:0 14px;background:#FFD84D;border:3px solid #26233A;border-radius:10px;transform:rotate(-1.5deg);font-family:'Do Hyeon',sans-serif;font-size:26px;color:#26233A;box-sizing:border-box">우리 모둠 자원 카드</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px;height:116px;box-sizing:border-box;padding:0 14px;background:#C4F3E0;border:3px solid #26233A;border-radius:18px;box-shadow:3px 3px 0 #26233A">
+        <span style="width:56px;height:56px;flex:none;border-radius:50%;background:#6FE0B4;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19 C5 9 11 5 19 5 C19 13 15 19 5 19 Z"></path><path d="M5 19 L14 10"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:'Do Hyeon',sans-serif;font-size:28px;line-height:1.15">봉화</div><div style="font-size:19px;line-height:1.3">고랭지 채소</div><a href="#" style="display:flex;align-items:center;width:fit-content;height:40px;padding:0 14px;background:#fff;border:2px solid #26233A;border-radius:999px;font-size:18px;color:#26233A;text-decoration:none;box-sizing:border-box">자료 보기</a></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;height:116px;box-sizing:border-box;padding:0 14px;background:#FFE99A;border:3px solid #26233A;border-radius:18px;box-shadow:3px 3px 0 #26233A">
+        <span style="width:56px;height:56px;flex:none;border-radius:50%;background:#FFD84D;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 V8"></path><ellipse cx="9" cy="10" rx="2" ry="3.2" transform="rotate(-25 9 10)"></ellipse><ellipse cx="15" cy="10" rx="2" ry="3.2" transform="rotate(25 15 10)"></ellipse><ellipse cx="9" cy="15.5" rx="2" ry="3.2" transform="rotate(-25 9 15.5)"></ellipse><ellipse cx="15" cy="15.5" rx="2" ry="3.2" transform="rotate(25 15 15.5)"></ellipse><ellipse cx="12" cy="5" rx="1.8" ry="2.8"></ellipse></svg></span>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:'Do Hyeon',sans-serif;font-size:28px;line-height:1.15">상주</div><div style="font-size:19px;line-height:1.3">쌀</div><a href="#" style="display:flex;align-items:center;width:fit-content;height:40px;padding:0 14px;background:#fff;border:2px solid #26233A;border-radius:999px;font-size:18px;color:#26233A;text-decoration:none;box-sizing:border-box">자료 보기</a></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;height:116px;box-sizing:border-box;padding:0 14px;background:#FFD3E1;border:3px solid #26233A;border-radius:18px;box-shadow:3px 3px 0 #26233A">
+        <span style="width:56px;height:56px;flex:none;border-radius:50%;background:#FF8FB1;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="14" rx="6" ry="4"></ellipse><circle cx="5" cy="8.5" r="2.2"></circle><circle cx="19" cy="8.5" r="2.2"></circle><path d="M8.5 12 L6 10 M15.5 12 L18 10 M7 16.5 L4 19 M9.5 17.7 L8 21 M17 16.5 L20 19 M14.5 17.7 L16 21"></path><path d="M10.5 11 V9.5 M13.5 11 V9.5"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:'Do Hyeon',sans-serif;font-size:28px;line-height:1.15">영덕</div><div style="font-size:19px;line-height:1.3">대게</div><a href="#" style="display:flex;align-items:center;width:fit-content;height:40px;padding:0 14px;background:#fff;border:2px solid #26233A;border-radius:999px;font-size:18px;color:#26233A;text-decoration:none;box-sizing:border-box">자료 보기</a></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;height:116px;box-sizing:border-box;padding:0 14px;background:#DCD2FF;border:3px solid #26233A;border-radius:18px;box-shadow:3px 3px 0 #26233A">
+        <span style="width:56px;height:56px;flex:none;border-radius:50%;background:#B9A6FF;border:3px solid #26233A;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"></circle><circle cx="16" cy="15" r="3.5"></circle><circle cx="12" cy="9" r="3.5"></circle><path d="M12 5.5 L14.5 2.5"></path></svg></span>
+        <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:'Do Hyeon',sans-serif;font-size:28px;line-height:1.15">문경</div><div style="font-size:19px;line-height:1.3">오미자</div><a href="#" style="display:flex;align-items:center;width:fit-content;height:40px;padding:0 14px;background:#fff;border:2px solid #26233A;border-radius:999px;font-size:18px;color:#26233A;text-decoration:none;box-sizing:border-box">자료 보기</a></div>
+      </div>
+    </div>
+    <div style="margin-top:auto;display:flex;align-items:center;gap:8px;font-size:22px;color:#26233A"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26233A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 H19 M13 6 L19 12 L13 18"></path></svg>연결한 화살표 3개</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

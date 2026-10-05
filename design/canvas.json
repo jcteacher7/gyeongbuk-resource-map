@@ -1,0 +1,17 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-05T13:15:00Z" },
+  "title": "경북 자원 지도 느낌 시안",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 1280, "h": 800, "title": "가. 관광 안내도" },
+    "Sticker.dc.html": { "x": 1360, "y": 0, "w": 1280, "h": 800, "title": "나. 스티커 지도" },
+    "Notebook.dc.html": { "x": 2720, "y": 0, "w": 1280, "h": 800, "title": "다. 여행 수첩" }
+  },
+  "order": ["Main.dc.html", "Sticker.dc.html", "Notebook.dc.html"],
+  "notes": {
+    "t1": { "x": 0, "y": -300, "text": "경북 자원 지도: 귀여운 관광 지도 느낌 3가지", "kind": "title1", "maxW": 4000 }
+  },
+  "designSystems": []
+}
