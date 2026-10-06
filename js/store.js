@@ -4,12 +4,13 @@
 //   그래서 인터넷이 끊겨도, 새로고침해도 글이 사라지지 않고 연결이 돌아오면 다시 보냅니다.
 // - 읽기는 몇 초마다 "마지막으로 본 뒤 바뀐 줄"만 가져오고, 가끔 전체를 다시 읽습니다.
 // - 지우기는 줄을 없애지 않고 deleted 표시를 붙입니다(다른 기기에도 지운 것이 전해지도록).
-import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=3';
+import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=8';
 
 const CACHE_KEY = 'gb-cache-v1';
 const OUTBOX_KEY = 'gb-outbox-v1';
-const FULL_EVERY_MS = 90000;
-const KINDS = ['cfg', 'res', 'arrow'];
+const FULL_EVERY_MS = 180000;
+// cstep: 모둠의 챗봇 단계, gen: 모둠 일반화 문장
+const KINDS = ['cfg', 'res', 'arrow', 'tag', 'chat', 'gen', 'cstep'];
 
 const rows = new Map(); // 'kind/key' → { kind, key, value, updated_at, pending }
 let outbox = []; // { kind, key, value, photo: {full, thumb} (dataURL) | null }
@@ -156,7 +157,9 @@ async function flush() {
         body: JSON.stringify([{ kind: item.kind, key: item.key, value: item.value }]),
       });
       if (!res.ok) { const m = await failOf(res); throw Object.assign(new Error('push'), { mode: m }); }
-      outbox.shift();
+      // 보내는 사이에 같은 줄이 다시 저장되었을 수 있으므로, 보낸 그 항목만 뺍니다.
+      const at = outbox.indexOf(item);
+      if (at >= 0) outbox.splice(at, 1);
       saveOutbox();
       if (!isPending(item.kind, item.key)) {
         rows.set(rk(item.kind, item.key), { kind: item.kind, key: item.key, value: item.value, updated_at: '', pending: false });
@@ -206,9 +209,15 @@ export const store = {
   // photo: 새 사진이 있을 때 { full, thumb } (dataURL). 서버로 보낼 때 올리고 주소로 바꿉니다.
   put(kind, key, value, photo = null) {
     const prev = outbox.findIndex((o) => o.kind === kind && o.key === key);
-    if (!photo && prev >= 0 && outbox[prev].photo && value.photo && value.photo.local) photo = outbox[prev].photo;
     const v = { ...value };
-    if (v.photo && v.photo.local) delete v.photo;
+    if (v.photo && v.photo.local) {
+      // 아직 못 보낸 사진을 그대로 두고 글만 고친 경우: 앞 항목의 사진(또는 이미 올린 주소)을 이어받음
+      delete v.photo;
+      if (!photo && prev >= 0) {
+        if (outbox[prev].photo) photo = outbox[prev].photo;
+        else if (outbox[prev].value.photo) v.photo = outbox[prev].value.photo;
+      }
+    }
     const item = { kind, key, value: v, photo };
     if (prev >= 0) outbox.splice(prev, 1);
     outbox.push(item);
@@ -229,4 +238,60 @@ export const store = {
     return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   },
   retry() { tick(); },
+  // 서버에서 전체를 한 번이라도 읽었는지(선생님 암호를 처음 정할 때 확인)
+  ready() { return lastFull > 0; },
+  // 서버(챗봇 중계 함수)가 이미 저장한 줄을 바로 화면에 넣습니다.
+  absorb(kind, key, value) {
+    rows.set(rk(kind, key), { kind, key, value, updated_at: '', pending: false });
+    saveCache();
+    emit();
+  },
+  // 선생님 화면: 지금 바로 전체를 다시 읽습니다.
+  async refresh() {
+    try { await pull(true); setMode('ok'); } catch (e) { setMode(e.mode || 'offline'); }
+  },
+  // 선생님 화면: 한 종류의 기록을 서버에서 완전히 지웁니다.
+  // key 를 주면 그 한 줄만 지웁니다.
+  async wipe(kinds, key) {
+    const hit = (o) => kinds.includes(o.kind) && (key == null || o.key === key);
+    outbox = outbox.filter((o) => !hit(o));
+    saveOutbox();
+    const res = await api(`/rest/v1/${TABLE}?kind=in.(${kinds.join(',')})${key == null ? '' : '&key=eq.' + encodeURIComponent(key)}`, { method: 'DELETE', headers: { Prefer: 'return=minimal' } });
+    if (!res.ok) throw new Error('지우지 못했어요 (' + res.status + ')');
+    for (const [id, r] of rows) if (hit(r)) rows.delete(id);
+    saveCache();
+    emit();
+  },
+  // 선생님 화면: 사진 저장 공간의 사진을 모두 지웁니다. 지운 장수를 돌려줍니다.
+  async wipePhotos() {
+    let total = 0;
+    for (let round = 0; round < 20; round++) {
+      const res = await api(`/storage/v1/object/list/${PHOTO_BUCKET}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefix: 'res/', limit: 500, offset: 0 }),
+      });
+      if (!res.ok) throw new Error('사진 목록을 읽지 못했어요 (' + res.status + ')');
+      const list = (await res.json()).filter((o) => o.id);
+      if (!list.length) break;
+      const del = await api(`/storage/v1/object/${PHOTO_BUCKET}`, {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prefixes: list.map((o) => 'res/' + o.name) }),
+      });
+      if (!del.ok) throw new Error('사진을 지우지 못했어요 (' + del.status + ')');
+      total += list.length;
+    }
+    return total;
+  },
+  // 챗봇 중계 함수 부르기
+  async callFunction(name, body, ms = 40000) {
+    const res = await api(`/functions/v1/${name}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    }, ms);
+    let data = null;
+    try { data = await res.json(); } catch (e) { /* 무시 */ }
+    if (!res.ok || !data || !data.ok) {
+      throw Object.assign(new Error('call'), { status: res.status, code: data && data.error });
+    }
+    return data;
+  },
 };

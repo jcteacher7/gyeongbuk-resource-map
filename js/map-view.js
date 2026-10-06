@@ -1,6 +1,6 @@
 // 지도 그리기: 시군 모양(확대되는 층) 위에 이름·핀·화살표(글자 크기가 그대로인 층)를 얹습니다.
 // 확대는 [+] [−] [처음 크기] 단추와 "이 시군 크게 보기"로만 합니다. 한 손가락으로 밀면 지도가 움직입니다.
-import { esc } from './util.js?v=3';
+import { esc } from './util.js?v=8';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAD = 22;

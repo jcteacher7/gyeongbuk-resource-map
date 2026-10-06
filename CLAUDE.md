@@ -9,7 +9,12 @@
 - 사진 공간 SQL은 SQL Editor에서 오류 없이 실행됨. 선생님께 SQL을 줄 때는 표/사진 두 번에 나눠 주는 편이 안전함.
 - 명단은 선생님 화면이 없어 시험용 가짜 이름(`js/app.js`의 DEMO)을 씀. `cfg/roster` 줄이 생기면 그걸 씀: `{ groups: [{id, name, members: []}], assign: { 시군ID: 모둠id } }`.
 - 저장소 public 전환, GitHub Pages 켬(`main` 루트).
-- 다음 할 일: 갤럭시탭 실제 화면 확인(선생님) → "만드는 순서" 2번.
+- **2026-10-06: 만드는 순서 2번 코드 완성.** TAG(`js/tag-view.js`), AI 챗봇(`js/chat-view.js`), 선생님 화면(`js/teacher.js`, 들어가기 제목 5번 누르기 + 4자리 암호, 해시는 `cfg/teacher`), 설정 기본값(`js/defaults.js`), 중계 함수(`supabase/functions/gemini-chat/index.ts`). 로컬에서 TAG·모둠 문장·선생님 화면·챗봇 실패 처리 시험 통과.
+- 중계 함수는 아직 배포 전(선생님이 Supabase 화면에서 만들고 `GEMINI_API_KEY` 넣고 JWT 확인 끄기, README 2~3번). 배포 뒤 Claude가 실제 대화를 시험해야 함.
+- 제미나이 모델: `gemini-2.5-flash`는 2026-10-16 종료 예정이라 쓰지 않음. 함수가 `GEMINI_MODEL` → gemini-3.8-flash → 3.6-flash → 3.1-flash-lite 순서로 시도(404/400이면 다음).
+- 새 기록 종류: `cstep`(모둠 챗봇 단계, key `g<모둠>`), `gen`(key `g<모둠>`, 완성 문장 text + parts). `chat`은 함수가 서버에서 저장(a가 null이면 실패 기록, 아이 화면에는 안 보임).
+- 시험할 때 주의: 열어 둔 시험 탭의 보관함(outbox)이 나중에 서버로 보내질 수 있음. 시험 뒤 탭을 닫고 서버의 시험 줄을 지울 것.
+- 다음 할 일: 선생님이 제미나이 키·중계 함수 준비 → 챗봇 실제 시험 → 갤럭시탭 확인 → "만드는 순서" 3번.
 
 ## 구현 메모 (1번에서 정한 것)
 

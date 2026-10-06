@@ -1,9 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=3';
-import { store } from './store.js?v=3';
-import { createMapView, shortName } from './map-view.js?v=3';
-import { shrinkPhoto } from './photo.js?v=3';
-import { esc, safeLink, josa, timeText } from './util.js?v=3';
-import { MAX_LEN } from './config.js?v=3';
+import mapData from '../data/gyeongbuk-map.js?v=8';
+import { store } from './store.js?v=8';
+import { createMapView, shortName } from './map-view.js?v=8';
+import { shrinkPhoto } from './photo.js?v=8';
+import { esc, safeLink, josa, timeText } from './util.js?v=8';
+import { MAX_LEN } from './config.js?v=8';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=8';
+import { createTagView } from './tag-view.js?v=8';
+import { createChatView } from './chat-view.js?v=8';
+import { createTeacher, hashCode } from './teacher.js?v=8';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -32,8 +36,9 @@ function typingNow() {
   const a = document.activeElement;
   return !!a && ((a.tagName === 'INPUT' && !['file', 'button', 'checkbox', 'radio'].includes(a.type)) || a.tagName === 'TEXTAREA');
 }
+// 입력칸이 있는 부분은 따로 한 번만 그리므로, 다른 부분은 글자를 조합하는 순간만 피해서 그립니다.
 function requestRender() {
-  if (typingNow()) { renderQueued = true; return; }
+  if (composing) { renderQueued = true; return; }
   renderQueued = false;
   renderAll();
 }
@@ -50,31 +55,24 @@ const S = {
 };
 let modal = null;
 
-const DEMO = {
-  demo: true,
-  groups: [
-    { id: 1, name: '1모둠', members: ['가나다', '라마바', '사아자', '차카타'] },
-    { id: 2, name: '2모둠', members: ['파하가', '나다라', '마바사', '아자차'] },
-    { id: 3, name: '3모둠', members: ['카타파', '하가나', '다라마', '바사아', '자차카'] },
-    { id: 4, name: '4모둠', members: ['타파하', '가라사', '나마아', '다바자', '라사차'] },
-  ],
-  assign: {},
-};
-const DEFAULT_TEXT = { tabMap: '우리 지도', tabTag: 'TAG', tabChat: 'AI 챗봇' };
+const TEACHER = { g: 0, n: '선생님', teacher: true };
 
 function roster() {
   const r = store.get('cfg', 'roster');
-  return r && Array.isArray(r.groups) && r.groups.length ? r : DEMO;
+  return r && Array.isArray(r.groups) && r.groups.length ? r : DEMO_ROSTER;
 }
-const groupName = (g) => (roster().groups.find((x) => x.id === g) || { name: g + '모둠' }).name;
+const groupName = (g) => (g === 0 ? '선생님' : (roster().groups.find((x) => x.id === g) || { name: g + '모둠' }).name);
 const ownerOf = (cid) => (roster().assign || {})[cid];
-const canAdd = (cid) => ownerOf(cid) == null || ownerOf(cid) === S.me.g;
+const isTeacher = () => !!(S.me && S.me.teacher);
+const canAdd = (cid) => isTeacher() || ownerOf(cid) == null || ownerOf(cid) === S.me.g;
 const myCounties = () => mapData.regions.filter((r) => S.me && ownerOf(r.id) === S.me.g).map((r) => r.id);
-const texts = () => ({ ...DEFAULT_TEXT, ...(store.get('cfg', 'texts') || {}) });
+const texts = () => withDefaults(store.get('cfg', 'texts'), DEFAULT_TEXTS);
+const tagCfg = () => withDefaults(store.get('cfg', 'tagcfg'), DEFAULT_TAG);
+const chatCfg = () => withDefaults(store.get('cfg', 'chatcfg'), DEFAULT_CHAT);
 const stages = () => store.get('cfg', 'stages') || {};
 const regionName = (id) => (mapData.regions.find((r) => r.id === id) || {}).name || '';
 const sameMe = (by) => !!by && !!S.me && by.g === S.me.g && by.n === S.me.n;
-const byText = (by) => (by ? `${groupName(by.g)} · ${by.n}` : '');
+const byText = (by) => (by ? (by.g === 0 ? '선생님' : `${groupName(by.g)} · ${by.n}`) : '');
 const ENV = { nat: '자연환경', hum: '인문환경' };
 const AMT = { many: '많아요', few: '적어요' };
 
@@ -98,6 +96,7 @@ let lastPanel = '';
 let lastMapSig = '';
 
 function renderAll() {
+  if (S.teacherScreen) { teacher.render(); refreshModal(); return; }
   if (!S.me) { renderEnter(); return; }
   renderTop();
   renderTabs();
@@ -111,13 +110,14 @@ function renderAll() {
 function renderEnter() {
   $('#enter').hidden = false;
   $('#main').hidden = true;
+  $('#teacher').hidden = true;
   const r = roster();
   const g = r.groups.find((x) => x.id === S.enterGroup);
   const names = g ? g.members : [];
   const ready = g && names.includes(S.enterName);
   $('#enter').innerHTML = `
     <div class="enter">
-      <div class="enter-title">${ICON.pin}<span>경상북도 자원 지도</span></div>
+      <div class="enter-title" data-act="secret">${ICON.pin}<span>경상북도 자원 지도</span></div>
       <p class="enter-sub">어린이 지역 조사관, 어서 와요!</p>
       <div class="enter-step"><span class="num">1</span>우리 모둠을 골라요</div>
       <div class="groups">${r.groups.map((x) => `<button type="button" class="gbtn ${x.id === S.enterGroup ? 'on' : ''}" data-act="pick-group" data-g="${x.id}">${esc(x.name)}</button>`).join('')}</div>
@@ -146,11 +146,13 @@ function syncInfo() {
 
 function renderTop() {
   $('#enter').hidden = true;
+  $('#teacher').hidden = true;
   $('#main').hidden = false;
-  $('#who').textContent = `${groupName(S.me.g)} · ${S.me.n}`;
+  $('#who').innerHTML = isTeacher() ? `${ICON.key}선생님 화면으로` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
   const t = texts(), st = stages();
   const tab = (id, label, open) => `<button type="button" class="tab ${S.tab === id ? 'on' : ''} ${open ? '' : 'locked'}" data-tab="${id}">${open ? '' : ICON.lock}${esc(label)}</button>`;
-  $('#tabs').innerHTML = tab('map', t.tabMap, true) + tab('tag', t.tabTag, !!st.tag) + tab('chat', t.tabChat, !!st.chat);
+  const html = isTeacher() ? tab('map', t.tabMap, true) : tab('map', t.tabMap, true) + tab('tag', t.tabTag, !!st.tag) + tab('chat', t.tabChat, !!st.chat);
+  if ($('#tabs').innerHTML !== html) $('#tabs').innerHTML = html;
   const s = syncInfo();
   $('#sync').className = 'sync ' + s.cls;
   $('#syncText').textContent = s.text;
@@ -160,13 +162,19 @@ function renderTabs() {
   $('#view-map').hidden = S.tab !== 'map';
   ['tag', 'chat'].forEach((id) => {
     const v = $('#view-' + id);
+    const view = id === 'tag' ? tagView : chatView;
     v.hidden = S.tab !== id;
     if (S.tab !== id) return;
-    const open = !!stages()[id];
+    if (stages()[id]) {
+      if (v.dataset.locked) { delete v.dataset.locked; view.unmount(); }
+      view.update();
+      return;
+    }
     const name = texts()[id === 'tag' ? 'tabTag' : 'tabChat'];
-    v.innerHTML = `<div class="locked-view"><div class="lock-card">${ICON.lockBig}<h2>${esc(name)}</h2>
-      <p>${open ? '곧 쓸 수 있게 준비하고 있어요.' : '선생님이 열어 주면 쓸 수 있어요.'}</p>
+    const html = `<div class="locked-view"><div class="lock-card">${ICON.lockBig}<h2>${esc(name)}</h2>
+      <p>선생님이 열어 주면 쓸 수 있어요.</p>
       <button type="button" class="btn" data-tab="map">${esc(texts().tabMap)}(으)로 가기</button></div></div>`;
+    if (!v.dataset.locked || v.innerHTML !== html) { v.innerHTML = html; v.dataset.locked = '1'; view.unmount(); }
   });
 }
 
@@ -323,8 +331,8 @@ function photoBox(p, big) {
 }
 
 function editRow(item, kind) {
-  const canEdit = S.me && item.by && item.by.g === S.me.g;
-  const canDel = sameMe(item.by);
+  const canEdit = isTeacher() || (S.me && item.by && item.by.g === S.me.g);
+  const canDel = isTeacher() || sameMe(item.by);
   const edited = item.edited ? ` · ${esc(item.edited.n)}${josa(item.edited.n, '이', '가').slice(-1)} 고쳤어요` : '';
   return `<div class="pop-foot">
     <span class="by">${esc(byText(item.by))}${josa(item.by ? item.by.n : '', '이', '가').slice(-1)} 남겼어요${edited}</span>
@@ -635,10 +643,19 @@ document.addEventListener('click', (e) => {
     mapView.home(true);
   }
   else if (a === 'who') {
+    if (isTeacher()) { openTeacher(); return; }
     confirmBox(`${esc(S.me.n)}, 나가기 할까요?<br><small>다음 친구가 자기 이름으로 들어갈 수 있어요.</small>`, '나가기', () => {
       S.me = null; S.enterGroup = null; S.enterName = null; S.arrowMode = null; S.selected = null;
+      tagView.reset(); chatView.reset();
       renderEnter();
     });
+  }
+  else if (a === 'secret') secretTap();
+  else if (a === 'tlogin-ok') teacherLogin();
+  else if (a === 'typed-ok') {
+    const inp = $('#modal input[data-typed]');
+    if (inp.value.trim() !== modal.word) { toast(`"${modal.word}"라고 써 주세요.`); return; }
+    const fn = modal.onOk; closeModal(); fn();
   }
   else if (a === 'close') closeModal();
   else if (a === 'confirm-ok') { const fn = modal.onOk; closeModal(); fn(); }
@@ -669,6 +686,73 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// ---------- 선생님 화면 ----------
+let teacher = null, tagView = null, chatView = null;
+let secretTaps = [];
+function secretTap() {
+  const now = Date.now();
+  secretTaps = secretTaps.filter((t) => now - t < 3000).concat(now);
+  if (secretTaps.length < 5) return;
+  secretTaps = [];
+  if (!store.ready()) { toast('서버와 연결된 뒤에 다시 눌러 주세요.'); return; }
+  const has = !!store.get('cfg', 'teacher');
+  openModal({ type: 'tlogin', setup: !has }, `<div class="sheet confirm" role="dialog">
+    <p>${has ? '선생님 암호' : '선생님 암호 정하기'}<br><small>${has ? '숫자 4자리' : '처음이에요. 숫자 4자리를 두 번 써 주세요.'}</small></p>
+    <div class="code-row"><input type="password" inputmode="numeric" maxlength="4" data-code="1" autocomplete="off" aria-label="암호">
+    ${has ? '' : '<input type="password" inputmode="numeric" maxlength="4" data-code="2" autocomplete="off" aria-label="암호 한 번 더">'}</div>
+    <div class="confirm-acts"><button type="button" class="btn" data-act="close">닫기</button>
+    <button type="button" class="btn primary" data-act="tlogin-ok">들어가기</button></div></div>`);
+  setTimeout(() => { const i = $('#modal [data-code="1"]'); if (i) i.focus(); }, 50);
+}
+async function teacherLogin() {
+  const a = ($('#modal [data-code="1"]') || {}).value || '';
+  if (!/^\d{4}$/.test(a)) { toast('숫자 4자리로 써 주세요.'); return; }
+  const saved = store.get('cfg', 'teacher');
+  if (modal.setup) {
+    if (a !== $('#modal [data-code="2"]').value) { toast('두 번 쓴 암호가 달라요.'); return; }
+    const salt = Math.random().toString(36).slice(2, 10);
+    store.put('cfg', 'teacher', { salt, hash: await hashCode(salt, a) });
+  } else if (!saved || (await hashCode(saved.salt, a)) !== saved.hash) {
+    toast('암호가 맞지 않아요.');
+    return;
+  }
+  closeModal();
+  try { sessionStorage.setItem('gb-teacher', '1'); } catch (e) { /* 무시 */ }
+  openTeacher(true);
+}
+function openTeacher(fresh) {
+  S.teacherScreen = true;
+  S.me = null; S.arrowMode = null; S.selected = null; S.selArrow = null;
+  if (modal) closeModal();
+  $('#enter').hidden = true;
+  $('#main').hidden = true;
+  $('#teacher').hidden = false;
+  if (fresh) teacher.open(); else teacher.render(true);
+  store.refresh();
+}
+function teacherMap() {
+  S.teacherScreen = false;
+  S.me = { ...TEACHER };
+  S.tab = 'map'; S.selected = null; S.arrowMode = null; S.selArrow = null;
+  lastPanel = ''; lastMapSig = '';
+  renderAll();
+  mapView.resize();
+  mapView.home(true);
+}
+function teacherExit() {
+  S.teacherScreen = false;
+  S.me = null; S.enterGroup = null; S.enterName = null;
+  try { sessionStorage.removeItem('gb-teacher'); } catch (e) { /* 무시 */ }
+  renderEnter();
+}
+function confirmTyped(word, onOk) {
+  openModal({ type: 'confirm', word, onOk }, `<div class="sheet confirm" role="dialog">
+    <p>정말 지울까요?<br><small>되살릴 수 없어요. 아래 칸에 "${esc(word)}"라고 써 주세요.</small></p>
+    <div class="code-row"><input data-typed autocomplete="off" aria-label="확인 글자"></div>
+    <div class="confirm-acts"><button type="button" class="btn" data-act="close">아니요</button>
+    <button type="button" class="btn danger" data-act="typed-ok">지우기</button></div></div>`);
+}
+
 // ---------- 시작 ----------
 function start() {
   fitStage();
@@ -691,9 +775,24 @@ function start() {
       if (!S.arrowMode && S.selected != null) { S.selected = null; requestRender(); }
     },
   });
+  const ctx = {
+    store, esc, ICON, regions: mapData.regions,
+    me: () => S.me,
+    roster, groupName, texts, stages, tagCfg, chatCfg, toast,
+    saved: (msg) => (store.status().mode === 'ok' ? toast(msg) : toast(msg + ' 아직 서버에 못 보냈어요, 이 태블릿에만 있어요.', 4000)),
+    confirm: (text, onOk) => confirmBox(text, '네', onOk),
+    confirmTyped,
+    openMap: teacherMap,
+    exit: teacherExit,
+  };
+  tagView = createTagView($('#view-tag'), ctx);
+  chatView = createChatView($('#view-chat'), ctx);
+  teacher = createTeacher($('#teacher'), ctx);
   store.onChange(requestRender);
   store.start();
-  renderEnter();
+  let wasTeacher = false;
+  try { wasTeacher = sessionStorage.getItem('gb-teacher') === '1'; } catch (e) { /* 무시 */ }
+  if (wasTeacher) openTeacher(true); else renderEnter();
 }
 
 const sv = (d, w = 24, extra = '') => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" ${extra} aria-hidden="true">${d}</svg>`;
@@ -715,6 +814,12 @@ const ICON = {
   trash: sv('<path d="M5 7 H19 M9 7 V4 H15 V7 M7 7 L8 20 H16 L17 7"/>', 18),
   check: sv('<path d="M5 12 L10 17 L19 7"/>', 22),
   zoom: sv('<circle cx="11" cy="11" r="6.5"/><path d="M16 16 L20 20 M11 8 V14 M8 11 H14"/>', 18),
+  key: sv('<circle cx="8" cy="15" r="4"/><path d="M11 12 L20 3 M17 6 L20 9 M15 8 L17 10"/>', 22),
+  inbox: sv('<path d="M3 13 L6 5 H18 L21 13 V19 H3 Z"/><path d="M3 13 H8 L9 16 H15 L16 13 H21"/>', 22),
+  bulb: sv('<path d="M9 18 H15 M10 21 H14 M12 3 a6 6 0 0 0-3.5 10.9 V16 H15.5 V13.9 A6 6 0 0 0 12 3 Z"/>', 26),
+  send: sv('<path d="M4 12 L20 4 L14 20 L11 13 Z"/>', 22),
+  star: sv('<path d="M12 3 L14.6 9 L21 9.5 L16 13.6 L17.6 20 L12 16.5 L6.4 20 L8 13.6 L3 9.5 L9.4 9 Z"/>', 24),
+  bot: sv('<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4 V8 M9 13 V14 M15 13 V14"/>', 16),
   cloud: sv('<path d="M7 18 H17 a4 4 0 0 0 0-8 a6 6 0 0 0-11.5 1.5 A3.5 3.5 0 0 0 7 18 Z"/><path d="M4 4 L20 20"/>', 26),
 };
 
