@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=11';
-import { store } from './store.js?v=11';
-import { createMapView, shortName } from './map-view.js?v=11';
-import { shrinkPhoto } from './photo.js?v=11';
-import { esc, safeLink, josa, timeText } from './util.js?v=11';
-import { MAX_LEN } from './config.js?v=11';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=11';
-import { createTagView } from './tag-view.js?v=11';
-import { createChatView } from './chat-view.js?v=11';
-import { createTeacher, hashCode } from './teacher.js?v=11';
+import mapData from '../data/gyeongbuk-map.js?v=12';
+import { store } from './store.js?v=12';
+import { createMapView, shortName } from './map-view.js?v=12';
+import { shrinkPhoto } from './photo.js?v=12';
+import { esc, safeLink, josa, timeText } from './util.js?v=12';
+import { MAX_LEN } from './config.js?v=12';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=12';
+import { createTagView } from './tag-view.js?v=12';
+import { createChatView } from './chat-view.js?v=12';
+import { createTeacher, hashCode } from './teacher.js?v=12';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');

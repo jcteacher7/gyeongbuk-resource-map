@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=11';
-import { esc, timeText, josa } from './util.js?v=11';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=12';
+import { esc, timeText, josa } from './util.js?v=12';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -204,6 +204,7 @@ export function createTeacher(root, ctx) {
         <label>안내 문구<input class="t-in" data-chat="guide" value="${esc(ch.guide)}" maxlength="80"></label>
         ${ch.steps.map((s, i) => `<div class="t-grid2 wide"><label>${i + 1}단계 이름<input class="t-in" data-chat="steps.${i}.name" value="${esc(s.name)}" maxlength="12"></label>
           <label>${i + 1}단계 첫 질문<textarea class="t-in" rows="2" data-chat="steps.${i}.question" maxlength="200">${esc(s.question)}</textarea></label></div>`).join('')}
+        <label>미션 성공 뒤에 AI가 붙이는 말 <small>(칭찬 한 문장 뒤에 이 말이 붙고, 다음 단계 질문은 하지 않아요)</small><input class="t-in" data-chat="passText" value="${esc(ch.passText)}" maxlength="120"></label>
         <label>모둠 문장 틀 <small>([ ] 자리가 빈칸이 돼요. 빈칸 개수는 아이들이 쓰기 전에 정해 주세요)</small><input class="t-in" data-chat="template" value="${esc(ch.template)}" maxlength="120"></label>
         <button type="button" class="btn primary" data-save="chatcfg">챗봇 저장</button></section>
 

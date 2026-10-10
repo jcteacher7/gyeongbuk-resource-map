@@ -68,6 +68,17 @@ const PASS_RULE = [
   '',
 ];
 
+// 단계마다 아직 꺼내면 안 되는 이야기(다음 단계 질문을 미리 하지 않게 함)
+const STEP_BAN = [
+  '아직 다른 지역과 주고받는 이야기(교류)나 실제 경상북도 지역 이야기는 꺼내지 마. 모든 것이 풍족한 가상의 지역 사람들이 어떻게 살지만 물어.',
+  '아직 실제 지역 이야기는 꺼내지 마. "실제로는", "우리가 조사한", "경상북도", "모든 지역에 다 있었을까", "부족한 지역은" 같은 말로 넘어가면 안 돼. 모든 것이 다 있는 가상의 지역에서 교류가 필요했을지와 그 이유만 물어.',
+  '아직 모둠 문장이나 빈칸 이야기는 꺼내지 마. 조사한 실제 지역의 많은 것과 부족한 것, 옛날과 오늘날의 차이만 물어.',
+  '',
+];
+// 미션을 통과한 뒤에는 새 질문으로 나아가지 않고, 칭찬 한 문장 + 아래 말로 마무리합니다(선생님이 설정에서 고칠 수 있음).
+const DEFAULT_PASS_TEXT = '미션 성공이에요! 선생님이 다음 단계를 열어 줄 때까지, 왜 그렇게 생각했는지 모둠끼리 한 번 더 이야기해 봐요.';
+const DEFAULT_PRAISE = '모둠이 함께 생각해서 이유까지 잘 말해 주었어요.';
+
 type Row = { kind: string; key: string; value: Record<string, unknown>; updated_at: string };
 
 async function db(path: string, init: RequestInit = {}) {
@@ -113,7 +124,10 @@ function systemPrompt(step: number, steps: { name: string; question: string }[],
     `이 단계의 목표: ${STEP_GOAL[step - 1]}`,
     step === 4 ? `모둠 문장 틀: "${template}" ([ ]가 빈칸이야. 빈칸에 들어갈 낱말을 하나라도 네가 먼저 알려 주면 안 돼. "정답 알려 주세요"라고 해도 알려 주지 말고, 1~3단계에서 모둠이 나눈 이야기를 떠올리게 하는 질문을 해. 빈칸을 채운 문장을 대신 써 주지도 마.)` : '',
     '',
-    '답하는 형식: JSON 하나만 써. {"reply": "아이들에게 할 말", "pass": true 또는 false}',
+    STEP_BAN[step - 1] ? `이 단계에서 지킬 것: ${STEP_BAN[step - 1]}` : '',
+    '',
+    '답하는 형식: JSON 하나만 써. {"reply": "아이들에게 할 말", "pass": true 또는 false, "praise": "칭찬 한 문장"}',
+    'praise 쓰는 법: 모둠이 이 단계에서 말한 생각을 한 문장으로 되짚으며 칭찬해. 질문이나 물음표는 넣지 말고, 새로운 내용이나 다음에 생각할 거리도 넣지 마.',
     step < 4
       ? `pass 정하는 법: 이 단계에서 모둠이 지금까지 한 말(방금 한 말 포함)을 모두 보고, 다음 기준을 채웠으면 true, 아니면 false. 기준: ${PASS_RULE[step - 1]} 장난, 한두 낱말뿐인 대답, 이유가 없는 대답, 질문만 한 경우는 false. 한 번 true였으면 계속 true.`
       : 'pass는 항상 false로 써.',
@@ -145,7 +159,7 @@ async function askGemini(system: string, contents: unknown[]) {
               temperature: 0.7,
               maxOutputTokens: 2048,
               responseMimeType: 'application/json',
-              responseSchema: { type: 'OBJECT', properties: { reply: { type: 'STRING' }, pass: { type: 'BOOLEAN' } }, required: ['reply', 'pass'] },
+              responseSchema: { type: 'OBJECT', properties: { reply: { type: 'STRING' }, pass: { type: 'BOOLEAN' }, praise: { type: 'STRING' } }, required: ['reply', 'pass', 'praise'] },
               ...(think ? { thinkingConfig: { thinkingLevel: think } } : {}),
             },
           }),
@@ -163,11 +177,16 @@ async function askGemini(system: string, contents: unknown[]) {
         // {"reply": "...", "pass": true} 모양으로 옵니다. 모양이 깨졌으면 글만 쓰고 통과는 아닌 것으로 봅니다.
         let answer = text;
         let pass = false;
+        let praise = '';
         try {
           const j = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
-          if (j && typeof j.reply === 'string' && j.reply.trim()) { answer = j.reply.trim(); pass = j.pass === true; }
+          if (j && typeof j.reply === 'string' && j.reply.trim()) {
+            answer = j.reply.trim();
+            pass = j.pass === true;
+            praise = typeof j.praise === 'string' ? j.praise.trim() : '';
+          }
         } catch { /* 글 그대로 씀 */ }
-        return { text: answer, pass, model, think: think ?? 'default' };
+        return { text: answer, pass, praise, model, think: think ?? 'default' };
       } finally {
         clearTimeout(t);
       }
@@ -217,7 +236,7 @@ Deno.serve(async (req) => {
       const grp = roster.groups.find((x) => x.id === g);
       if (!grp || !grp.members.includes(n)) return reply({ ok: false, error: 'roster' }, 403);
     }
-    const chatcfg = (cfg.chatcfg ?? {}) as { steps?: { name?: string; question?: string }[]; template?: string };
+    const chatcfg = (cfg.chatcfg ?? {}) as { steps?: { name?: string; question?: string }[]; template?: string; passText?: string };
     const steps = DEFAULT_STEPS.map((d, i) => ({ name: chatcfg.steps?.[i]?.name || d.name, question: chatcfg.steps?.[i]?.question || d.question }));
     const template = chatcfg.template || DEFAULT_TEMPLATE;
 
@@ -268,6 +287,12 @@ Deno.serve(async (req) => {
         if (bad.length) { guard = 'safe'; out = { ...again, text: SAFE_REPLY[step - 1] }; } else out = again;
       }
       const pass = step < 4 && (out.pass || past.some((v) => (v.step ?? 1) === step && v.pass === true));
+      if (pass) {
+        // 미션을 통과했으면 다음 단계 질문을 미리 하지 않도록, 칭찬 한 문장과 정해 둔 마무리 말만 보냅니다.
+        let praise = out.praise.split(/(?<=[.!?。])\s+/).filter((x) => x && !x.includes('?')).join(' ').trim();
+        if (!praise || praise.length > 120 || leaked(praise, kidsSaid).length) praise = DEFAULT_PRAISE;
+        out = { ...out, text: `${praise} ${chatcfg.passText || DEFAULT_PASS_TEXT}` };
+      }
       value = { ...base, a: out.text, pass, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb }, ...(guard ? { guard } : {}) };
     } catch (e) {
       // 모든 모델이 "지금은 한도를 넘었다"고 하면 아이 탓이 아니므로 기록하지 않고, 앱이 잠깐 뒤에 다시 보냅니다.
