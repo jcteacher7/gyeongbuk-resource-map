@@ -4,8 +4,8 @@
 // - AI가 모둠의 대답이 단계 기준을 채웠다고 판정하면 "미션 성공!"이 뜹니다(넘어가는 것은 선생님이 정함).
 // - 대화는 모둠마다 하나로 쌓이고, 아이 말과 AI 답이 한 쌍으로 서버(중계 함수)에 저장됩니다.
 // - AI가 실패해도 아이가 쓴 말은 지워지지 않고 [다시 보내기]가 나옵니다.
-import { splitTemplate } from './defaults.js?v=26';
-import { josa, timeText, markBlanks } from './util.js?v=26';
+import { splitTemplate } from './defaults.js?v=28';
+import { josa, timeText, markBlanks } from './util.js?v=28';
 
 const BLANK_MAX = 20;
 
@@ -30,7 +30,7 @@ export function createChatView(el, ctx) {
     const cfg = ctx.chatCfg();
     const sig = JSON.stringify([cfg.guide, cfg.max, me().g, me().n]);
     if (sig === shellSig) return;
-    if (shellSig && el.contains(document.activeElement) && document.activeElement.tagName === 'INPUT') return;
+    if (shellSig && el.contains(document.activeElement) && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
     shellSig = sig;
     editSig = '';
     el.innerHTML = `<div class="chat-view">
@@ -42,7 +42,7 @@ export function createChatView(el, ctx) {
       <section class="cv-main">
         <div class="cv-thread" data-thread></div>
         <div class="cv-input">
-          <input data-chat maxlength="${cfg.max}" placeholder="AI에게 물어보거나 내 생각을 말해요" autocomplete="off">
+          <textarea data-chat rows="2" maxlength="${cfg.max}" placeholder="AI에게 물어보거나 내 생각을 말해요 (줄을 바꾸려면 엔터, 보내려면 [보내기])" autocomplete="off"></textarea>
           <button type="button" class="btn primary" data-send>${ICON.send}보내기</button>
         </div>
       </section>
@@ -223,8 +223,8 @@ export function createChatView(el, ctx) {
   });
   el.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
-    if (e.target.matches('[data-chat]')) { e.preventDefault(); send(); }
-    else if (e.target.matches('[data-blank]')) {
+    // 대화 입력칸에서는 엔터가 줄바꿈입니다(보내기는 [보내기] 단추로만).
+    if (e.target.matches('[data-blank]')) {
       e.preventDefault();
       const all = [...el.querySelectorAll('[data-blank]')];
       const next = all[all.indexOf(e.target) + 1];

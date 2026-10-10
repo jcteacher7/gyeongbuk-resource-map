@@ -181,3 +181,12 @@ input, textarea { caret-color: var(--coral-d); }
 .panel, .tv-main, .cv-thread, .cv-right, .t-body, .modal.side .sheet { scrollbar-width: thin; scrollbar-color: var(--teal-l) transparent; }
 
 @media (prefers-reduced-motion: reduce) { .why-badge { animation: none; } }
+
+/* 챗봇 입력칸: 엔터로 줄을 바꿀 수 있는 두 줄짜리 칸 */
+.cv-input { align-items: flex-end; }
+.cv-input textarea { flex: 1; min-width: 0; height: 76px; padding: 10px 16px; border: 3px solid var(--teal-l); border-radius: 16px; background: #fff; font-family: var(--body); font-size: 20px; line-height: 1.4; color: var(--ink); outline: none; resize: none; }
+.cv-input textarea:focus { border-color: var(--teal); }
+.cv-input textarea::placeholder { font-size: 17px; }
+.cv-input .btn { height: 56px; }
+.tb-item p { white-space: pre-wrap; }
+.cv-input textarea { scrollbar-width: thin; scrollbar-color: var(--teal-l) transparent; }
