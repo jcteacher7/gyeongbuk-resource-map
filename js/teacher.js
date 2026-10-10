@@ -1,10 +1,10 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=9';
-import { esc, timeText, josa } from './util.js?v=9';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=11';
+import { esc, timeText, josa } from './util.js?v=11';
 
-const TABS = [['status', '현황'], ['tag', 'TAG'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
+const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
 export async function hashCode(salt, code) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salt + ':' + code));
@@ -20,6 +20,8 @@ export function createTeacher(root, ctx) {
   let chatN = 'all';
   let big = false;
   let lastBody = '';
+  let boardStep = null; // null 이면 아이들이 있는 단계를 따라감
+  let boardAi = false;
 
   root.innerHTML = `
     <header class="top t-top">
@@ -116,6 +118,38 @@ export function createTeacher(root, ctx) {
         <div class="bub kid"><div class="bub-text">${esc(c.q)}</div></div>
         ${c.a ? `<div class="bub ai"><div class="bub-text">${esc(c.a)}</div></div>` : `<div class="bub ai fail"><div class="bub-text">AI가 답하지 못함${c.err ? ` <small>(${esc(c.err.slice(0, 120))})</small>` : ''}</div></div>`}
       </div>`).join('') : '<p class="hint big">아직 챗봇 대화가 없어요.</p>'}</div>`;
+  }
+
+  // ---------- 챗봇 한눈에: 모둠 4개의 대답을 단계별로 한 화면에(전자칠판용) ----------
+  function boardHtml() {
+    const r = ctx.roster();
+    const cfg = ctx.chatCfg();
+    const cls = ctx.classStep();
+    const view = boardStep || cls;
+    const chats = all('chat');
+    const passOf = (g, s) => (s === 4 ? !!(store.get('gen', 'g' + g) || {}).text : chats.some((c) => c.g === g && (c.step || 1) === s && c.pass));
+    return `<div class="t-board ${big ? 'big' : ''}">
+      <div class="tb-bar">
+        <div class="tb-steps">${cfg.steps.map((s, i) => `<button type="button" class="tb-step ${view === i + 1 ? 'on' : ''} ${cls === i + 1 ? 'cls' : ''}" data-bstep="${i + 1}"><span class="num">${i + 1}</span>${esc(s.name)}${cls === i + 1 ? '<small>아이들 지금 여기</small>' : ''}</button>`).join('')}</div>
+        <div class="tb-ctl">
+          <button type="button" class="btn small ghost ${cls <= 1 ? 'off' : ''}" data-cstep="-1">◀ 이전 단계로</button>
+          <button type="button" class="btn small primary ${cls >= 4 ? 'off' : ''}" data-cstep="1">다음 단계 열기 ▶</button>
+          <label class="chk"><input type="checkbox" data-bai ${boardAi ? 'checked' : ''}>AI 답도 보기</label>
+          ${big ? '' : `<button type="button" class="btn small" data-t="big">${ICON.zoom}크게 띄우기</button>`}
+        </div>
+      </div>
+      <p class="tb-q"><b>${view}단계 질문</b> ${esc(cfg.steps[view - 1].question)}</p>
+      <div class="tb-grid" style="grid-template-columns:repeat(${r.groups.length},1fr)">${r.groups.map((g) => {
+        const list = chats.filter((c) => c.g === g.id && (c.step || 1) === view);
+        const gen = view === 4 ? store.get('gen', 'g' + g.id) : null;
+        return `<div class="tb-col ${passOf(g.id, view) ? 'pass' : ''}">
+          <h3>${esc(g.name)}${passOf(g.id, view) ? `<span class="tb-pass">${ICON.star}미션 성공</span>` : ''}</h3>
+          ${view === 4 ? `<div class="tb-gen">${gen && gen.text ? esc(gen.text) : '<span class="hint">아직 문장을 저장하지 않았어요</span>'}</div>` : ''}
+          <div class="tb-list">${list.length ? list.map((c) => `<div class="tb-item"><p>${esc(c.q)}</p>
+            ${boardAi ? `<div class="tb-ai">${c.a ? esc(c.a) : 'AI가 답하지 못함'}</div>` : ''}
+            <small>${esc(c.n)} · ${timeText(c.at)}${c.pass ? ' · ★' : ''}</small></div>`).join('') : '<p class="hint">아직 대답이 없어요</p>'}</div>
+        </div>`;
+      }).join('')}</div></div>`;
   }
 
   // ---------- 모둠 문장 ----------
@@ -272,7 +306,7 @@ export function createTeacher(root, ctx) {
     const jobs = {
       map: async () => { const n = await store.wipePhotos(); await store.wipe(['res', 'arrow']); return `사진 ${n}장과 지도 기록을 지웠어요.`; },
       tag: async () => { await store.wipe(['tag']); return 'TAG를 지웠어요.'; },
-      chat: async () => { await store.wipe(['chat', 'cstep']); return '챗봇 기록을 지웠어요.'; },
+      chat: async () => { await store.wipe(['chat', 'cstep']); await store.wipe(['cfg'], 'chatstep'); return '챗봇 기록을 지우고 1단계로 돌렸어요.'; },
       gen: async () => { await store.wipe(['gen']); return '모둠 문장을 지웠어요.'; },
       roster: async () => { await store.wipe(['cfg'], 'roster'); return '명단을 지웠어요.'; },
     };
@@ -287,13 +321,14 @@ export function createTeacher(root, ctx) {
   function rebuild() { lastBody = ''; render(true); }
   function render(force) {
     header();
-    root.classList.toggle('big', big && tab === 'gen');
-    root.querySelector('[data-t="unbig"]').hidden = !(big && tab === 'gen');
+    const canBig = tab === 'gen' || tab === 'board';
+    root.classList.toggle('big', big && canBig);
+    root.querySelector('[data-t="unbig"]').hidden = !(big && canBig);
     if (tab === 'settings') {
       if (force || !body.querySelector('.t-settings')) { body.innerHTML = settingsHtml(); lastBody = ''; }
       return; // 설정 화면은 입력 중일 수 있어 다시 그리지 않음
     }
-    const html = { status: statusHtml, tag: tagHtml, chat: chatHtml, gen: genHtml, wipe: wipeHtml }[tab]();
+    const html = { status: statusHtml, tag: tagHtml, board: boardHtml, chat: chatHtml, gen: genHtml, wipe: wipeHtml }[tab]();
     if (html !== lastBody) {
       const y = body.scrollTop;
       body.innerHTML = html;
@@ -324,6 +359,17 @@ export function createTeacher(root, ctx) {
       else if (k === 'unbig') { big = false; rebuild(); }
       return;
     }
+    const bs = t.closest('[data-bstep]');
+    if (bs) { boardStep = +bs.dataset.bstep === ctx.classStep() ? null : +bs.dataset.bstep; render(); return; }
+    const cs = t.closest('[data-cstep]');
+    if (cs) {
+      if (cs.classList.contains('off')) return;
+      const next = ctx.classStep() + +cs.dataset.cstep;
+      store.put('cfg', 'chatstep', { step: next, at: Date.now() });
+      boardStep = null;
+      ctx.toast(`반 전체를 ${next}단계 "${ctx.chatCfg().steps[next - 1].name}"(으)로 보냈어요.`);
+      return;
+    }
     const f = t.closest('[data-tagf]');
     if (f) { tagFilter = f.dataset.tagf === 'all' ? 'all' : +f.dataset.tagf; render(); return; }
     const cg = t.closest('[data-chatg]');
@@ -348,6 +394,7 @@ export function createTeacher(root, ctx) {
   });
   root.addEventListener('change', (e) => {
     if (e.target.matches('[data-drafts]')) { showDrafts = e.target.checked; render(); }
+    if (e.target.matches('[data-bai]')) { boardAi = e.target.checked; render(); }
   });
 
   return {

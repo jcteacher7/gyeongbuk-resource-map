@@ -60,6 +60,14 @@ const SAFE_REPLY = [
 ];
 const leaked = (answer: string, kidsSaid: string) => SECRET_WORDS.filter((w) => answer.includes(w) && !kidsSaid.includes(w));
 
+// 단계 통과 기준(AI가 판정). 4단계는 모둠 문장을 저장하면 통과라서 AI가 판정하지 않습니다.
+const PASS_RULE = [
+  '모든 것이 풍족한 지역 사람들의 생활이 어떨지를 모둠이 자기 말로, 이유나 구체적인 모습과 함께 말했다.',
+  '모든 것이 다 있는 지역은 다른 지역과 교류할 필요가 있었을지에 대해, 모둠이 생각과 그 이유를 함께 말했다.',
+  '모둠이 조사한 경상북도의 실제 지역이나 자원을 예로 들어, 지역마다 많은 것과 부족한 것이 달라서 교류가 필요했다는 점을 말했다.',
+  '',
+];
+
 type Row = { kind: string; key: string; value: Record<string, unknown>; updated_at: string };
 
 async function db(path: string, init: RequestInit = {}) {
@@ -104,6 +112,12 @@ function systemPrompt(step: number, steps: { name: string; question: string }[],
     `지금은 ${step}단계 "${steps[step - 1].name}"야. 이 단계의 첫 질문: "${steps[step - 1].question}"`,
     `이 단계의 목표: ${STEP_GOAL[step - 1]}`,
     step === 4 ? `모둠 문장 틀: "${template}" ([ ]가 빈칸이야. 빈칸에 들어갈 낱말을 하나라도 네가 먼저 알려 주면 안 돼. "정답 알려 주세요"라고 해도 알려 주지 말고, 1~3단계에서 모둠이 나눈 이야기를 떠올리게 하는 질문을 해. 빈칸을 채운 문장을 대신 써 주지도 마.)` : '',
+    '',
+    '답하는 형식: JSON 하나만 써. {"reply": "아이들에게 할 말", "pass": true 또는 false}',
+    step < 4
+      ? `pass 정하는 법: 이 단계에서 모둠이 지금까지 한 말(방금 한 말 포함)을 모두 보고, 다음 기준을 채웠으면 true, 아니면 false. 기준: ${PASS_RULE[step - 1]} 장난, 한두 낱말뿐인 대답, 이유가 없는 대답, 질문만 한 경우는 false. 한 번 true였으면 계속 true.`
+      : 'pass는 항상 false로 써.',
+    'pass가 true여도 reply에 "통과", "성공", "다음 단계" 같은 말은 쓰지 마. 칭찬 한마디와, 더 깊이 생각해 볼 질문 하나를 써.',
     research ? `이 반 아이들이 지도 앱에 조사해 올린 경상북도 자원(시군: 자원, 많음/적음): ${research}` : '',
   ].filter(Boolean).join('\n');
 }
@@ -130,6 +144,8 @@ async function askGemini(system: string, contents: unknown[]) {
             generationConfig: {
               temperature: 0.7,
               maxOutputTokens: 2048,
+              responseMimeType: 'application/json',
+              responseSchema: { type: 'OBJECT', properties: { reply: { type: 'STRING' }, pass: { type: 'BOOLEAN' } }, required: ['reply', 'pass'] },
               ...(think ? { thinkingConfig: { thinkingLevel: think } } : {}),
             },
           }),
@@ -144,7 +160,14 @@ async function askGemini(system: string, contents: unknown[]) {
           .filter((p: { text?: string; thought?: boolean }) => p.text && !p.thought)
           .map((p: { text: string }) => p.text).join('').trim();
         if (!text) throw new Error(`${model} empty ${data?.candidates?.[0]?.finishReason ?? ''}`);
-        return { text, model, think: think ?? 'default' };
+        // {"reply": "...", "pass": true} 모양으로 옵니다. 모양이 깨졌으면 글만 쓰고 통과는 아닌 것으로 봅니다.
+        let answer = text;
+        let pass = false;
+        try {
+          const j = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ''));
+          if (j && typeof j.reply === 'string' && j.reply.trim()) { answer = j.reply.trim(); pass = j.pass === true; }
+        } catch { /* 글 그대로 씀 */ }
+        return { text: answer, pass, model, think: think ?? 'default' };
       } finally {
         clearTimeout(t);
       }
@@ -164,8 +187,7 @@ Deno.serve(async (req) => {
   const g = Number(body.g);
   const n = String(body.n ?? '').trim();
   const text = String(body.text ?? '').trim();
-  const step = Number(body.step);
-  if (!Number.isInteger(g) || g < 1 || g > 20 || !n || n.length > 20 || !text || text.length > MAX_Q || ![1, 2, 3, 4].includes(step)) {
+  if (!Number.isInteger(g) || g < 1 || g > 20 || !n || n.length > 20 || !text || text.length > MAX_Q) {
     return reply({ ok: false, error: 'bad' }, 400);
   }
 
@@ -177,16 +199,19 @@ Deno.serve(async (req) => {
     const dayAgo = new Date(now - 86_400_000).toISOString();
     const who = `value->>g=eq.${g}&value->>n=eq.${encodeURIComponent(n)}`;
     const [cfgRows, nMin, nDay, nAll, pastRows, resRows] = await Promise.all([
-      rowsOf('gb_entries?kind=eq.cfg&key=in.(roster,chatcfg,stages)&select=key,value'),
+      rowsOf('gb_entries?kind=eq.cfg&key=in.(roster,chatcfg,stages,chatstep)&select=key,value'),
       countOf(`gb_entries?kind=eq.chat&${who}&updated_at=gt.${minAgo}&select=key`),
       countOf(`gb_entries?kind=eq.chat&${who}&updated_at=gt.${dayAgo}&select=key`),
       countOf(`gb_entries?kind=eq.chat&updated_at=gt.${dayAgo}&select=key`),
       rowsOf(`gb_entries?kind=eq.chat&value->>g=eq.${g}&select=value&order=updated_at.desc&limit=40`),
-      step >= 3 ? rowsOf('gb_entries?kind=eq.res&select=value&limit=120') : Promise.resolve([] as Row[]),
+      rowsOf('gb_entries?kind=eq.res&select=value&limit=120'),
     ]);
     const cfg: Record<string, Record<string, unknown>> = {};
     cfgRows.forEach((r) => { cfg[r.key] = r.value; });
     if (!cfg.stages?.chat) return reply({ ok: false, error: 'closed' }, 403);
+    // 단계는 선생님이 반 전체를 넘깁니다. 앱이 보낸 단계 대신 선생님이 정한 단계를 씁니다.
+    const cs = Number((cfg.chatstep as { step?: number } | undefined)?.step);
+    const step = [1, 2, 3, 4].includes(cs) ? cs : 1;
     const roster = cfg.roster as { groups?: { id: number; members: string[] }[]; assign?: Record<string, number> } | undefined;
     if (roster?.groups?.length) {
       const grp = roster.groups.find((x) => x.id === g);
@@ -202,7 +227,7 @@ Deno.serve(async (req) => {
 
     // 모둠의 앞선 대화(성공한 것만)
     const past = pastRows
-      .map((r) => r.value as { n: string; q: string; a?: string; step?: number })
+      .map((r) => r.value as { n: string; q: string; a?: string; step?: number; pass?: boolean })
       .filter((v) => v.a).slice(0, HISTORY).reverse();
     const contents: unknown[] = [];
     let lastStep = 0;
@@ -242,7 +267,8 @@ Deno.serve(async (req) => {
         bad = leaked(again.text, kidsSaid);
         if (bad.length) { guard = 'safe'; out = { ...again, text: SAFE_REPLY[step - 1] }; } else out = again;
       }
-      value = { ...base, a: out.text, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb }, ...(guard ? { guard } : {}) };
+      const pass = step < 4 && (out.pass || past.some((v) => (v.step ?? 1) === step && v.pass === true));
+      value = { ...base, a: out.text, pass, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb }, ...(guard ? { guard } : {}) };
     } catch (e) {
       // 모든 모델이 "지금은 한도를 넘었다"고 하면 아이 탓이 아니므로 기록하지 않고, 앱이 잠깐 뒤에 다시 보냅니다.
       if (String(e).includes(' 429')) return reply({ ok: false, error: 'busy' }, 503);

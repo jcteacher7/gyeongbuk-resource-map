@@ -1,9 +1,11 @@
 // AI 챗봇 화면: 모둠이 함께 "만약에 ~라면?" 대화를 하고 모둠 일반화 문장을 완성합니다.
 // - 단계(대조 상황 → 반대 추론 → 실제 사례 비교 → 모둠 문장 완성)는 코드에 고정, 이름과 질문은 선생님이 고침.
+// - 단계는 선생님이 반 전체를 한꺼번에 넘깁니다(cfg/chatstep). 아이 화면에는 넘기는 단추가 없습니다.
+// - AI가 모둠의 대답이 단계 기준을 채웠다고 판정하면 "미션 성공!"이 뜹니다(넘어가는 것은 선생님이 정함).
 // - 대화는 모둠마다 하나로 쌓이고, 아이 말과 AI 답이 한 쌍으로 서버(중계 함수)에 저장됩니다.
 // - AI가 실패해도 아이가 쓴 말은 지워지지 않고 [다시 보내기]가 나옵니다.
-import { splitTemplate } from './defaults.js?v=9';
-import { josa, timeText } from './util.js?v=9';
+import { splitTemplate } from './defaults.js?v=11';
+import { josa, timeText } from './util.js?v=11';
 
 const BLANK_MAX = 20;
 
@@ -16,7 +18,11 @@ export function createChatView(el, ctx) {
 
   const me = () => ctx.me();
   const gkey = () => 'g' + me().g;
-  const stepNow = () => Math.min(4, Math.max(1, (store.get('cstep', gkey()) || {}).step || 1));
+  const stepNow = () => ctx.classStep();
+  // 단계 통과: 1~3단계는 AI 판정, 4단계는 모둠 문장을 저장했는지
+  const passed = (s) => (s === 4 ? !!(store.get('gen', gkey()) || {}).text : store.list('chat').some((c) => c.g === me().g && (c.step || 1) === s && c.pass));
+  let lastStep = 0;
+  let lastPassed = '';
   const rows = () => store.list('chat').filter((c) => c.g === me().g && c.a).sort((a, b) => (a.at || 0) - (b.at || 0));
   const draftKey = () => `gb-draft|${me().g}|${me().n}|gen`;
 
@@ -31,10 +37,7 @@ export function createChatView(el, ctx) {
       <aside class="cv-left">
         <div class="cv-guide">${ICON.bulb}<span>${esc(cfg.guide)}</span></div>
         <ol class="cv-steps" data-steps></ol>
-        <div class="cv-stepbtns">
-          <button type="button" class="btn small ghost" data-step="prev">이전 단계</button>
-          <button type="button" class="btn small primary" data-step="next">다음 단계로</button>
-        </div>
+        <div class="cv-mission" data-mission></div>
       </aside>
       <section class="cv-main">
         <div class="cv-thread" data-thread></div>
@@ -54,11 +57,21 @@ export function createChatView(el, ctx) {
   function steps() {
     const cfg = ctx.chatCfg();
     const now = stepNow();
-    const html = cfg.steps.map((s, i) => `<li class="${i + 1 === now ? 'on' : i + 1 < now ? 'done' : ''}"><span class="num">${i + 1}</span>${esc(s.name)}</li>`).join('');
+    const html = cfg.steps.map((s, i) => `<li class="${i + 1 === now ? 'on' : i + 1 < now ? 'done' : 'todo'}"><span class="num">${i + 1}</span><span class="sname">${esc(s.name)}</span>${passed(i + 1) ? `<span class="pass">${ICON.star}</span>` : i + 1 > now ? ICON.lock : ''}</li>`).join('');
     const node = el.querySelector('[data-steps]');
     if (node.innerHTML !== html) node.innerHTML = html;
-    el.querySelector('[data-step="prev"]').classList.toggle('off', now <= 1);
-    el.querySelector('[data-step="next"]').classList.toggle('off', now >= 4);
+    const ok = passed(now);
+    const mHtml = ok
+      ? `<div class="mission ok">${ICON.star}<b>${now}단계 미션 성공!</b><span>${now < 4 ? '선생님이 다음 단계를 열어 줄 거예요. 다른 모둠의 생각도 함께 봐요.' : '모둠 문장을 완성했어요.'}</span></div>`
+      : `<div class="mission">${ICON.flag}<b>${now}단계 미션</b><span>${now < 4 ? '모둠이 함께 고민해서 이유까지 말해 봐요.' : '빈칸을 채워 모둠 문장을 저장해요.'}</span></div>`;
+    const m = el.querySelector('[data-mission]');
+    if (m.innerHTML !== mHtml) m.innerHTML = mHtml;
+    // 선생님이 단계를 넘겼거나 방금 미션을 통과했으면 알려 줍니다.
+    if (lastStep && lastStep !== now) { ctx.toast(now > lastStep ? `선생님이 ${now}단계를 열었어요! "${cfg.steps[now - 1].name}"` : `${now}단계로 돌아왔어요.`, 3000); const th = el.querySelector('[data-thread]'); if (th) delete th.dataset.seen; }
+    const pk = me().g + ':' + [1, 2, 3, 4].filter(passed).join('');
+    if (lastPassed && pk !== lastPassed && ok && lastStep === now) ctx.toast(`${now}단계 미션 성공!`, 2600);
+    lastStep = now;
+    lastPassed = pk;
   }
 
   function bubble(who, text, extra = '') {
@@ -201,14 +214,6 @@ export function createChatView(el, ctx) {
       inp.focus();
       return;
     }
-    const s = e.target.closest('[data-step]');
-    if (s) {
-      if (s.classList.contains('off')) return;
-      const next = stepNow() + (s.dataset.step === 'next' ? 1 : -1);
-      store.put('cstep', gkey(), { step: next, by: { g: me().g, n: me().n }, at: Date.now() });
-      ctx.toast(`${next}단계 "${ctx.chatCfg().steps[next - 1].name}"(으)로 왔어요.`);
-      return;
-    }
     if (e.target.closest('[data-gen]')) saveSentence();
   });
   el.addEventListener('input', (e) => {
@@ -235,7 +240,7 @@ export function createChatView(el, ctx) {
       thread();
       sentence();
     },
-    reset() { shellSig = ''; editSig = ''; pend.length = 0; },
+    reset() { shellSig = ''; editSig = ''; pend.length = 0; lastStep = 0; lastPassed = ''; },
     unmount() { shellSig = ''; editSig = ''; },
   };
 }

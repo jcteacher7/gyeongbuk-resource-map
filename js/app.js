@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=9';
-import { store } from './store.js?v=9';
-import { createMapView, shortName } from './map-view.js?v=9';
-import { shrinkPhoto } from './photo.js?v=9';
-import { esc, safeLink, josa, timeText } from './util.js?v=9';
-import { MAX_LEN } from './config.js?v=9';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=9';
-import { createTagView } from './tag-view.js?v=9';
-import { createChatView } from './chat-view.js?v=9';
-import { createTeacher, hashCode } from './teacher.js?v=9';
+import mapData from '../data/gyeongbuk-map.js?v=11';
+import { store } from './store.js?v=11';
+import { createMapView, shortName } from './map-view.js?v=11';
+import { shrinkPhoto } from './photo.js?v=11';
+import { esc, safeLink, josa, timeText } from './util.js?v=11';
+import { MAX_LEN } from './config.js?v=11';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=11';
+import { createTagView } from './tag-view.js?v=11';
+import { createChatView } from './chat-view.js?v=11';
+import { createTeacher, hashCode } from './teacher.js?v=11';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -779,6 +779,7 @@ function start() {
     store, esc, ICON, regions: mapData.regions,
     me: () => S.me,
     roster, groupName, texts, stages, tagCfg, chatCfg, toast,
+    classStep: () => Math.min(4, Math.max(1, (store.get('cfg', 'chatstep') || {}).step || 1)),
     saved: (msg) => (store.status().mode === 'ok' ? toast(msg) : toast(msg + ' 아직 서버에 못 보냈어요, 이 태블릿에만 있어요.', 4000)),
     confirm: (text, onOk) => confirmBox(text, '네', onOk),
     confirmTyped,
@@ -820,6 +821,7 @@ const ICON = {
   send: sv('<path d="M4 12 L20 4 L14 20 L11 13 Z"/>', 22),
   star: sv('<path d="M12 3 L14.6 9 L21 9.5 L16 13.6 L17.6 20 L12 16.5 L6.4 20 L8 13.6 L3 9.5 L9.4 9 Z"/>', 24),
   bot: sv('<rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4 V8 M9 13 V14 M15 13 V14"/>', 16),
+  flag: sv('<path d="M6 21 V4 M6 5 H18 L15 9 L18 13 H6"/>', 24),
   cloud: sv('<path d="M7 18 H17 a4 4 0 0 0 0-8 a6 6 0 0 0-11.5 1.5 A3.5 3.5 0 0 0 7 18 Z"/><path d="M4 4 L20 20"/>', 26),
 };
 
