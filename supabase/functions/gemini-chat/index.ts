@@ -9,7 +9,8 @@
 //
 // 비밀 값(Supabase → Edge Functions → Secrets):
 //   GEMINI_API_KEY  (필수) 수업 전용 제미나이 키
-//   GEMINI_MODEL    (선택) 쓸 모델 이름. 없으면 아래 MODELS 순서대로 시도합니다.
+//   GEMINI_MODEL    (선택) 먼저 쓸 모델 이름. 없으면 아래 MODELS 순서대로 시도합니다.
+//   GEMINI_THINKING (선택) 생각하는 정도(minimal, low 등). 없으면 가장 짧게.
 
 const MAX_Q = 200; // 한 번에 보낼 수 있는 글자 수
 const PER_MIN = 6; // 한 사람이 1분에 보낼 수 있는 횟수
@@ -22,7 +23,8 @@ const SB_URL = Deno.env.get('SUPABASE_URL') ?? '';
 // 표는 공개 키로 읽고 쓸 수 있게 되어 있으므로, 앱이 보낸 공개 키(apikey)를 그대로 씁니다.
 // (프로젝트마다 서버 쪽 키 이름과 모양이 달라 생기는 문제를 피하려는 것입니다.)
 let SB_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-const MODELS: string[] = [...new Set([Deno.env.get('GEMINI_MODEL') ?? '', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite'])]
+// 무료 등급으로 쓰기 때문에 가벼운 모델(flash-lite)을 먼저 씁니다. 한도를 넘거나 없으면 다음 모델로 넘어갑니다.
+const MODELS: string[] = [...new Set([Deno.env.get('GEMINI_MODEL') ?? '', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-3.6-flash'])]
   .filter((m) => m !== '');
 
 const CORS = {
