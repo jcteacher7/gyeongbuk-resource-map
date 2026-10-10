@@ -93,32 +93,44 @@ function systemPrompt(step: number, steps: { name: string; question: string }[],
   ].filter(Boolean).join('\n');
 }
 
+// 아이들이 오래 기다리지 않도록 "생각하는 시간"을 가장 짧게 둡니다.
+// 모델이 그 설정을 모르면(400) 한 단계씩 풀어서 다시 묻고, 모델이 없으면(404) 다음 모델로 넘어갑니다.
+const THINK: (string | null)[] = [...new Set([Deno.env.get('GEMINI_THINKING') ?? 'minimal', 'low'])].filter((x) => x !== '');
+THINK.push(null);
+
 async function askGemini(system: string, contents: unknown[]) {
   let lastErr = '';
   for (const model of MODELS) {
-    const ctl = new AbortController();
-    const t = setTimeout(() => ctl.abort(), 25000);
-    try {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        method: 'POST',
-        signal: ctl.signal,
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: system }] },
-          contents,
-          generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
-        }),
-      });
-      if (r.status === 404 || r.status === 400) { lastErr = `${model} ${r.status} ${(await r.text()).slice(0, 200)}`; continue; }
-      if (!r.ok) throw new Error(`${model} ${r.status} ${(await r.text()).slice(0, 200)}`);
-      const data = await r.json();
-      const text = (data?.candidates?.[0]?.content?.parts ?? [])
-        .filter((p: { text?: string; thought?: boolean }) => p.text && !p.thought)
-        .map((p: { text: string }) => p.text).join('').trim();
-      if (!text) throw new Error(`${model} empty ${data?.candidates?.[0]?.finishReason ?? ''}`);
-      return { text, model };
-    } finally {
-      clearTimeout(t);
+    for (const think of THINK) {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 25000);
+      try {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: 'POST',
+          signal: ctl.signal,
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: system }] },
+            contents,
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2048,
+              ...(think ? { thinkingConfig: { thinkingLevel: think } } : {}),
+            },
+          }),
+        });
+        if (r.status === 400) { lastErr = `${model}/${think} 400 ${(await r.text()).slice(0, 200)}`; continue; }
+        if (r.status === 404) { lastErr = `${model} 404`; break; }
+        if (!r.ok) throw new Error(`${model} ${r.status} ${(await r.text()).slice(0, 200)}`);
+        const data = await r.json();
+        const text = (data?.candidates?.[0]?.content?.parts ?? [])
+          .filter((p: { text?: string; thought?: boolean }) => p.text && !p.thought)
+          .map((p: { text: string }) => p.text).join('').trim();
+        if (!text) throw new Error(`${model} empty ${data?.candidates?.[0]?.finishReason ?? ''}`);
+        return { text, model, think: think ?? 'default' };
+      } finally {
+        clearTimeout(t);
+      }
     }
   }
   throw new Error(lastErr || 'no model');
@@ -141,8 +153,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // 선생님 설정 읽기
-    const cfgRows = await rowsOf('gb_entries?kind=eq.cfg&key=in.(roster,chatcfg,stages)&select=key,value');
+    // 설정, 보낸 횟수, 앞선 대화, 조사한 자원을 한꺼번에 읽습니다(기다리는 시간을 줄이려고).
+    const t0 = Date.now();
+    const now = t0;
+    const minAgo = new Date(now - 60_000).toISOString();
+    const dayAgo = new Date(now - 86_400_000).toISOString();
+    const who = `value->>g=eq.${g}&value->>n=eq.${encodeURIComponent(n)}`;
+    const [cfgRows, nMin, nDay, nAll, pastRows, resRows] = await Promise.all([
+      rowsOf('gb_entries?kind=eq.cfg&key=in.(roster,chatcfg,stages)&select=key,value'),
+      countOf(`gb_entries?kind=eq.chat&${who}&updated_at=gt.${minAgo}&select=key`),
+      countOf(`gb_entries?kind=eq.chat&${who}&updated_at=gt.${dayAgo}&select=key`),
+      countOf(`gb_entries?kind=eq.chat&updated_at=gt.${dayAgo}&select=key`),
+      rowsOf(`gb_entries?kind=eq.chat&value->>g=eq.${g}&select=value&order=updated_at.desc&limit=40`),
+      step >= 3 ? rowsOf('gb_entries?kind=eq.res&select=value&limit=120') : Promise.resolve([] as Row[]),
+    ]);
     const cfg: Record<string, Record<string, unknown>> = {};
     cfgRows.forEach((r) => { cfg[r.key] = r.value; });
     if (!cfg.stages?.chat) return reply({ ok: false, error: 'closed' }, 403);
@@ -156,16 +180,11 @@ Deno.serve(async (req) => {
     const template = chatcfg.template || DEFAULT_TEMPLATE;
 
     // 보내는 횟수 제한
-    const now = Date.now();
-    const minAgo = new Date(now - 60_000).toISOString();
-    const dayAgo = new Date(now - 86_400_000).toISOString();
-    const who = `value->>g=eq.${g}&value->>n=eq.${encodeURIComponent(n)}`;
-    if (await countOf(`gb_entries?kind=eq.chat&${who}&updated_at=gt.${minAgo}&select=key`) >= PER_MIN) return reply({ ok: false, error: 'rate' }, 429);
-    if (await countOf(`gb_entries?kind=eq.chat&${who}&updated_at=gt.${dayAgo}&select=key`) >= PER_DAY_NAME) return reply({ ok: false, error: 'limit' }, 429);
-    if (await countOf(`gb_entries?kind=eq.chat&updated_at=gt.${dayAgo}&select=key`) >= PER_DAY_ALL) return reply({ ok: false, error: 'limit' }, 429);
+    if (nMin >= PER_MIN) return reply({ ok: false, error: 'rate' }, 429);
+    if (nDay >= PER_DAY_NAME || nAll >= PER_DAY_ALL) return reply({ ok: false, error: 'limit' }, 429);
 
     // 모둠의 앞선 대화(성공한 것만)
-    const past = (await rowsOf(`gb_entries?kind=eq.chat&value->>g=eq.${g}&select=value&order=updated_at.desc&limit=40`))
+    const past = pastRows
       .map((r) => r.value as { n: string; q: string; a?: string; step?: number })
       .filter((v) => v.a).slice(0, HISTORY).reverse();
     const contents: unknown[] = [];
@@ -183,18 +202,19 @@ Deno.serve(async (req) => {
     let research = '';
     if (step >= 3) {
       const NAMES: Record<string, string> = { '37010': '포항', '37020': '경주', '37030': '김천', '37040': '안동', '37050': '구미', '37060': '영주', '37070': '영천', '37080': '상주', '37090': '문경', '37100': '경산', '37320': '의성', '37330': '청송', '37340': '영양', '37350': '영덕', '37360': '청도', '37370': '고령', '37380': '성주', '37390': '칠곡', '37400': '예천', '37410': '봉화', '37420': '울진', '37430': '울릉' };
-      const res = (await rowsOf('gb_entries?kind=eq.res&select=value&limit=120'))
+      const res = resRows
         .map((r) => r.value as { cid: number; name: string; amt: string; deleted?: boolean })
         .filter((v) => !v.deleted);
       research = res.slice(0, 60).map((v) => `${NAMES[String(v.cid)] ?? v.cid}: ${v.name}(${v.amt === 'few' ? '적음' : '많음'})`).join(', ');
     }
 
+    const tDb = Date.now() - t0;
     const key = 'c' + now.toString(36) + Math.random().toString(36).slice(2, 6);
     const base = { g, n, step, q: text, at: now };
     let value: Record<string, unknown>;
     try {
       const out = await askGemini(systemPrompt(step, steps, template, research), contents);
-      value = { ...base, a: out.text, model: out.model };
+      value = { ...base, a: out.text, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb } };
     } catch (e) {
       // 실패해도 아이가 보낸 말은 기록에 남깁니다(선생님 화면에서 볼 수 있음).
       await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value: { ...base, a: null, err: String(e).slice(0, 300) } }]) });
