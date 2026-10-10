@@ -55,7 +55,7 @@
   .chip.many { border-color: #C93A27; color: #C93A27; background: #FFF0EC; }
   .chip.few { border-color: #2F63B0; color: #2F63B0; background: #EDF3FD; }
   /* 가운데에 달라진 우리 지역, 양옆과 아래에 함께 달라지는 세 지역 */
-  .web { display: grid; grid-template-columns: 186px 20px 1fr 20px 186px; grid-template-rows: auto 26px auto; align-items: center; }
+  .web { display: grid; grid-template-columns: 166px 16px 1fr 16px 166px; grid-template-rows: auto 26px auto; align-items: center; }
   .node { background: #fff; border: 3px solid var(--teal); border-radius: 18px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
   .node h3 { margin: 0; font-size: 23px; line-height: 1.1; color: var(--teal); }
   .node p { margin: 0; font-size: 19px; line-height: 1.22; }
@@ -156,6 +156,32 @@
   .num5 .plus, .key .plus { white-space: nowrap; }
   .swap { white-space: nowrap; }
   .tk { white-space: nowrap; }
+  /* 달라진 우리 지역: 무엇이 달라지는지 세 가지로 나누어 자세히 */
+  .chg { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+  .chg li { display: grid; grid-template-columns: max-content 1fr; column-gap: 7px; align-items: start; font-size: 19px; line-height: 1.22; text-align: left; }
+  .chg b { padding: 0 7px; border-radius: 8px; background: var(--coral-d); color: #fff; font-size: 16px; line-height: 1.5; white-space: nowrap; }
+  .chg span { text-wrap: pretty; }
+  .chg.fill b { background: #D9A79F; }
+  .hub .pic { height: 140px; }
+  /* ---------- 미래 틀 안의 배치: 위에 두 지역, 가운데에 넓게 달라진 우리 지역, 아래에 한 지역 ---------- */
+  .web { grid-template-columns: 1fr 1fr; column-gap: 14px; grid-template-rows: auto 22px auto 22px auto; align-items: stretch; }
+  .node:not(.hub) { display: grid; grid-template-columns: 112px 1fr; column-gap: 8px; row-gap: 5px; align-content: start; }
+  .node:not(.hub) h3, .node:not(.hub) .swap { grid-column: 1 / 3; justify-self: start; }
+  .node:not(.hub) .pic { grid-column: 1; grid-row: 3 / 5; height: 100%; min-height: 92px; }
+  .node:not(.hub) p, .node:not(.hub) .plus { grid-column: 2; }
+  .a { grid-column: 1; grid-row: 1; }
+  .b { grid-column: 2; grid-row: 1; }
+  .c { grid-column: 1 / 3; grid-row: 5; justify-self: center; width: 330px; }
+  .hub { grid-column: 1 / 3; grid-row: 3; display: grid; grid-template-columns: 236px 1fr; column-gap: 14px; row-gap: 6px; align-items: center; }
+  .hub h3 { grid-column: 1 / 3; }
+  .hub .pic { height: 150px; }
+  .chg { gap: 8px; }
+  .chg li { font-size: 21px; line-height: 1.25; }
+  .chg b { font-size: 17px; }
+  .lk { width: 0; height: 100%; border-top: 0; border-left: 6px dotted var(--coral-d); justify-self: center; align-self: stretch; }
+  .lk.l { grid-column: 1; grid-row: 2; }
+  .lk.r { grid-column: 2; grid-row: 2; }
+  .lk.v { grid-column: 1 / 3; grid-row: 4; }
   @media print {
     body { background: #fff; }
     body { padding: 8mm; }
@@ -230,7 +256,11 @@
         <div class="node hub">
           <h3><span class="cn">4</span>달라진 문경</h3>
           <div class="pic">교류 후 문경 그림<small>AI와 함께 상상해서 그린 그림</small></div>
-          <p>밥상에 먹을 것이 많아지고, 문경에 놀러 오는 사람이 늘어요.</p>
+          <ul class="chg">
+            <li><b>먹는 것</b><span>산골 밥상에 대게와 곶감이 올라와요.</span></li>
+            <li><b>하는 일</b><span>오미자 농사를 짓고 찻사발을 빚는 사람이 늘어요.</span></li>
+            <li><b>마을 모습</b><span>축제와 배움 여행으로 찾아오는 사람이 많아져요.</span></li>
+          </ul>
         </div>
       </div>
         </div>
@@ -249,7 +279,7 @@
       <li><span class="cn">1</span><span><b>제목과 탐구 질문</b><br>모둠 이름, 친구들 이름도 써요.</span></li>
       <li><span class="cn">2</span><span><b>과거 ↓ 현재 ↓ 미래</b><br>위에서 아래로 시간이 흘러요. 현재 칸에 <span style="color:#C93A27">많은 것은 빨강</span>, <span style="color:#2F63B0">부족한 것은 파랑</span>.</span></li>
       <li><span class="cn">3</span><span><b>미래: 함께 달라지는 지역 세 곳</b><br>주고받는 것 · 그림 · 한 문장 · <span class="plus" style="font-family:'Gaegu';font-weight:700">만드는 것</span></span></li>
-      <li><span class="cn">4</span><span><b>미래: 달라진 우리 지역</b><br>가장 크게! 그림과 한 문장.</span></li>
+      <li><span class="cn">4</span><span><b>미래: 달라진 우리 지역</b><br>가장 크게! 그림과 <b style="font-family:inherit;font-size:inherit">달라지는 것 세 가지</b> <small>(먹는 것 · 하는 일 · 마을 모습)</small></span></li>
       <li><span class="cn">5</span><span><b>우리 지역의 답</b><br>서로 채워요 · 함께 만들어요 · 살아가는 방식이 달라져요</span></li>
     </ol>
     <div class="remember"><b>꼭 기억해요</b><br>· 예시를 베끼지 말고 <b>우리가 조사한 것</b>으로 써요.<br>· 지역과 지역을 <b>선이나 길로 이어요.</b><br>· 글씨는 <b>세 걸음 떨어져도 읽히게</b> 크게, 짧게 써요.</div>
@@ -265,7 +295,7 @@
     <li><b>연습 종이에 적기</b>
       <ul><li><b>과거</b> 한 줄, <b>현재</b> 많은 것과 부족한 것</li>
       <li><b>미래</b> 세 지역마다: 주고받는 것, 함께 만드는 것, 어떻게 달라지는지</li>
-      <li><b>미래</b> 우리 지역은 어떻게 달라질까요? 한 문장</li></ul></li>
+      <li><b>미래</b> 우리 지역은 어떻게 달라질까요? 먹는 것, 하는 일, 마을 모습으로 나누어 써요.</li></ul></li>
     <li><b>그림 네 장 만들기</b>
       <ul><li>우리 지역 한 장, 세 지역 한 장씩. 모두 <b>교류한 뒤</b>의 모습이에요.</li></ul>
       <div class="say">AI에게 이렇게 부탁해요.<br>( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 ) ( 어떻게 하고 있는 ) 모습</div></li>
@@ -339,7 +369,11 @@
         <div class="node hub">
           <h3>달라진 <span class="fill">우리 지역</span></h3>
           <div class="pic">교류 후 우리 지역 그림<small>AI와 함께 상상해서 그린 그림</small></div>
-          <p class="fill">어떻게 달라지나요? (한 문장)</p>
+          <ul class="chg fill">
+            <li><b>먹는 것</b><span>어떻게 달라지나요?</span></li>
+            <li><b>하는 일</b><span>어떻게 달라지나요?</span></li>
+            <li><b>마을 모습</b><span>어떻게 달라지나요?</span></li>
+          </ul>
         </div>
       </div>
         </div>
