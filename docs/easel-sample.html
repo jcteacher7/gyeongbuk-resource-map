@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>교류 제안서 이젤패드 배치 견본</title>
+<title>교류 제안서 이젤패드 만들기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
@@ -65,6 +65,27 @@
   .blank .fill { color: #B7C7CC; }
   .blank .plus { color: #B79B4A; }
 
+  .cn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-right: 6px; border-radius: 50%; background: var(--ink); color: #fff; font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 17px; vertical-align: 3px; flex: none; }
+  /* 학생용 안내 */
+  .kid { max-width: 1500px; }
+  .kid h2 { font-family: 'Gaegu', sans-serif; font-size: 32px; margin: 30px 0 8px; color: var(--coral-d); }
+  .kid h2 .cn { background: var(--coral-d); width: 34px; height: 34px; font-size: 20px; vertical-align: 4px; }
+  .kid p { margin: 0 0 10px; font-size: 18px; line-height: 1.6; max-width: 980px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 6px 0 4px; }
+  .card { background: #fff; border: 3px solid var(--teal-l); border-radius: 16px; padding: 12px 14px; font-size: 17px; line-height: 1.55; }
+  .card b.t { display: block; font-family: 'Gaegu', sans-serif; font-size: 24px; margin-bottom: 2px; }
+  .card small { color: var(--mute); font-size: 15px; }
+  .card em { font-style: normal; color: var(--coral-d); }
+  .steps { counter-reset: st; display: grid; gap: 10px; margin: 6px 0; padding: 0; list-style: none; max-width: 980px; }
+  .steps li { counter-increment: st; position: relative; background: #fff; border: 3px solid var(--teal-l); border-radius: 16px; padding: 10px 14px 10px 58px; font-size: 18px; line-height: 1.55; }
+  .steps li::before { content: counter(st); position: absolute; left: 12px; top: 10px; width: 34px; height: 34px; border-radius: 50%; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Gaegu', sans-serif; font-weight: 700; font-size: 22px; }
+  .steps b { font-family: 'Gaegu', sans-serif; font-size: 23px; }
+  .say { background: #FFF6D6; border: 3px dashed #E0B84A; border-radius: 14px; padding: 8px 12px; margin-top: 6px; font-size: 17px; }
+  .check { display: grid; gap: 6px; margin: 6px 0; padding: 0; list-style: none; max-width: 980px; font-size: 18px; line-height: 1.5; }
+  .check li { padding-left: 38px; position: relative; }
+  .check li::before { content: ""; position: absolute; left: 4px; top: 2px; width: 22px; height: 22px; border: 3px solid var(--teal); border-radius: 6px; background: #fff; }
+  details.teacher { margin-top: 34px; max-width: 980px; background: #fff; border: 2px solid var(--teal-l); border-radius: 14px; padding: 10px 16px; font-size: 15.5px; line-height: 1.65; color: var(--mute); }
+  details.teacher summary { cursor: pointer; font-family: 'Gaegu', sans-serif; font-weight: 700; font-size: 22px; color: var(--ink); }
   .notes { max-width: 450px; font-size: 16px; line-height: 1.65; }
   .notes h2 { font-family: 'Gaegu', sans-serif; font-size: 26px; margin: 0 0 6px; color: var(--coral-d); }
   .notes h2:not(:first-child) { margin-top: 20px; }
@@ -89,30 +110,47 @@
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 14px; font-size: 14.5px; color: var(--mute); }
   .legend i { display: inline-block; width: 16px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 2px solid; }
   @media print {
-    body { background: #fff; padding: 0; }
-    .lead, .notes, h1 { display: none; }
-    .ideas { break-before: page; padding: 8mm; }
+    body { background: #fff; }
+    body { padding: 8mm; }
+    details.teacher { display: none; }
     .wrap { display: block; }
-    figure { break-after: page; padding: 8mm; }
+    figure { break-inside: avoid; break-after: page; }
+    .ideas { break-before: page; }
+    .steps li, .card { break-inside: avoid; }
     .pad { box-shadow: none; zoom: .92; }
   }
 </style>
 </head>
 <body>
-<h1>교류 제안서 이젤패드 배치 견본</h1>
-<p class="lead">이젤패드의 주인공은 <b>"교류하면 생활 모습이 어떻게, 왜 달라지는가"</b>입니다. 자원 지도와 화살표는 앱(교류 제안서 화면)을 띄운 태블릿으로 보여 주고, 종이에는 핵심만 적습니다. 가운데에 <b>달라진 우리 지역</b>, 둘레에 <b>함께 달라지는 세 지역</b>을 놓았습니다. 왼쪽은 예시 지역 문경시로 채운 견본, 오른쪽은 빈 틀입니다.</p>
+<h1>교류 제안서 이젤패드 만들기</h1>
+<p class="lead" style="font-size:18px;color:var(--ink)">우리 지역이 다른 지역과 교류하면 <b>사람들의 생활이 어떻게 달라지는지</b> 큰 종이 한 장에 보여 줘요. 이 안내를 차례대로 따라 하면 만들 수 있어요.</p>
+
+<section class="kid">
+  <h2><span class="cn">1</span>종이에 넣는 것 다섯 가지</h2>
+  <p>아래 "다 만든 모습"에 붙은 번호와 같아요.</p>
+  <div class="cards">
+    <div class="card"><b class="t"><span class="cn">1</span>제목</b>"○○ 교류 제안서"와 모둠 이름을 크게 써요.</div>
+    <div class="card"><b class="t"><span class="cn">2</span>많은 것 · 부족한 것</b>우리 지역에 <em>많은 것은 빨강</em>, <span style="color:#2F63B0">부족한 것은 파랑</span>으로 낱말만 써요.</div>
+    <div class="card"><b class="t"><span class="cn">3</span>함께 달라지는 지역 (세 곳)</b>지역마다 네 가지를 넣어요.<br>· 주고받는 것 <small>예: 오미자 ⇄ 대게</small><br>· 교류한 뒤의 그림 한 장<br>· 어떻게 달라지는지 한 문장<br>· <span class="plus" style="font-family:'Gaegu';font-weight:700">함께 만드는 것</span></div>
+    <div class="card"><b class="t"><span class="cn">4</span>달라진 우리 지역</b>가장 크게! 교류한 뒤의 그림 한 장과, 어떻게 달라지는지 한 문장을 써요.</div>
+    <div class="card"><b class="t"><span class="cn">5</span>우리의 주장</b>"우리는 ○○와 교류해야 합니다. 왜냐하면"을 쓰고 세 줄로 까닭을 써요.<br>· 서로 채워요<br>· 함께 만들어요<br>· 그래서 달라져요</div>
+  </div>
+
+  <h2><span class="cn">2</span>다 만든 모습을 먼저 봐요</h2>
+  <p>왼쪽은 예시 지역인 문경시로 만든 것이고, 오른쪽은 무엇을 쓸지 물음이 적힌 빈 틀이에요. 예시를 그대로 베끼지 말고, <b>우리 모둠이 조사한 지역과 자원</b>으로 써요.</p>
+</section>
 
 <div class="wrap">
   <figure>
-    <figcaption>견본 (예시 지역: 문경시)</figcaption>
+    <figcaption>다 만든 모습 (문경시로 만든 예시)</figcaption>
     <div class="pad">
-      <div class="title"><b>문경시 교류 제안서</b><span>○모둠</span></div>
-      <div class="intro"><b>우리 문경은</b>
+      <div class="title"><b><span class="cn">1</span>문경시 교류 제안서</b><span>○모둠</span></div>
+      <div class="intro"><b><span class="cn">2</span>우리 문경은</b>
         <div class="chip many"><small>많은 것</small>오미자, 찻사발</div>
         <div class="chip few"><small>부족한 것</small>바다 먹거리, 곶감</div></div>
       <div class="web">
         <div class="node a">
-          <h3>달라진 영덕</h3>
+          <h3><span class="cn">3</span>달라진 영덕</h3>
           <span class="swap">오미자 ⇄ 대게</span>
           <div class="pic">교류 후 그림</div>
           <p>바닷가에서도 오미자차를 마셔요.</p>
@@ -122,34 +160,33 @@
           <h3>달라진 상주</h3>
           <span class="swap">찻사발 ⇄ 곶감</span>
           <div class="pic">교류 후 그림</div>
-          <p>곶감이 예쁜 그릇에 담겨 더 잘 팔려요.</p>
+          <p>곶감을 예쁜 그릇에 담아 더 많이 팔아요.</p>
           <span class="plus">찻사발 곶감 선물</span>
         </div>
         <div class="node c">
           <h3>달라진 포항</h3>
           <span class="swap">석탄 박물관 ⇄ 제철소</span>
           <div class="pic">교류 후 그림</div>
-          <p>석탄과 철 이야기를 배우러 아이들이 와요.</p>
+          <p>석탄과 철을 배우러 아이들이 찾아와요.</p>
           <span class="plus">석탄·철 배움 여행길</span>
         </div>
         <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
         <div class="node hub">
-          <h3>달라진 문경</h3>
+          <h3><span class="cn">4</span>달라진 문경</h3>
           <div class="pic">교류 후 문경 그림<small>AI와 함께 상상해서 그린 그림</small></div>
-          <p>밥상이 풍성해지고, 문경을 찾아오는 손님이 늘어요.</p>
+          <p>밥상에 먹을 것이 많아지고, 문경에 놀러 오는 사람이 늘어요.</p>
         </div>
       </div>
-      <div class="claim">문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 왜냐하면
+      <div class="claim"><span class="cn">5</span>문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 왜냐하면
         <ol>
-          <li><b>서로 채워요</b><span>오미자·찻사발을 보내고 대게·곶감을 받아, 서로 없던 것이 생겨요.</span></li>
-          <li><b>함께 만들어요</b><span>맛 축제, 찻사발 곶감 선물, 배움 여행길을 두 지역이 함께 만들어요.</span></li>
-          <li><b>그래서 달라져요</b><span>밥상이 풍성해지고, 찾아오는 손님과 일거리가 늘어나요.</span></li>
+          <li><b>서로 채워요</b><span>오미자와 찻사발을 보내고, 대게와 곶감을 받아요.</span></li>
+          <li><b>함께 만들어요</b><span>맛 축제, 곶감 선물, 배움 여행길을 함께 만들어요.</span></li>
+          <li><b>그래서 달라져요</b><span>먹을 것이 많아지고, 놀러 오는 사람이 늘어나요.</span></li>
         </ol></div>
     </div>
   </figure>
-
   <figure>
-    <figcaption>빈 틀 (아이들에게 보여 줄 것)</figcaption>
+    <figcaption>빈 틀 (무엇을 쓸지 물음이 적혀 있어요)</figcaption>
     <div class="pad blank">
       <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span>○모둠</span></div>
       <div class="intro"><b>우리 <span class="fill">○○</span>은</b>
@@ -186,61 +223,71 @@
       </div>
       <div class="claim">우리는 <span class="fill">○○·○○·○○</span>와 교류해야 합니다. 왜냐하면
         <ol>
-          <li><b>서로 채워요</b><span class="fill">무엇을 보내고 무엇을 받아서, 무엇이 생기나요?</span></li>
-          <li><b>함께 만들어요</b><span class="fill">두 지역이 힘을 합쳐 무엇을 만드나요?</span></li>
+          <li><b>서로 채워요</b><span class="fill">무엇을 보내고, 무엇을 받나요?</span></li>
+          <li><b>함께 만들어요</b><span class="fill">힘을 합쳐 무엇을 함께 만드나요?</span></li>
           <li><b>그래서 달라져요</b><span class="fill">사람들의 생활이 어떻게 달라지나요?</span></li>
         </ol></div>
     </div>
   </figure>
-
-  <div class="notes">
-    <h2>종이에 적는 것</h2>
-    <p style="margin:0 0 8px"><b>제목 아래 한 줄</b>: 우리 지역에 많은 것(빨강)과 부족한 것(파랑). 낱말로만 씁니다.</p>
-    <p style="margin:0 0 4px"><b>지역마다 세 가지</b></p>
-    <div class="key">
-      <span><span class="swap" style="font-size:17px">오미자 ⇄ 대게</span><span>주고받는 것 (왜 ①: 서로 부족한 것을 채움)</span></span>
-      <span><span class="plus" style="font-size:17px">맛 축제</span><span>함께 만드는 것 (왜 ②: 힘을 합치면 새로 생기는 것)</span></span>
-      <span>그림 + 한 문장: 그래서 생활이 어떻게 달라지는지</span>
-    </div>
-    <p style="margin:8px 0 4px"><b>맨 아래 주장</b>: "왜냐하면"을 세 줄로 나눠 씁니다. ① 무엇을 주고받아 서로 채웠는지 ② 함께 무엇을 만들었는지 ③ 그래서 생활이 어떻게 달라졌는지. 줄마다 실제 자원과 만든 것의 이름을 넣어 구체적으로, 한 줄을 넘기지 않게 씁니다.</p>
-    <p style="margin:8px 0 0">어떤 환경인지, 화살표의 자세한 이유는 종이에 쓰지 않습니다. 발표할 때 옆에 둔 태블릿의 <b>교류 제안서 화면</b>을 짚으며 말로 설명합니다.</p>
-
-    <h2>발표 5분에 이렇게 써요</h2>
-    <table>
-      <tr><th>순서</th><th>하는 말</th><th>시간</th></tr>
-      <tr><td>제목 아래 + 태블릿</td><td>우리 지역에 많은 것과 부족한 것을 말하고, 태블릿으로 이은 화살표를 짧게 보여 줌</td><td>1분</td></tr>
-      <tr><td>둘레 세 곳</td><td>한 곳씩: 무엇을 주고받고 → 함께 무엇을 만들고 → 그래서 그 지역이 어떻게 달라지는지</td><td>2분 30초</td></tr>
-      <tr><td>가운데</td><td>그래서 우리 지역은 이렇게 달라진다</td><td>1분</td></tr>
-      <tr><td>맨 아래</td><td>주장과 세 가지 까닭(채워요 → 함께 만들어요 → 그래서 달라져요)으로 마무리</td><td>30초</td></tr>
-    </table>
-
-    <h2>만들 때 지킬 것</h2>
-    <ul>
-      <li><b>교류하는 지역은 세 곳까지.</b> 앱에서 이은 화살표 가운데 가장 자신 있는 것만 고릅니다.</li>
-      <li><b>"채우기"에서 멈추지 않기.</b> 주고받는 것만 쓰면 "없으니까 받는다"로 끝납니다. <b>"함께!" 딱지</b>에 두 지역이 힘을 합쳐 새로 만들 수 있는 것을 꼭 하나씩 적게 합니다.</li>
-      <li><b>달라지는 것은 양쪽 모두.</b> 우리 지역만이 아니라 상대 지역도 어떻게 달라지는지 한 문장씩 씁니다.</li>
-      <li>그림은 모두 <b>"교류한 뒤"의 모습</b>입니다(가운데 한 장 + 둘레 세 장). 그림 아래에 "AI와 함께 상상해서 그린 그림"이라고 씁니다.</li>
-      <li>그림이 네 장이라 만드는 데 시간이 걸립니다. 모자라면 둘레 세 곳은 손그림으로 해도 됩니다.</li>
-    </ul>
-
-    <div class="tip">
-      <b>그림 주문 글 틀</b> (이 글이 그림 아래 한 문장이 됩니다)<br>
-      ( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 / 함께 무엇을 만들어서 ) ( 어떻게 하고 있는 ) 모습<br>
-      <small>예: 영덕 바닷가 축제에서 사람들이 대게를 먹으며 문경 오미자차를 마시고 있는 모습</small>
-    </div>
-  </div>
 </div>
-<section class="ideas">
-  <h2>배치는 자유롭게: 여러 가지 예시</h2>
-  <p>위 견본은 한 가지 예일 뿐입니다. <b>넣는 것은 같고, 어디에 어떻게 놓을지는 모둠이 정합니다.</b> 지키면 좋은 것은 하나, 지역들이 <b>서로 이어져 있다</b>는 느낌이 나게 하는 것입니다. 아이들에게 아래 그림을 보여 주고 고르거나 새로 생각해 보게 하세요.</p>
+
+<section class="kid">
+  <h2><span class="cn">3</span>이 순서로 만들어요</h2>
+  <ol class="steps">
+    <li><b>교류할 지역 세 곳 고르기</b><br>태블릿에서 <b>교류 제안</b> 화면을 열어요. 우리 모둠이 이은 화살표 가운데 가장 자신 있는 <b>세 곳</b>을 골라요.</li>
+    <li><b>지역마다 세 가지 정하기</b><br>모둠 친구들과 이야기해서 연습 종이에 먼저 적어요.
+      <div class="say">① 무엇을 보내고 무엇을 받나요? <small>(예: 오미자 ⇄ 대게)</small><br>② 두 지역이 힘을 합치면 무엇을 <b>함께 만들 수</b> 있나요? <small>(예: 대게·오미자 맛 축제)</small><br>③ 그래서 그 지역 사람들의 생활이 어떻게 달라지나요? <small>(예: 바닷가에서도 오미자차를 마셔요.)</small></div></li>
+    <li><b>우리 지역이 어떻게 달라지는지 한 문장 쓰기</b><br>세 곳과 교류하고 나면 우리 지역 사람들의 생활은 어떻게 달라질까요? 한 문장으로 써요.</li>
+    <li><b>그림 네 장 만들기</b><br>우리 지역 한 장, 세 지역 한 장씩이에요. 모두 <b>교류한 뒤의 모습</b>이에요. 아래 틀에 맞춰 AI에게 부탁할 글을 쓰고, 그림을 만들어 선생님께 인쇄를 부탁해요.
+      <div class="say"><b>그림 부탁 글 틀</b>: ( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 / 함께 무엇을 만들어서 ) ( 어떻게 하고 있는 ) 모습<br><small>예: 영덕 바닷가 축제에서 사람들이 대게를 먹으며 문경 오미자차를 마시고 있는 모습</small></div></li>
+    <li><b>놓을 자리 정하기</b><br>아래 4번의 여러 모양 가운데 하나를 고르거나 새로 생각해요. 연필로 연하게 자리를 먼저 잡아요.</li>
+    <li><b>쓰고 붙이기</b><br>제목 → 많은 것·부족한 것 → 그림 붙이기 → 주고받는 것, 함께 만드는 것, 한 문장 순서로 해요. 지역과 지역 사이를 <b>선이나 길로 이어요.</b></li>
+    <li><b>맨 아래에 우리의 주장 쓰기</b><br>위에 쓴 것을 모아서 세 줄로 써요. 자원 이름과 함께 만든 것의 이름을 넣으면 좋아요.</li>
+  </ol>
+  <p style="margin-top:12px"><b>글씨는 이렇게 써요.</b> 친구가 <b>세 걸음 떨어져서도 읽을 수 있게</b> 크게 써요. 긴 글 대신 낱말과 짧은 문장으로 써요. 자세한 이야기는 발표할 때 말로 해요.</p>
+</section>
+
+<section class="ideas kid">
+  <h2><span class="cn">4</span>놓는 자리는 우리 모둠이 정해요</h2>
+  <p>꼭 위의 예시처럼 놓지 않아도 돼요. <b>넣는 것은 같고, 어디에 놓을지는 우리 모둠이 정해요.</b> 하나만 지켜요. 지역들이 <b>서로 이어져 보이게</b> 해요. 아래에서 고르거나, 새로운 모양을 생각해 봐요.</p>
   <div class="legend">
-    <span><i style="background:#FFF0C2;border-color:#C93A27"></i>달라진 우리 지역(그림 + 한 문장)</span>
-    <span><i style="background:#EAF6F8;border-color:#2A6F7D"></i>함께 달라지는 지역(그림 + 한 문장, 주고받는 것, 함께!)</span>
-    <span><i style="background:#FFF6D6;border-color:#C93A27"></i>주장과 세 가지 까닭</span>
+    <span><i style="background:#FFF0C2;border-color:#C93A27"></i>달라진 우리 지역</span>
+    <span><i style="background:#EAF6F8;border-color:#2A6F7D"></i>함께 달라지는 지역</span>
+    <span><i style="background:#FFF6D6;border-color:#C93A27"></i>우리의 주장</span>
     <span><i style="background:#FFE1DB;border-color:#C93A27"></i><i style="background:#DDE8FB;border-color:#2F63B0"></i>많은 것 · 부족한 것</span>
   </div>
   <div class="ideas-grid" id="ideas"></div>
 </section>
+
+<section class="kid">
+  <h2><span class="cn">5</span>다 만들었나요? 확인해요</h2>
+  <ul class="check">
+    <li>제목과 모둠 이름이 있어요.</li>
+    <li>우리 지역에 많은 것(빨강)과 부족한 것(파랑)을 썼어요.</li>
+    <li>교류하는 지역 세 곳마다 <b>주고받는 것, 그림, 한 문장, 함께 만드는 것</b>이 다 있어요.</li>
+    <li>달라진 우리 지역의 그림과 한 문장이 가장 크게 있어요.</li>
+    <li>지역들이 선이나 길로 이어져 있어요.</li>
+    <li>맨 아래 주장에 까닭 세 줄(서로 채워요, 함께 만들어요, 그래서 달라져요)이 있어요.</li>
+    <li>그림 아래에 "AI와 함께 상상해서 그린 그림"이라고 썼어요.</li>
+    <li>세 걸음 떨어져서도 글씨가 읽혀요.</li>
+  </ul>
+
+  <h2><span class="cn">6</span>발표는 이렇게 해요 (5분)</h2>
+  <ol class="steps">
+    <li><b>우리 지역 소개하기</b> (1분)<div class="say">"우리 ○○은 ( 많은 것 )이 많고, ( 부족한 것 )이 부족합니다." 태블릿의 교류 제안 화면에서 우리가 이은 화살표를 보여 줘요.</div></li>
+    <li><b>세 지역을 하나씩 말하기</b> (2분 30초)<div class="say">"○○와는 ( 무엇 )을 주고받습니다. 함께 ( 무엇 )을 만들 수 있습니다. 그래서 ○○ 사람들은 ( 어떻게 달라집니다 )."</div></li>
+    <li><b>달라진 우리 지역 말하기</b> (1분)<div class="say">"이렇게 교류하면 우리 ○○ 사람들의 생활은 ( 어떻게 달라집니다 )." 가운데 그림을 짚으며 말해요.</div></li>
+    <li><b>주장으로 마무리하기</b> (30초)<div class="say">맨 아래의 주장과 세 가지 까닭을 또박또박 읽어요. 그다음 친구들의 질문을 받아요.</div></li>
+  </ol>
+</section>
+
+<details class="teacher">
+  <summary>선생님께</summary>
+  <p>이젤패드의 중심은 "교류하면 생활 모습이 어떻게, 왜 달라지는가"입니다. 자원 지도와 화살표의 자세한 내용은 종이에 옮기지 않고, 발표 때 옆에 둔 태블릿의 교류 제안 화면으로 보여 줍니다.</p>
+  <p>"주고받는 것"은 서로 부족한 것을 채우는 까닭, "함께 만드는 것"은 힘을 합쳐 새로 생기는 것(시너지)에 해당합니다. 주고받는 것만 쓰면 "없으니까 받는다"에서 멈추므로 "함께 만드는 것"을 지역마다 하나씩 적게 했습니다.</p>
+  <p>그림은 모둠당 네 장(우리 지역 한 장, 세 지역 한 장씩)입니다. 시간이 모자라면 세 지역은 손그림으로 해도 됩니다. 예시의 내용(상주 곶감, 포항 제철소 등)은 배치를 보여 주려고 지은 것입니다.</p>
+  <p>인쇄하면 "다 만든 모습", "빈 틀", "여러 가지 모양"이 쪽을 나누어 나옵니다.</p>
+</details>
 
 <script>
   // 작은 배치 그림을 그립니다. 종이는 200×240, 제목과 "많은 것·부족한 것" 줄은 늘 위에 있습니다.
@@ -255,31 +302,31 @@
   const claim = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#FFF6D6" stroke="#C93A27" stroke-width="2"/>` +
     [0, 1, 2].map((i) => `<path d="M${x + 6} ${y + 8 + i * (h - 12) / 3} h${w - 12}" stroke="#C9B37A" stroke-width="2.5" stroke-linecap="round"/>`).join('');
   const IDEAS = [
-    { name: '가운데와 둘레', say: '우리 지역이 가운데, 세 지역이 둘레에서 이어져요. (위 견본)',
+    { name: '가운데와 둘레', say: '우리 지역이 가운데에 있고, 세 지역이 둘레에서 이어져요. (위의 예시와 같아요)',
       svg: line([100, 112], [34, 84]) + line([100, 112], [166, 84]) + line([100, 112], [100, 170]) +
         box(8, 58, 52, 50, PAR) + box(140, 58, 52, 50, PAR) + box(74, 150, 52, 44, PAR) + box(66, 80, 68, 60, HUB) + claim(12, 202, 176, 28) },
-    { name: '길 따라가기', say: '구불구불한 길 위에 지역이 차례로 놓여요. 길을 따라가며 발표해요.',
+    { name: '길 따라가기', say: '구불구불한 길 위에 지역을 차례로 놓아요. 길을 따라가며 발표해요.',
       svg: `<path d="M38 70 C120 40 190 70 150 104 C110 138 20 120 52 160 C76 190 150 178 162 178" fill="none" stroke="#E7D9A8" stroke-width="16" stroke-linecap="round"/>
         <path d="M38 70 C120 40 190 70 150 104 C110 138 20 120 52 160 C76 190 150 178 162 178" ${LINK}/>` +
         box(10, 46, 60, 50, HUB) + box(126, 80, 50, 42, PAR) + box(22, 132, 50, 42, PAR) + box(136, 156, 50, 42, PAR) + claim(12, 206, 110, 24) },
     { name: '꽃 모양', say: '우리 지역이 꽃 가운데, 세 지역이 꽃잎이에요. 줄기에 주장을 써요.',
       svg: `<path d="M100 150 V200" stroke="#3E9E5C" stroke-width="5" stroke-linecap="round"/>` +
         dot(52, 82, 27, PAR) + dot(148, 82, 27, PAR) + dot(100, 152, 25, PAR) + dot(100, 104, 31, HUB) + claim(30, 204, 140, 26) },
-    { name: '나무 모양', say: '뿌리는 우리 지역, 가지 끝의 열매는 세 지역이에요. 함께 자라는 느낌.',
+    { name: '나무 모양', say: '뿌리는 우리 지역, 가지 끝의 열매는 세 지역이에요. 함께 자라요.',
       svg: `<path d="M100 168 V120 M100 130 L38 92 M100 124 L100 86 M100 130 L162 92" fill="none" stroke="#9C7A4A" stroke-width="6" stroke-linecap="round"/>` +
         dot(36, 74, 25, PAR) + dot(100, 66, 25, PAR) + dot(164, 74, 25, PAR) + box(66, 150, 68, 46, HUB) + claim(12, 204, 176, 26) },
-    { name: '퍼즐 맞추기', say: '네 조각이 맞물려요. 서로 부족한 곳을 채워 준다는 뜻이 잘 보여요.',
+    { name: '퍼즐 맞추기', say: '네 조각이 딱 맞물려요. 서로 부족한 곳을 채워 줘요.',
       svg: box(20, 48, 80, 70, HUB, 4) + box(100, 48, 80, 70, PAR, 4) + box(20, 118, 80, 70, PAR, 4) + box(100, 118, 80, 70, PAR, 4) +
         dot(100, 83, 9, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"') + dot(60, 118, 9, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"') +
         dot(140, 118, 9, PAR) + dot(100, 153, 9, PAR) + claim(12, 200, 176, 30) },
-    { name: '지도 위에', say: '경북 모양을 크게 그리고, 지역이 있는 자리에 그림을 붙여 선으로 이어요.',
+    { name: '지도 위에', say: '경북 모양을 크게 그려요. 지역이 있는 자리에 그림을 붙이고 선으로 이어요.',
       svg: `<path d="M44 64 L70 48 L112 52 L150 46 L170 70 L166 112 L178 150 L150 186 L104 192 L70 176 L50 150 L34 110 Z" fill="#FBF3CC" stroke="#2A6F7D" stroke-width="2" stroke-linejoin="round"/>` +
         line([62, 84], [150, 96]) + line([62, 84], [70, 138]) + line([62, 84], [146, 156]) +
         box(36, 62, 52, 44, HUB) + box(130, 78, 42, 36, PAR) + box(50, 122, 42, 36, PAR) + box(126, 140, 42, 36, PAR) + claim(12, 204, 176, 26) },
     { name: '다리 놓기', say: '우리 지역에서 세 지역으로 다리가 놓여요. 다리 위에 주고받는 것을 써요.',
       svg: [70, 118, 166].map((y) => `<path d="M72 ${y} Q104 ${y - 20} 136 ${y}" fill="none" stroke="#9C7A4A" stroke-width="4"/><path d="M72 ${y} H136" stroke="#9C7A4A" stroke-width="3"/>`).join('') +
         box(10, 52, 62, 136, HUB) + box(136, 50, 54, 40, PAR) + box(136, 98, 54, 40, PAR) + box(136, 146, 54, 40, PAR) + claim(12, 202, 176, 28) },
-    { name: '손잡은 동그라미', say: '네 지역이 둥글게 손을 잡아요. 가운데에 함께 만든 것과 주장을 써요.',
+    { name: '손잡은 동그라미', say: '네 지역이 둥글게 손을 잡아요. 가운데에 우리의 주장을 써요.',
       svg: `<circle cx="100" cy="124" r="62" ${LINK}/>` + dot(100, 62, 26, HUB) + dot(38, 124, 23, PAR) + dot(162, 124, 23, PAR) + dot(100, 186, 23, PAR) + claim(66, 104, 68, 40) },
   ];
   document.getElementById('ideas').innerHTML = IDEAS.map((d) =>
