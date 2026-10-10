@@ -77,9 +77,21 @@
   .key { flex-direction: column; gap: 8px; }
   .key > span { display: flex; align-items: center; gap: 8px; font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 15.5px; line-height: 1.4; }
   .key .swap, .key .plus { flex: none; white-space: nowrap; font-family: 'Gaegu', sans-serif; font-weight: 700; }
+  /* 여러 가지 배치 예시(작은 그림) */
+  .ideas { margin-top: 30px; max-width: 1500px; }
+  .ideas h2 { font-family: 'Gaegu', sans-serif; font-size: 30px; margin: 0 0 4px; color: var(--coral-d); }
+  .ideas > p { margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--mute); max-width: 980px; }
+  .ideas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 18px; }
+  .idea { background: #fff; border: 3px solid var(--teal-l); border-radius: 16px; padding: 10px 10px 12px; }
+  .idea svg { width: 100%; height: auto; display: block; }
+  .idea b { display: block; margin-top: 6px; font-family: 'Gaegu', sans-serif; font-size: 23px; }
+  .idea span { font-size: 14.5px; line-height: 1.45; color: var(--mute); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 14px; font-size: 14.5px; color: var(--mute); }
+  .legend i { display: inline-block; width: 16px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 2px solid; }
   @media print {
     body { background: #fff; padding: 0; }
     .lead, .notes, h1 { display: none; }
+    .ideas { break-before: page; padding: 8mm; }
     .wrap { display: block; }
     figure { break-after: page; padding: 8mm; }
     .pad { box-shadow: none; zoom: .92; }
@@ -216,10 +228,62 @@
       ( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 / 함께 무엇을 만들어서 ) ( 어떻게 하고 있는 ) 모습<br>
       <small>예: 영덕 바닷가 축제에서 사람들이 대게를 먹으며 문경 오미자차를 마시고 있는 모습</small>
     </div>
-
-    <h2>일부러 쓰지 않는 낱말</h2>
-    <p style="margin:0">종이에는 "공간(장소)", "시간", "희소성"이라는 낱말을 쓰지 않습니다. 뒤의 챗봇 활동에서 아이들이 스스로 찾을 낱말이기 때문입니다.</p>
   </div>
 </div>
+<section class="ideas">
+  <h2>배치는 자유롭게: 여러 가지 예시</h2>
+  <p>위 견본은 한 가지 예일 뿐입니다. <b>넣는 것은 같고, 어디에 어떻게 놓을지는 모둠이 정합니다.</b> 지키면 좋은 것은 하나, 지역들이 <b>서로 이어져 있다</b>는 느낌이 나게 하는 것입니다. 아이들에게 아래 그림을 보여 주고 고르거나 새로 생각해 보게 하세요.</p>
+  <div class="legend">
+    <span><i style="background:#FFF0C2;border-color:#C93A27"></i>달라진 우리 지역(그림 + 한 문장)</span>
+    <span><i style="background:#EAF6F8;border-color:#2A6F7D"></i>함께 달라지는 지역(그림 + 한 문장, 주고받는 것, 함께!)</span>
+    <span><i style="background:#FFF6D6;border-color:#C93A27"></i>주장과 세 가지 까닭</span>
+    <span><i style="background:#FFE1DB;border-color:#C93A27"></i><i style="background:#DDE8FB;border-color:#2F63B0"></i>많은 것 · 부족한 것</span>
+  </div>
+  <div class="ideas-grid" id="ideas"></div>
+</section>
+
+<script>
+  // 작은 배치 그림을 그립니다. 종이는 200×240, 제목과 "많은 것·부족한 것" 줄은 늘 위에 있습니다.
+  const HUB = 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"', PAR = 'fill="#EAF6F8" stroke="#2A6F7D" stroke-width="2"';
+  const LINK = 'fill="none" stroke="#C93A27" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 6"';
+  const box = (x, y, w, h, st, r = 6) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" ${st}/>`;
+  const dot = (x, y, r, st) => `<circle cx="${x}" cy="${y}" r="${r}" ${st}/>`;
+  const line = (a, b) => `<path d="M${a[0]} ${a[1]} L${b[0]} ${b[1]}" ${LINK}/>`;
+  const head = `<rect x="3" y="3" width="194" height="234" rx="6" fill="#fff" stroke="#2A6F7D" stroke-width="2.5"/>
+    <rect x="12" y="11" width="96" height="9" rx="3" fill="#C93A27"/><path d="M12 25 H188" stroke="#C93A27" stroke-width="2"/>
+    <rect x="12" y="30" width="60" height="9" rx="3" fill="#FFE1DB" stroke="#C93A27"/><rect x="76" y="30" width="60" height="9" rx="3" fill="#DDE8FB" stroke="#2F63B0"/>`;
+  const claim = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#FFF6D6" stroke="#C93A27" stroke-width="2"/>` +
+    [0, 1, 2].map((i) => `<path d="M${x + 6} ${y + 8 + i * (h - 12) / 3} h${w - 12}" stroke="#C9B37A" stroke-width="2.5" stroke-linecap="round"/>`).join('');
+  const IDEAS = [
+    { name: '가운데와 둘레', say: '우리 지역이 가운데, 세 지역이 둘레에서 이어져요. (위 견본)',
+      svg: line([100, 112], [34, 84]) + line([100, 112], [166, 84]) + line([100, 112], [100, 170]) +
+        box(8, 58, 52, 50, PAR) + box(140, 58, 52, 50, PAR) + box(74, 150, 52, 44, PAR) + box(66, 80, 68, 60, HUB) + claim(12, 202, 176, 28) },
+    { name: '길 따라가기', say: '구불구불한 길 위에 지역이 차례로 놓여요. 길을 따라가며 발표해요.',
+      svg: `<path d="M38 70 C120 40 190 70 150 104 C110 138 20 120 52 160 C76 190 150 178 162 178" fill="none" stroke="#E7D9A8" stroke-width="16" stroke-linecap="round"/>
+        <path d="M38 70 C120 40 190 70 150 104 C110 138 20 120 52 160 C76 190 150 178 162 178" ${LINK}/>` +
+        box(10, 46, 60, 50, HUB) + box(126, 80, 50, 42, PAR) + box(22, 132, 50, 42, PAR) + box(136, 156, 50, 42, PAR) + claim(12, 206, 110, 24) },
+    { name: '꽃 모양', say: '우리 지역이 꽃 가운데, 세 지역이 꽃잎이에요. 줄기에 주장을 써요.',
+      svg: `<path d="M100 150 V200" stroke="#3E9E5C" stroke-width="5" stroke-linecap="round"/>` +
+        dot(52, 82, 27, PAR) + dot(148, 82, 27, PAR) + dot(100, 152, 25, PAR) + dot(100, 104, 31, HUB) + claim(30, 204, 140, 26) },
+    { name: '나무 모양', say: '뿌리는 우리 지역, 가지 끝의 열매는 세 지역이에요. 함께 자라는 느낌.',
+      svg: `<path d="M100 168 V120 M100 130 L38 92 M100 124 L100 86 M100 130 L162 92" fill="none" stroke="#9C7A4A" stroke-width="6" stroke-linecap="round"/>` +
+        dot(36, 74, 25, PAR) + dot(100, 66, 25, PAR) + dot(164, 74, 25, PAR) + box(66, 150, 68, 46, HUB) + claim(12, 204, 176, 26) },
+    { name: '퍼즐 맞추기', say: '네 조각이 맞물려요. 서로 부족한 곳을 채워 준다는 뜻이 잘 보여요.',
+      svg: box(20, 48, 80, 70, HUB, 4) + box(100, 48, 80, 70, PAR, 4) + box(20, 118, 80, 70, PAR, 4) + box(100, 118, 80, 70, PAR, 4) +
+        dot(100, 83, 9, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"') + dot(60, 118, 9, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"') +
+        dot(140, 118, 9, PAR) + dot(100, 153, 9, PAR) + claim(12, 200, 176, 30) },
+    { name: '지도 위에', say: '경북 모양을 크게 그리고, 지역이 있는 자리에 그림을 붙여 선으로 이어요.',
+      svg: `<path d="M44 64 L70 48 L112 52 L150 46 L170 70 L166 112 L178 150 L150 186 L104 192 L70 176 L50 150 L34 110 Z" fill="#FBF3CC" stroke="#2A6F7D" stroke-width="2" stroke-linejoin="round"/>` +
+        line([62, 84], [150, 96]) + line([62, 84], [70, 138]) + line([62, 84], [146, 156]) +
+        box(36, 62, 52, 44, HUB) + box(130, 78, 42, 36, PAR) + box(50, 122, 42, 36, PAR) + box(126, 140, 42, 36, PAR) + claim(12, 204, 176, 26) },
+    { name: '다리 놓기', say: '우리 지역에서 세 지역으로 다리가 놓여요. 다리 위에 주고받는 것을 써요.',
+      svg: [70, 118, 166].map((y) => `<path d="M72 ${y} Q104 ${y - 20} 136 ${y}" fill="none" stroke="#9C7A4A" stroke-width="4"/><path d="M72 ${y} H136" stroke="#9C7A4A" stroke-width="3"/>`).join('') +
+        box(10, 52, 62, 136, HUB) + box(136, 50, 54, 40, PAR) + box(136, 98, 54, 40, PAR) + box(136, 146, 54, 40, PAR) + claim(12, 202, 176, 28) },
+    { name: '손잡은 동그라미', say: '네 지역이 둥글게 손을 잡아요. 가운데에 함께 만든 것과 주장을 써요.',
+      svg: `<circle cx="100" cy="124" r="62" ${LINK}/>` + dot(100, 62, 26, HUB) + dot(38, 124, 23, PAR) + dot(162, 124, 23, PAR) + dot(100, 186, 23, PAR) + claim(66, 104, 68, 40) },
+  ];
+  document.getElementById('ideas').innerHTML = IDEAS.map((d) =>
+    `<div class="idea"><svg viewBox="0 0 200 240" role="img" aria-label="${d.name} 배치">${head}${d.svg}</svg><b>${d.name}</b><span>${d.say}</span></div>`).join('');
+</script>
 </body>
 </html>
