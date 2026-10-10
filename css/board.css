@@ -207,3 +207,21 @@ input, textarea { caret-color: var(--coral-d); }
 /* 낱말 중간에서 줄이 바뀌지 않게(한글은 띄어쓰기에서만 줄 바꿈). 너무 긴 낱말만 넘치지 않게 끊음 */
 body { word-break: keep-all; overflow-wrap: break-word; }
 .toast, .hint, .lock-card p, .confirm p, .mission, .cv-guide, .cv-keyq, .t-keyq, .tip-box, .arrow-banner, .step-text, .info-row { text-wrap: pretty; }
+
+/* 선생님의 팁 안의 "달라지는 것 고르기": 이름만 작은 딱지로, 누르면 물음 한 줄 */
+.ways { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0 38px; }
+.ways button { min-height: 36px; padding: 0 10px; background: #fff; border: 2px solid #E0B84A; border-radius: 999px; font-family: var(--hand); font-weight: 700; font-size: 18px; color: var(--ink); white-space: nowrap; }
+.ways button.on { background: #FFD35C; border-color: #B07A00; }
+.way-q { margin: 8px 0 0 38px; padding: 6px 12px; background: #fff; border-radius: 12px; border: 2px solid #E0B84A; font-size: 16.5px; line-height: 1.4; }
+.way-q b { font-family: var(--hand); font-size: 20px; color: var(--coral-d); margin-right: 8px; }
+.af-body .tip-box { width: 430px; }
+.arrow-form:has([data-tip]:not([hidden])) { width: 1210px; }
+/* 팁 상자가 화면 아래로 넘치지 않게 촘촘히 */
+.tip-box { font-size: 16px; line-height: 1.4; padding: 10px 14px; }
+.tip-box p { margin-top: 6px; }
+.tip-box > small { display: none; }
+.ways { gap: 5px; margin-top: 6px; }
+.ways button { min-height: 32px; padding: 0 9px; font-size: 16.5px; border-width: 2px; }
+.way-q { margin-top: 6px; padding: 4px 10px; font-size: 15.5px; }
+.way-q b { font-size: 18px; }
+.modal.dim { padding-top: 30px; }
