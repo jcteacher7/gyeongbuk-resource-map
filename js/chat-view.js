@@ -2,8 +2,8 @@
 // - 단계(대조 상황 → 반대 추론 → 실제 사례 비교 → 모둠 문장 완성)는 코드에 고정, 이름과 질문은 선생님이 고침.
 // - 대화는 모둠마다 하나로 쌓이고, 아이 말과 AI 답이 한 쌍으로 서버(중계 함수)에 저장됩니다.
 // - AI가 실패해도 아이가 쓴 말은 지워지지 않고 [다시 보내기]가 나옵니다.
-import { splitTemplate } from './defaults.js?v=8';
-import { josa, timeText } from './util.js?v=8';
+import { splitTemplate } from './defaults.js?v=9';
+import { josa, timeText } from './util.js?v=9';
 
 const BLANK_MAX = 20;
 
@@ -134,6 +134,7 @@ export function createChatView(el, ctx) {
   }
 
   function errMsg(e) {
+    if (e && e.code === 'busy') return 'AI가 지금 많이 바빠요. 조금 뒤에 [다시 보내기]를 눌러 주세요.';
     if (e && e.code === 'closed') return '선생님이 챗봇을 닫았어요.';
     if (e && e.code === 'rate') return '조금 천천히 보내 주세요. 잠깐 뒤에 다시 보내요.';
     if (e && e.code === 'limit') return '오늘 보낼 수 있는 만큼 다 보냈어요. 선생님께 말해 주세요.';
@@ -142,14 +143,24 @@ export function createChatView(el, ctx) {
     return 'AI가 대답하지 못했어요. 다시 물어봐 주세요.';
   }
 
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   async function ask(p) {
     busy = true;
     p.status = 'wait';
     thread();
     try {
-      const d = await store.callFunction('gemini-chat', { g: me().g, n: me().n, text: p.text, step: p.step });
-      store.absorb('chat', d.key, d.value);
-      pend.splice(pend.indexOf(p), 1);
+      // AI가 잠깐 바쁘면(1분 한도) "생각 중"을 보여 준 채로 몇 초 뒤에 저절로 다시 보냅니다.
+      for (let tries = 0; ; tries++) {
+        try {
+          const d = await store.callFunction('gemini-chat', { g: me().g, n: me().n, text: p.text, step: p.step });
+          store.absorb('chat', d.key, d.value);
+          pend.splice(pend.indexOf(p), 1);
+          break;
+        } catch (e) {
+          if (e && e.code === 'busy' && tries < 4) { await wait(7000); continue; }
+          throw e;
+        }
+      }
     } catch (e) {
       p.status = 'fail';
       p.msg = errMsg(e);

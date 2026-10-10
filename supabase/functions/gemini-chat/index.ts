@@ -49,6 +49,12 @@ const STEP_GOAL = [
   '모둠 문장 완성: 문장 틀의 빈칸에 들어갈 말을 아이들이 스스로 고르게 도와요. 빈칸 답을 통째로 알려 주지 말고, 앞의 대화에서 아이들이 한 말을 떠올리게 하거나 두세 개의 낱말 중에서 고르게 해요.',
 ];
 
+// 아이들이 스스로 찾아야 하는 낱말입니다. 모둠 아이가 먼저 쓰기 전에 AI 답에 이 낱말이 나오면
+// 다시 쓰게 하고, 그래도 나오면 아래의 안전한 되묻기로 바꿉니다.
+const SECRET_WORDS = ['장소', '시간', '희소', '공간'];
+const SAFE_REPLY = '스스로 찾아내면 훨씬 더 멋질 거예요. 앞에서 우리 모둠이 나눈 이야기를 떠올려 봐요. 무엇이 달라서 지역마다 있는 것과 없는 것이 달랐나요?';
+const leaked = (answer: string, kidsSaid: string) => SECRET_WORDS.filter((w) => answer.includes(w) && !kidsSaid.includes(w));
+
 type Row = { kind: string; key: string; value: Record<string, unknown>; updated_at: string };
 
 async function db(path: string, init: RequestInit = {}) {
@@ -219,9 +225,22 @@ Deno.serve(async (req) => {
     const base = { g, n, step, q: text, at: now };
     let value: Record<string, unknown>;
     try {
-      const out = await askGemini(systemPrompt(step, steps, template, research), contents);
-      value = { ...base, a: out.text, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb } };
+      const system = systemPrompt(step, steps, template, research);
+      let out = await askGemini(system, contents);
+      const kidsSaid = past.map((v) => v.q).join(' ') + ' ' + text;
+      let guard = '';
+      let bad = leaked(out.text, kidsSaid);
+      if (bad.length) {
+        guard = 'retry';
+        const again = await askGemini(system, [...contents, { role: 'model', parts: [{ text: out.text }] },
+          { role: 'user', parts: [{ text: `(선생님) 방금 답에 아이들이 스스로 찾아야 할 낱말 "${bad.join(', ')}"을 먼저 말했어요. 그 낱말을 쓰지 말고, 같은 뜻의 답을 질문 하나로 다시 써 주세요.` }] }]);
+        bad = leaked(again.text, kidsSaid);
+        if (bad.length) { guard = 'safe'; out = { ...again, text: SAFE_REPLY }; } else out = again;
+      }
+      value = { ...base, a: out.text, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb }, ...(guard ? { guard } : {}) };
     } catch (e) {
+      // 모든 모델이 "지금은 한도를 넘었다"고 하면 아이 탓이 아니므로 기록하지 않고, 앱이 잠깐 뒤에 다시 보냅니다.
+      if (String(e).includes(' 429')) return reply({ ok: false, error: 'busy' }, 503);
       // 실패해도 아이가 보낸 말은 기록에 남깁니다(선생님 화면에서 볼 수 있음).
       await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value: { ...base, a: null, err: String(e).slice(0, 600) } }]) });
       return reply({ ok: false, error: 'ai', detail: String(e).slice(0, 300) }, 502);
