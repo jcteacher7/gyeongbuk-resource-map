@@ -58,7 +58,6 @@ const SAFE_REPLY = [
   '잘 찾았어요. 우리가 조사한 지역 가운데 어디에 무엇이 많고, 어디에 무엇이 적었는지 하나만 더 말해 줄래요?',
   '스스로 찾아내면 훨씬 더 멋질 거예요. 앞에서 우리 모둠이 나눈 이야기를 떠올려 봐요. 무엇이 달라서 지역마다 있는 것과 없는 것이 달랐나요?',
 ];
-const leaked = (answer: string, kidsSaid: string) => SECRET_WORDS.filter((w) => answer.includes(w) && !kidsSaid.includes(w));
 
 // 단계 통과 기준(AI가 판정). 4단계는 모둠 문장을 저장하면 통과라서 AI가 판정하지 않습니다.
 const PASS_RULE = [
@@ -78,6 +77,48 @@ const STEP_BAN = [
 // 미션을 통과한 뒤에는 새 질문으로 나아가지 않고, 칭찬 한 문장 + 아래 말로 마무리합니다(선생님이 설정에서 고칠 수 있음).
 const DEFAULT_PASS_TEXT = '미션 성공이에요! 선생님이 다음 단계를 열어 줄 때까지, 왜 그렇게 생각했는지 모둠끼리 한 번 더 이야기해 봐요.';
 const DEFAULT_PRAISE = '모둠이 함께 생각해서 이유까지 잘 말해 주었어요.';
+
+// ---------- 4단계: 빈칸 정답으로 이끌기 ----------
+// 정답은 선생님 설정(chatcfg.answers)에서 옵니다. 쉼표로 빈칸을 나누고, 같은 뜻으로 인정할 말은 | 로 나눕니다.
+const DEFAULT_ANSWERS = '공간|장소, 시간, 자원의 희소성|희소성';
+const parseAnswers = (t: string) => t.split(',').map((x) => x.split('|').map((y) => y.trim()).filter(Boolean)).filter((x) => x.length);
+const CHO = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+const chosung = (w: string) => [...w].map((c) => {
+  const k = c.charCodeAt(0) - 0xac00;
+  return k >= 0 && k <= 11171 ? CHO[Math.floor(k / 588)] : c;
+}).join('');
+const shape = (w: string) => `${w.split(' ').map((x) => x.length + '글자').join(' + ')}, 첫소리는 ${chosung(w)}`;
+
+// 모둠이 4단계에서 한 말(차례대로)을 보고, 빈칸마다 몇 번째 말에서 맞혔는지(-1이면 아직) 알아냅니다.
+function blankState(answers: string[][], said: string[]) {
+  const at = answers.map((syn) => said.findIndex((m) => syn.some((w) => m.replace(/\s/g, '').includes(w.replace(/\s/g, '')))));
+  const last = said.length - 1;
+  const cur = at.findIndex((x) => x < 0);
+  const lastSolve = Math.max(-1, ...at);
+  return { at, cur, just: at.map((x, i) => (x === last ? i : -1)).filter((i) => i >= 0), tries: last - lastSolve, done: cur < 0 };
+}
+
+function step4Guide(answers: string[][], st: ReturnType<typeof blankState>) {
+  const n = st.cur + 1;
+  const word = answers[st.cur][0];
+  const level = Math.min(3, Math.max(1, st.tries));
+  return [
+    '',
+    '[4단계 빈칸 이끌기 — 아래를 꼭 지켜]',
+    `빈칸의 정답(너만 알고 있어. 아이가 먼저 말하기 전에는 정답 낱말을 절대 쓰지 마): ${answers.map((a, i) => `${i + 1}번=${a.join(' 또는 ')}`).join(', ')}`,
+    `지금 상태: ${answers.map((_, i) => `${i + 1}번 ${st.at[i] >= 0 ? '찾음' : '아직'}`).join(', ')}. 지금 도울 빈칸은 ${n}번이야. 한 번에 이 빈칸 하나만 다뤄.`,
+    st.just.length
+      ? `방금 아이가 ${st.just.map((i) => i + 1).join(', ')}번 빈칸을 맞혔어. "맞아요"라고 분명하게 확인해 준 다음, ${n}번 빈칸으로 넘어가 힌트 질문을 해.`
+      : st.tries > 0
+        ? `방금 아이가 한 말은 ${n}번 빈칸의 정답이 아니야. "좋아요", "똑똑해요", "맞아요", "멋져요"처럼 맞은 것처럼 들리는 칭찬을 하지 마. "아직 아니에요" 또는 (뜻이 가까우면) "뜻은 가까워요, 그런데 낱말이 달라요"라고 분명히 말한 뒤 힌트를 줘. (아이가 낱말을 말한 것이 아니라 "모르겠어요"라고 하거나 질문을 한 것이면 "아직 아니에요"는 빼고 바로 힌트를 줘.)`
+        : `이제 ${n}번 빈칸을 시작해. 힌트 질문을 해.`,
+    `힌트는 지금 ${level}단계로 줘.`,
+    '힌트 1단계: 앞에서 모둠이 나눈 이야기를 떠올리게 해. (지역마다 달랐던 것 / 옛날과 오늘날이 달랐던 것 / 필요한 만큼 넉넉하지 않았던 것 가운데 이 빈칸에 맞는 것)',
+    '힌트 2단계: 이 낱말의 뜻을 4학년이 알아듣게 풀어서 "이런 뜻을 가진 낱말이에요"라고 알려 줘.',
+    `힌트 3단계: 뜻을 다시 알려 주고, 이 말을 그대로 덧붙여: "힌트! ${shape(word)}이에요."`,
+    '어느 단계든 정답 낱말 자체는 쓰지 마. 다른 빈칸의 정답도 쓰지 마.',
+  ].join('\n');
+}
 
 type Row = { kind: string; key: string; value: Record<string, unknown>; updated_at: string };
 
@@ -117,7 +158,7 @@ function systemPrompt(step: number, steps: { name: string; question: string }[],
     '- 아이가 한 말에서 좋은 점을 먼저 한마디 짚어 주고, 질문은 한 번에 하나만 해.',
     '- "희소성"처럼 어려운 낱말은 "부족함", "흔하지 않음"처럼 쉬운 말로 풀어. 아이가 그 낱말을 쓰면 칭찬해.',
     '- 아이 이름 말고 다른 개인 정보는 묻지 마. 수업과 상관없는 이야기, 장난, 위험한 이야기는 부드럽게 지금 단계 질문으로 돌아오게 해.',
-    '- 틀린 생각도 바로 틀렸다고 하지 말고, 다시 생각해 볼 질문을 해.',
+    '- 1~3단계에서는 틀린 생각도 바로 틀렸다고 하지 말고, 다시 생각해 볼 질문을 해. 다만 엉뚱하거나 틀린 대답을 "맞아요", "똑똑해요"라고 칭찬하지는 마.',
     '- 이모지, 표, 목록 기호는 쓰지 마.',
     '',
     `지금은 ${step}단계 "${steps[step - 1].name}"야. 이 단계의 첫 질문: "${steps[step - 1].question}"`,
@@ -236,7 +277,7 @@ Deno.serve(async (req) => {
       const grp = roster.groups.find((x) => x.id === g);
       if (!grp || !grp.members.includes(n)) return reply({ ok: false, error: 'roster' }, 403);
     }
-    const chatcfg = (cfg.chatcfg ?? {}) as { steps?: { name?: string; question?: string }[]; template?: string; passText?: string };
+    const chatcfg = (cfg.chatcfg ?? {}) as { steps?: { name?: string; question?: string }[]; template?: string; passText?: string; answers?: string };
     const steps = DEFAULT_STEPS.map((d, i) => ({ name: chatcfg.steps?.[i]?.name || d.name, question: chatcfg.steps?.[i]?.question || d.question }));
     const template = chatcfg.template || DEFAULT_TEMPLATE;
 
@@ -274,9 +315,26 @@ Deno.serve(async (req) => {
     const base = { g, n, step, q: text, at: now };
     let value: Record<string, unknown>;
     try {
-      const system = systemPrompt(step, steps, template, research);
-      let out = await askGemini(system, contents);
+      let system = systemPrompt(step, steps, template, research);
       const kidsSaid = past.map((v) => v.q).join(' ') + ' ' + text;
+      // 4단계: 빈칸 정답과 맞는지는 함수가 직접 확인하고, AI에게는 지금 상태와 힌트 단계를 알려 줍니다.
+      const answers = parseAnswers(chatcfg.answers || DEFAULT_ANSWERS);
+      const blanks = template.split(/\[\s*\]/).length - 1;
+      const st4 = step === 4 && answers.length === blanks
+        ? blankState(answers, past.filter((v) => (v.step ?? 1) === 4).map((v) => v.q).concat(text))
+        : null;
+      const secret = st4 ? [...new Set([...SECRET_WORDS, ...answers.flat()])] : SECRET_WORDS;
+      const leaked = (answer: string, said: string) => secret.filter((w) => answer.includes(w) && !said.includes(w));
+      let safe = SAFE_REPLY[step - 1];
+      let fixed = '';
+      if (st4 && st4.done) {
+        fixed = `${st4.just.length ? '맞아요! ' : ''}빈칸 ${blanks}개를 모두 찾았어요. 이제 오른쪽 "우리 모둠 문장"의 빈칸에 찾은 낱말을 써 넣고 [모둠 문장 저장]을 눌러요.`;
+      } else if (st4) {
+        system += step4Guide(answers, st4);
+        const n = st4.cur + 1;
+        safe = `${st4.just.length ? '맞아요! 이제 ' + n + '번 빈칸이에요. ' : st4.tries > 0 ? '아직 아니에요. ' : ''}${n}번 빈칸 힌트를 줄게요. ${shape(answers[st4.cur][0])}이에요. 앞에서 모둠이 나눈 이야기를 떠올려 봐요.`;
+      }
+      let out = fixed ? { text: fixed, pass: false, praise: '', model: 'fixed', think: '-' } : await askGemini(system, contents);
       let guard = '';
       let bad = leaked(out.text, kidsSaid);
       if (bad.length) {
@@ -284,7 +342,7 @@ Deno.serve(async (req) => {
         const again = await askGemini(system, [...contents, { role: 'model', parts: [{ text: out.text }] },
           { role: 'user', parts: [{ text: `(선생님) 방금 답에 아이들이 스스로 찾아야 할 낱말 "${bad.join(', ')}"을 먼저 말했어요. 그 낱말을 쓰지 말고, 같은 뜻의 답을 질문 하나로 다시 써 주세요.` }] }]);
         bad = leaked(again.text, kidsSaid);
-        if (bad.length) { guard = 'safe'; out = { ...again, text: SAFE_REPLY[step - 1] }; } else out = again;
+        if (bad.length) { guard = 'safe'; out = { ...again, text: safe }; } else out = again;
       }
       const pass = step < 4 && (out.pass || past.some((v) => (v.step ?? 1) === step && v.pass === true));
       if (pass) {
