@@ -225,3 +225,10 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .way-q { margin-top: 6px; padding: 4px 10px; font-size: 15.5px; }
 .way-q b { font-size: 18px; }
 .modal.dim { padding-top: 30px; }
+
+/* 팁의 딱지를 여덟 개씩 두 번에 나눠 보여 주고, 누르기 좋게 키움 */
+.ways { gap: 7px; }
+.ways button { min-height: 44px; padding: 0 13px; font-size: 20px; }
+.ways[data-page="0"] .p1, .ways[data-page="1"] .p0 { display: none; }
+.ways .more { background: var(--teal); border-color: var(--teal); color: #fff; }
+.ways .more small { font-family: var(--body); font-weight: 400; font-size: 14px; margin-left: 4px; opacity: .9; }

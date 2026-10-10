@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=34';
-import { store } from './store.js?v=34';
-import { createMapView, shortName } from './map-view.js?v=34';
-import { shrinkPhoto } from './photo.js?v=34';
-import { esc, safeLink, josa, timeText } from './util.js?v=34';
-import { MAX_LEN } from './config.js?v=34';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=34';
-import { createTagView } from './tag-view.js?v=34';
-import { createChatView } from './chat-view.js?v=34';
-import { createTeacher, hashCode } from './teacher.js?v=34';
+import mapData from '../data/gyeongbuk-map.js?v=35';
+import { store } from './store.js?v=35';
+import { createMapView, shortName } from './map-view.js?v=35';
+import { shrinkPhoto } from './photo.js?v=35';
+import { esc, safeLink, josa, timeText } from './util.js?v=35';
+import { MAX_LEN } from './config.js?v=35';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=35';
+import { createTagView } from './tag-view.js?v=35';
+import { createChatView } from './chat-view.js?v=35';
+import { createTeacher, hashCode } from './teacher.js?v=35';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -660,7 +660,8 @@ function openArrowForm(fromKey, toKey, key) {
       <b>${ICON.bulb}선생님의 팁 <small>예시: ${esc(ARROW_TIP.pair)}</small></b>
       <p><span class="num">1</span>${esc(ARROW_TIP.how.tip)}<br><em>예: ${esc(ARROW_TIP.how.ex)}</em></p>
       <p><span class="num">2</span>${esc(ARROW_TIP.change.tip)}<br><em>예: ${esc(ARROW_TIP.change.ex)}</em></p>
-      <div class="ways">${ARROW_TIP.ways.map(([name], i) => `<button type="button" data-act="way" data-i="${i}">${esc(name)}</button>`).join('')}</div>
+      <div class="ways" data-page="0">${ARROW_TIP.ways.map(([name], i) => `<button type="button" data-act="way" data-i="${i}" class="${i < 8 ? 'p0' : 'p1'}">${esc(name)}</button>`).join('')}
+        <button type="button" class="more" data-act="way-more">다른 것 더 보기 <small>1/2</small></button></div>
       <div class="way-q" data-wayq hidden></div>
       <small>예시를 그대로 쓰지 말고, 우리 모둠이 조사한 자원으로 써요.</small>
     </div>
@@ -787,6 +788,11 @@ document.addEventListener('click', (e) => {
   else if (a === 'form-save') modal.save();
   else if (a === 'form-cancel') modal.cancel();
   else if (a === 'photo-del') modal.photoDel();
+  else if (a === 'way-more') {
+    const box = act.closest('.ways');
+    box.dataset.page = box.dataset.page === '0' ? '1' : '0';
+    act.innerHTML = box.dataset.page === '0' ? '다른 것 더 보기 <small>1/2</small>' : '앞의 것 보기 <small>2/2</small>';
+  }
   else if (a === 'way') {
     // 고른 것의 물음을 한 줄로 보여 줍니다(입력칸은 건드리지 않음).
     const [name, q] = ARROW_TIP.ways[+act.dataset.i];
