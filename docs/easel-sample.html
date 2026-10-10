@@ -8,104 +8,111 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
 <style>
-  :root { --ink: #1E3A4C; --teal: #2A6F7D; --teal-l: #9FCFD6; --coral-d: #C93A27; --land: #F8E9A9; --mute: #3F5F6E; --many: #C93A27; --few: #2F63B0; }
+  :root { --ink: #1E3A4C; --teal: #2A6F7D; --teal-l: #9FCFD6; --coral-d: #C93A27; --mute: #3F5F6E; --sun: #FFD35C; }
   * { box-sizing: border-box; }
   body { margin: 0; padding: 24px; background: #E6F5F2; color: var(--ink); font-family: 'Gowun Dodum', sans-serif; }
   h1 { font-family: 'Gaegu', sans-serif; font-size: 34px; margin: 0 0 4px; }
-  .lead { margin: 0 0 18px; color: var(--mute); font-size: 16px; line-height: 1.6; max-width: 900px; }
+  .lead { margin: 0 0 18px; color: var(--mute); font-size: 16px; line-height: 1.6; max-width: 980px; }
   .wrap { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
   figure { margin: 0; }
   figcaption { font-family: 'Gaegu', sans-serif; font-weight: 700; font-size: 24px; margin-bottom: 8px; }
-  /* 이젤패드 한 장(세로로 긴 종이, 약 5:6) */
-  .pad { width: 720px; min-height: 864px; background: #fff; border: 3px solid var(--teal); border-radius: 10px; box-shadow: 0 8px 0 var(--teal-l); padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; font-family: 'Gaegu', sans-serif; font-weight: 700; }
+
+  /* 이젤패드 한 장(세로로 긴 종이) */
+  .pad { width: 720px; background: #fff; border: 3px solid var(--teal); border-radius: 10px; box-shadow: 0 8px 0 var(--teal-l); padding: 16px 18px 18px; font-family: 'Gaegu', sans-serif; font-weight: 700; }
   .title { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 4px solid var(--coral-d); padding-bottom: 6px; }
   .title b { font-size: 40px; color: var(--coral-d); }
   .title span { font-size: 22px; color: var(--mute); }
-  .box { position: relative; border: 3px dashed var(--teal-l); border-radius: 16px; padding: 12px 14px 12px 52px; }
-  .n { position: absolute; left: 10px; top: 10px; width: 34px; height: 34px; border-radius: 50%; background: var(--coral-d); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-  .lab { font-size: 22px; color: var(--teal); margin-bottom: 4px; }
-  .lab small { font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 13px; color: var(--mute); margin-left: 6px; }
-  .big { font-size: 27px; line-height: 1.25; }
-  .row { display: flex; gap: 12px; align-items: stretch; }
-  .chip { flex: 1; border-radius: 12px; padding: 6px 10px; font-size: 24px; border: 3px solid; }
-  .chip small { display: block; font-size: 16px; }
-  .chip.many { border-color: var(--many); color: var(--many); background: #FFF0EC; }
-  .chip.few { border-color: var(--few); color: var(--few); background: #EDF3FD; }
-  .then { margin-top: 8px; font-size: 22px; }
-  .then i { font-style: normal; color: var(--coral-d); padding: 0 6px; }
-  .mid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 12px; align-items: center; }
-  .mid svg { width: 100%; height: 290px; display: block; }
-  .deal { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
-  .deal div { border-radius: 14px; padding: 8px 12px; font-size: 24px; line-height: 1.25; border: 3px solid var(--teal); background: #F3FBF9; }
-  .deal em { font-style: normal; color: var(--coral-d); }
-  .life { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: center; }
-  .pic { height: 132px; border: 3px solid var(--teal); border-radius: 12px; background: repeating-linear-gradient(45deg, #F3FBF9 0 12px, #E3F1F4 12px 24px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 20px; color: var(--teal); }
-  .pic small { font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 12.5px; color: var(--mute); margin-top: 4px; }
-  .claim { border: 4px solid var(--coral-d); border-radius: 16px; padding: 10px 14px; font-size: 27px; line-height: 1.3; background: #FFF6D6; }
+
+  /* 가운데에 달라진 우리 지역, 양옆과 아래에 함께 달라지는 세 지역 */
+  .web { display: grid; grid-template-columns: 198px 24px 1fr 24px 198px; grid-template-rows: auto 26px auto; margin-top: 12px; align-items: center; }
+  .node { background: #fff; border: 3px solid var(--teal); border-radius: 18px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .node h3 { margin: 0; font-size: 23px; line-height: 1.1; color: var(--teal); }
+  .node p { margin: 0; font-size: 19px; line-height: 1.22; }
+  .pic { border: 3px solid var(--teal-l); border-radius: 12px; background: repeating-linear-gradient(45deg, #F3FBF9 0 12px, #E3F1F4 12px 24px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 18px; color: var(--teal); height: 104px; }
+  .pic small { font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 11.5px; color: var(--mute); }
+  .hub { grid-column: 3; grid-row: 1; border: 5px solid var(--coral-d); background: #FFF6D6; padding: 10px; }
+  .hub h3 { color: var(--coral-d); font-size: 29px; text-align: center; }
+  .hub .pic { height: 170px; background: repeating-linear-gradient(45deg, #FFFBEA 0 12px, #FFF0C2 12px 24px); border-color: #E0B84A; color: #A9781A; font-size: 21px; }
+  .hub p { font-size: 23px; text-align: center; }
+  .a { grid-column: 1; grid-row: 1; }
+  .b { grid-column: 5; grid-row: 1; }
+  .c { grid-column: 2 / 5; grid-row: 3; justify-self: center; width: 300px; display: grid; grid-template-columns: 118px 1fr; column-gap: 8px; row-gap: 5px; }
+  .c h3, .c .swap { grid-column: 1 / 3; }
+  .c .pic { grid-row: 3 / 5; height: 100%; min-height: 86px; }
+  /* 지역을 잇는 점선 */
+  .lk { border-top: 6px dotted var(--coral-d); align-self: center; }
+  .lk.l { grid-column: 2; grid-row: 1; }
+  .lk.r { grid-column: 4; grid-row: 1; }
+  .lk.v { grid-column: 3; grid-row: 2; justify-self: center; width: 0; height: 100%; border-top: 0; border-left: 6px dotted var(--coral-d); }
+  /* 주고받는 것, 함께 만드는 것 */
+  .swap { align-self: flex-start; padding: 2px 9px; border-radius: 999px; background: #fff; border: 3px solid var(--coral-d); color: var(--coral-d); font-size: 18px; line-height: 1.2; }
+  .plus { display: inline-block; align-self: flex-start; padding: 2px 9px; border-radius: 10px; background: var(--sun); border: 2px solid #E0A100; font-size: 18px; line-height: 1.2; }
+  .plus::before { content: "함께! "; color: var(--coral-d); }
+  .claim { margin-top: 12px; border: 4px solid var(--coral-d); border-radius: 16px; padding: 10px 14px; font-size: 25px; line-height: 1.32; background: #FFF6D6; }
   .claim u { text-decoration-color: var(--coral-d); text-decoration-thickness: 3px; text-underline-offset: 4px; }
-  /* 빈 틀: 써 넣을 자리만 */
   .blank .fill { color: #B7C7CC; }
-  .blank .line { display: block; border-bottom: 2px dotted #B7C7CC; height: 30px; }
-  .notes { max-width: 430px; font-size: 16px; line-height: 1.65; }
+  .blank .plus { color: #B79B4A; }
+
+  .notes { max-width: 450px; font-size: 16px; line-height: 1.65; }
   .notes h2 { font-family: 'Gaegu', sans-serif; font-size: 26px; margin: 0 0 6px; color: var(--coral-d); }
   .notes h2:not(:first-child) { margin-top: 20px; }
-  .notes ol, .notes ul { margin: 0; padding-left: 20px; }
+  .notes ul { margin: 0; padding-left: 20px; }
   .notes li { margin-bottom: 6px; }
   .notes table { border-collapse: collapse; width: 100%; font-size: 15px; }
-  .notes td, .notes th { border-bottom: 1px solid var(--teal-l); padding: 5px 6px; text-align: left; }
+  .notes td, .notes th { border-bottom: 1px solid var(--teal-l); padding: 5px 6px; text-align: left; vertical-align: top; }
   .tip { background: #fff; border: 2px solid var(--teal-l); border-radius: 14px; padding: 12px 14px; margin-top: 12px; }
+  .key { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 0; font-family: 'Gaegu', sans-serif; font-weight: 700; font-size: 19px; }
+  .key { flex-direction: column; gap: 8px; }
+  .key > span { display: flex; align-items: center; gap: 8px; font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 15.5px; line-height: 1.4; }
+  .key .swap, .key .plus { flex: none; white-space: nowrap; font-family: 'Gaegu', sans-serif; font-weight: 700; }
   @media print {
     body { background: #fff; padding: 0; }
     .lead, .notes, h1 { display: none; }
     .wrap { display: block; }
-    figure { break-after: page; padding: 10mm; }
-    .pad { width: 180mm; min-height: 0; box-shadow: none; zoom: .94; }
+    figure { break-after: page; padding: 8mm; }
+    .pad { box-shadow: none; zoom: .92; }
   }
 </style>
 </head>
 <body>
 <h1>교류 제안서 이젤패드 배치 견본</h1>
-<p class="lead">발표 순서(① → ② → ③ → 주장)와 종이의 위아래 순서를 똑같이 맞춘 배치입니다. 왼쪽은 예시 지역인 <b>문경시</b>로 채운 견본, 오른쪽은 아이들에게 보여 줄 빈 틀입니다. 인쇄하면 한 장에 하나씩 나옵니다.</p>
+<p class="lead">이젤패드의 주인공은 <b>"교류하면 생활 모습이 어떻게, 왜 달라지는가"</b>입니다. 자원 지도와 화살표는 앱(교류 제안서 화면)을 띄운 태블릿으로 보여 주고, 종이에는 핵심만 적습니다. 가운데에 <b>달라진 우리 지역</b>, 둘레에 <b>함께 달라지는 세 지역</b>을 놓았습니다. 왼쪽은 예시 지역 문경시로 채운 견본, 오른쪽은 빈 틀입니다.</p>
 
 <div class="wrap">
   <figure>
     <figcaption>견본 (예시 지역: 문경시)</figcaption>
     <div class="pad">
       <div class="title"><b>문경시 교류 제안서</b><span>○모둠</span></div>
-
-      <div class="box">
-        <span class="n">1</span>
-        <div class="lab">우리 지역은 <small>환경 한 줄 · 많은 것과 부족한 것 · 옛날과 지금</small></div>
-        <div class="big">산이 많고 낮과 밤의 기온 차가 커요.</div>
-        <div class="row" style="margin-top:8px">
-          <div class="chip many"><small>많은 것</small>오미자, 찻사발</div>
-          <div class="chip few"><small>부족한 것</small>바다에서 나는 먹거리</div>
+      <div class="web">
+        <div class="node a">
+          <h3>달라진 영덕</h3>
+          <span class="swap">오미자 ⇄ 대게</span>
+          <div class="pic">교류 후 그림</div>
+          <p>바닷가에서도 오미자차를 마셔요.</p>
+          <span class="plus">대게·오미자 맛 축제</span>
         </div>
-        <div class="then">옛날: 석탄을 많이 캤어요 <i>→</i> 지금: 탄광이 문을 닫고 박물관이 되었어요</div>
-      </div>
-
-      <div class="box mid">
-        <span class="n">2</span>
-        <div>
-          <div class="lab">교류 제안 <small>지도에 화살표 두세 개</small></div>
-          <svg id="map1" viewBox="0 0 10 10" role="img" aria-label="경상북도 지도에 문경과 영덕을 잇는 화살표"></svg>
+        <div class="node b">
+          <h3>달라진 상주</h3>
+          <span class="swap">찻사발 ⇄ 곶감</span>
+          <div class="pic">교류 후 그림</div>
+          <p>곶감이 예쁜 그릇에 담겨 더 잘 팔려요.</p>
+          <span class="plus">찻사발 곶감 선물</span>
         </div>
-        <div class="deal">
-          <div>문경 <em>→</em> 영덕<br>오미자를 보내요</div>
-          <div>영덕 <em>→</em> 문경<br>대게를 보내요</div>
+        <div class="node c">
+          <h3>달라진 포항</h3>
+          <span class="swap">석탄 박물관 ⇄ 제철소</span>
+          <div class="pic">교류 후 그림</div>
+          <p>석탄과 철 이야기를 배우러 아이들이 와요.</p>
+          <span class="plus">석탄·철 배움 여행길</span>
         </div>
-      </div>
-
-      <div class="box">
-        <span class="n">3</span>
-        <div class="lab">달라지는 생활 <small>교류한 뒤의 모습 그림 한 장 + 한 문장씩</small></div>
-        <div class="life">
-          <div class="pic">교류 후 그림<small>AI와 함께 상상해서 그린 그림</small></div>
-          <div class="big">문경: 산골 밥상에 대게가 올라와요.<br>영덕: 바닷가에서도 오미자차를 마셔요.</div>
+        <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
+        <div class="node hub">
+          <h3>달라진 문경</h3>
+          <div class="pic">교류 후 문경 그림<small>AI와 함께 상상해서 그린 그림</small></div>
+          <p>밥상이 풍성해지고, 문경을 찾아오는 손님이 늘어요.</p>
         </div>
       </div>
-
-      <div class="claim">우리는 <u>영덕</u>과 교류해야 합니다. 왜냐하면 <u>서로 부족한 것을 채워서 밥상이 풍성해지기</u> 때문입니다.</div>
+      <div class="claim">문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 서로 <u>부족한 것을 채우고</u>, 함께하면 <u>새로운 것도 만들 수 있기</u> 때문입니다.</div>
     </div>
   </figure>
 
@@ -113,102 +120,75 @@
     <figcaption>빈 틀 (아이들에게 보여 줄 것)</figcaption>
     <div class="pad blank">
       <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span>○모둠</span></div>
-
-      <div class="box">
-        <span class="n">1</span>
-        <div class="lab">우리 지역은</div>
-        <div class="big fill">어떤 환경인가요? (한 줄)</div>
-        <div class="row" style="margin-top:8px">
-          <div class="chip many"><small>많은 것</small><span class="line"></span></div>
-          <div class="chip few"><small>부족한 것</small><span class="line"></span></div>
+      <div class="web">
+        <div class="node a">
+          <h3>달라진 <span class="fill">○○</span></h3>
+          <span class="swap"><span class="fill">보낼 것 ⇄ 받을 것</span></span>
+          <div class="pic">교류 후 그림</div>
+          <p class="fill">어떻게 달라지나요?</p>
+          <span class="plus">함께 만드는 것</span>
         </div>
-        <div class="then fill">옛날: <i>→</i> 지금:</div>
-      </div>
-
-      <div class="box mid">
-        <span class="n">2</span>
-        <div>
-          <div class="lab">교류 제안</div>
-          <svg id="map2" viewBox="0 0 10 10" role="img" aria-label="경상북도 지도"></svg>
+        <div class="node b">
+          <h3>달라진 <span class="fill">○○</span></h3>
+          <span class="swap"><span class="fill">보낼 것 ⇄ 받을 것</span></span>
+          <div class="pic">교류 후 그림</div>
+          <p class="fill">어떻게 달라지나요?</p>
+          <span class="plus">함께 만드는 것</span>
         </div>
-        <div class="deal">
-          <div class="fill">우리 <em>→</em> ○○<br>무엇을 보내요</div>
-          <div class="fill">○○ <em>→</em> 우리<br>무엇을 보내요</div>
+        <div class="node c">
+          <h3>달라진 <span class="fill">○○</span></h3>
+          <span class="swap"><span class="fill">보낼 것 ⇄ 받을 것</span></span>
+          <div class="pic">교류 후 그림</div>
+          <p class="fill">어떻게 달라지나요?</p>
+          <span class="plus">함께 만드는 것</span>
         </div>
-      </div>
-
-      <div class="box">
-        <span class="n">3</span>
-        <div class="lab">달라지는 생활</div>
-        <div class="life">
-          <div class="pic">교류 후 그림<small>AI와 함께 상상해서 그린 그림</small></div>
-          <div class="big fill">우리 지역: <br>상대 지역: </div>
+        <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
+        <div class="node hub">
+          <h3>달라진 <span class="fill">우리 지역</span></h3>
+          <div class="pic">교류 후 우리 지역 그림<small>AI와 함께 상상해서 그린 그림</small></div>
+          <p class="fill">어떻게 달라지나요? (한 문장)</p>
         </div>
       </div>
-
-      <div class="claim">우리는 <span class="fill">○○</span>와 교류해야 합니다. 왜냐하면 <span class="fill">………………</span> 때문입니다.</div>
+      <div class="claim">우리는 <span class="fill">○○·○○·○○</span>와 교류해야 합니다. 서로 <span class="fill">………………</span>, 함께하면 <span class="fill">………………</span> 때문입니다.</div>
     </div>
   </figure>
 
   <div class="notes">
+    <h2>종이에 적는 것은 세 가지뿐</h2>
+    <div class="key">
+      <span><span class="swap" style="font-size:17px">오미자 ⇄ 대게</span><span>주고받는 것 (왜 ①: 서로 부족한 것을 채움)</span></span>
+      <span><span class="plus" style="font-size:17px">맛 축제</span><span>함께 만드는 것 (왜 ②: 힘을 합치면 새로 생기는 것)</span></span>
+      <span>그림 + 한 문장: 그래서 생활이 어떻게 달라지는지</span>
+    </div>
+    <p style="margin:8px 0 0">무엇이 많고 부족한지, 어떤 환경인지, 화살표의 자세한 이유는 종이에 쓰지 않습니다. 발표할 때 옆에 둔 태블릿의 <b>교류 제안서 화면</b>을 짚으며 말로 설명합니다.</p>
+
     <h2>발표 5분에 이렇게 써요</h2>
     <table>
-      <tr><th>순서</th><th>짚는 곳</th><th>시간</th></tr>
-      <tr><td>①</td><td>우리 지역은 어떤 곳인지, 많은 것과 부족한 것</td><td>1분</td></tr>
-      <tr><td>②</td><td>어느 지역과 무엇을 주고받는지(지도의 화살표)</td><td>2분</td></tr>
-      <tr><td>③</td><td>교류하면 생활이 어떻게 달라지는지(그림)</td><td>1분</td></tr>
-      <tr><td>주장</td><td>맨 아래 한 문장을 읽으며 마무리</td><td>30초</td></tr>
-      <tr><td></td><td>청중의 질문, TAG 남기기</td><td>남는 시간</td></tr>
+      <tr><th>순서</th><th>하는 말</th><th>시간</th></tr>
+      <tr><td>태블릿</td><td>우리 지역에 많은 것과 부족한 것, 이은 화살표를 짧게 보여 줌</td><td>1분</td></tr>
+      <tr><td>둘레 세 곳</td><td>한 곳씩: 무엇을 주고받고 → 함께 무엇을 만들고 → 그래서 그 지역이 어떻게 달라지는지</td><td>2분 30초</td></tr>
+      <tr><td>가운데</td><td>그래서 우리 지역은 이렇게 달라진다</td><td>1분</td></tr>
+      <tr><td>맨 아래</td><td>주장 한 문장으로 마무리</td><td>30초</td></tr>
     </table>
 
     <h2>만들 때 지킬 것</h2>
     <ul>
-      <li><b>화살표는 두세 개까지.</b> 앱에서 이은 것 가운데 가장 자신 있는 것만 고릅니다.</li>
-      <li><b>문장보다 낱말.</b> 종이에는 핵심 낱말만 쓰고, 이유는 말로 합니다. 문장은 ③의 두 줄과 맨 아래 주장뿐입니다.</li>
-      <li><b>많은 것은 빨강, 부족한 것은 파랑</b>으로 쓰면 멀리서도 구분됩니다.</li>
-      <li>②의 지도는 경북 모양을 크게 그리고 두 지역만 색칠합니다. 앱 화면을 보고 따라 그리면 됩니다.</li>
-      <li>그림 아래에 <b>"AI와 함께 상상해서 그린 그림"</b>이라고 씁니다.</li>
+      <li><b>교류하는 지역은 세 곳까지.</b> 앱에서 이은 화살표 가운데 가장 자신 있는 것만 고릅니다.</li>
+      <li><b>"채우기"에서 멈추지 않기.</b> 주고받는 것만 쓰면 "없으니까 받는다"로 끝납니다. <b>"함께!" 딱지</b>에 두 지역이 힘을 합쳐 새로 만들 수 있는 것을 꼭 하나씩 적게 합니다.</li>
+      <li><b>달라지는 것은 양쪽 모두.</b> 우리 지역만이 아니라 상대 지역도 어떻게 달라지는지 한 문장씩 씁니다.</li>
+      <li>그림은 모두 <b>"교류한 뒤"의 모습</b>입니다(가운데 한 장 + 둘레 세 장). 그림 아래에 "AI와 함께 상상해서 그린 그림"이라고 씁니다.</li>
+      <li>그림이 네 장이라 만드는 데 시간이 걸립니다. 모자라면 둘레 세 곳은 손그림으로 해도 됩니다.</li>
     </ul>
 
     <div class="tip">
-      <b>그림 주문 글 틀</b> (이 글이 ③에 적을 한 문장이 됩니다)<br>
-      ( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 ) ( 어떻게 하고 있는 ) 모습<br>
-      <small>예: 문경 산골 마을에 사는 가족이 영덕에서 온 대게를 밥상에 올려 함께 먹고 있는 모습</small>
+      <b>그림 주문 글 틀</b> (이 글이 그림 아래 한 문장이 됩니다)<br>
+      ( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 / 함께 무엇을 만들어서 ) ( 어떻게 하고 있는 ) 모습<br>
+      <small>예: 영덕 바닷가 축제에서 사람들이 대게를 먹으며 문경 오미자차를 마시고 있는 모습</small>
     </div>
 
     <h2>일부러 쓰지 않는 낱말</h2>
-    <p style="margin:0">종이에는 "공간(장소)", "시간", "희소성"이라는 낱말을 쓰지 않습니다. ①의 환경과 많은 것·부족한 것, "옛날과 지금"으로만 드러나게 두면, 뒤의 챗봇 활동에서 아이들이 "우리 제안서에 다 있었네" 하며 스스로 낱말을 찾게 됩니다.</p>
+    <p style="margin:0">종이에는 "공간(장소)", "시간", "희소성"이라는 낱말을 쓰지 않습니다. 뒤의 챗봇 활동에서 아이들이 스스로 찾을 낱말이기 때문입니다.</p>
   </div>
 </div>
-
-<script type="module">
-  // 앱의 지도 자료로 작은 경북 지도를 그립니다(견본에는 문경과 영덕을 색칠하고 화살표를 그림).
-  import map from '../data/gyeongbuk-map.js';
-  const [x0, y0, x1, y1] = map.home;
-  const ull = map.regions.find((r) => r.inset);
-  const by = (id) => map.regions.find((r) => r.id === id);
-  function draw(svg, marks) {
-    const land = map.regions.filter((r) => r !== ull);
-    const bx1 = Math.max(...land.map((r) => r.bbox[2])) + 14;
-    svg.setAttribute('viewBox', `${x0 - 8} ${y0 - 8} ${bx1 - x0 + 16} ${y1 - y0 + 16}`);
-    let h = land.map((r) => `<path d="${r.d}" fill="${(marks[r.id] || {}).fill || '#F8E9A9'}" stroke="#2A6F7D" stroke-width="1.6" stroke-linejoin="round"/>`).join('');
-    for (const [id, m] of Object.entries(marks)) {
-      const [lx, ly] = by(+id).label;
-      h += `<text x="${lx}" y="${ly + 15}" text-anchor="middle" font-family="Gaegu, sans-serif" font-weight="700" font-size="46" fill="#1E3A4C" stroke="#fff" stroke-width="8" paint-order="stroke">${m.name}</text>`;
-    }
-    const ids = Object.keys(marks);
-    if (ids.length === 2) {
-      const [a, b] = ids.map((id) => by(+id).label);
-      const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
-      const curve = (s) => { const cx = mx - (dy / len) * s, cy = my + (dx / len) * s; return `Q${cx} ${cy}`; };
-      h += `<defs><marker id="${svg.id}h" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#C93A27"/></marker></defs>`;
-      h += `<path d="M${a[0] + 50} ${a[1] - 22} ${curve(-70)} ${b[0] - 44} ${b[1] - 30}" fill="none" stroke="#C93A27" stroke-width="9" stroke-linecap="round" marker-end="url(#${svg.id}h)"/>`;
-      h += `<path d="M${b[0] - 44} ${b[1] + 26} ${curve(70)} ${a[0] + 50} ${a[1] + 34}" fill="none" stroke="#C93A27" stroke-width="9" stroke-linecap="round" stroke-dasharray="20 16" marker-end="url(#${svg.id}h)"/>`;
-    }
-    svg.innerHTML = h;
-  }
-  draw(document.getElementById('map1'), { 37090: { name: '문경', fill: '#F7A8C4' }, 37350: { name: '영덕', fill: '#9FD0F7' } });
-  draw(document.getElementById('map2'), {});
-</script>
 </body>
 </html>
