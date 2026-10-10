@@ -24,12 +24,16 @@ export const ERA = { old: '옛날부터 많았어요', more: '요즘 많아졌�
 export const EXAMPLE_CID = 37090;
 export const EXAMPLE_RES = [
   { key: 'ex-omija', cid: EXAMPLE_CID, env: 'nat', why: '산이 많고 낮과 밤의 기온 차가 커서', name: '오미자', amt: 'many',
-    era: 'more', eraWhy: '오미자 음료와 축제가 인기를 얻어 기르는 농가가 늘었어요' },
+    era: 'more', eraWhy: '오미자 음료와 축제가 인기를 얻어 기르는 농가가 늘었어요',
+    link: 'https://ko.wikipedia.org/wiki/오미자', img: 'omija' },
   { key: 'ex-coal', cid: EXAMPLE_CID, env: 'nat', why: '땅속에 석탄이 많이 묻혀 있어서', name: '석탄', amt: 'few',
-    era: 'less', eraWhy: '탄광이 문을 닫아 지금은 캐지 않고 박물관이 되었어요' },
-  { key: 'ex-bowl', cid: EXAMPLE_CID, env: 'hum', why: '도자기를 굽는 장인들이 모여 살아서', name: '찻사발(도자기)', amt: 'many',
-    era: 'old', eraWhy: '옛날부터 도자기를 구웠고 지금도 축제로 이어져요' },
-].map((r, i) => ({ ...r, link: '', photo: null, by: { g: 0, n: '예시' }, at: i, example: true }));
+    era: 'less', eraWhy: '탄광이 문을 닫아 지금은 캐지 않고 박물관이 되었어요',
+    link: 'https://ko.wikipedia.org/wiki/문경석탄박물관', img: 'coal' },
+  { key: 'ex-bowl', cid: EXAMPLE_CID, env: 'hum', why: '도자기를 굽는 장인들이 모여 살아서', name: '찻사발', amt: 'many',
+    era: 'old', eraWhy: '옛날부터 도자기를 구웠고 지금도 축제로 이어져요',
+    link: 'https://www.sabal21.com/', img: 'bowl' },
+// 사진은 assets/examples 에 있습니다(위키미디어 공용, 모두 CC0 — 출처: assets/examples/README.md).
+].map(({ img, ...r }, i) => ({ ...r, photo: { full: `assets/examples/${img}.jpg`, thumb: `assets/examples/${img}-s.jpg` }, by: { g: 0, n: '예시' }, at: i, example: true }));
 // 입력칸 아래에 보여 주는 예시(문경 예시 카드에서 가져옴)
 export const EXAMPLE_HINT = {
   why: '예: 산이 많고 낮과 밤의 기온 차가 커서 (문경 오미자)',

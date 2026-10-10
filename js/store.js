@@ -4,7 +4,7 @@
 //   그래서 인터넷이 끊겨도, 새로고침해도 글이 사라지지 않고 연결이 돌아오면 다시 보냅니다.
 // - 읽기는 몇 초마다 "마지막으로 본 뒤 바뀐 줄"만 가져오고, 가끔 전체를 다시 읽습니다.
 // - 지우기는 줄을 없애지 않고 deleted 표시를 붙입니다(다른 기기에도 지운 것이 전해지도록).
-import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=20';
+import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=21';
 
 const CACHE_KEY = 'gb-cache-v1';
 const OUTBOX_KEY = 'gb-outbox-v1';
