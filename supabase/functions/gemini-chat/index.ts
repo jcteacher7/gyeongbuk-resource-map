@@ -121,6 +121,8 @@ async function askGemini(system: string, contents: unknown[]) {
         });
         if (r.status === 400) { lastErr = `${model}/${think} 400 ${(await r.text()).slice(0, 200)}`; continue; }
         if (r.status === 404) { lastErr = `${model} 404`; break; }
+        // 이 모델의 사용 한도를 넘었으면(429) 다음 모델로 넘어가 봅니다.
+        if (r.status === 429) { lastErr = `${model} 429 ${(await r.text()).slice(0, 400)}`; break; }
         if (!r.ok) throw new Error(`${model} ${r.status} ${(await r.text()).slice(0, 200)}`);
         const data = await r.json();
         const text = (data?.candidates?.[0]?.content?.parts ?? [])
@@ -217,7 +219,7 @@ Deno.serve(async (req) => {
       value = { ...base, a: out.text, model: out.model, think: out.think, ms: { db: tDb, ai: Date.now() - t0 - tDb } };
     } catch (e) {
       // 실패해도 아이가 보낸 말은 기록에 남깁니다(선생님 화면에서 볼 수 있음).
-      await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value: { ...base, a: null, err: String(e).slice(0, 300) } }]) });
+      await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value: { ...base, a: null, err: String(e).slice(0, 600) } }]) });
       return reply({ ok: false, error: 'ai', detail: String(e).slice(0, 300) }, 502);
     }
     const w = await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value }]) });
