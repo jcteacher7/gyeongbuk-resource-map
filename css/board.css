@@ -123,3 +123,61 @@
 #main .top.tighter #syncText { display: none; }
 #main .top.tighter .sync { padding: 0 12px; }
 #main .top.tighter .tab { font-size: 20px; padding: 0 9px; }
+
+/* ================= 3단계 다듬기 (점검 결과 반영) ================= */
+/* 1. 지도에서 누르는 곳을 44px 이상으로: 핀은 키우고, 시군 이름은 글씨는 그대로 두고 눌리는 범위만 넓힘 */
+.pin { height: 44px; padding: 0 7px 0 15px; border-radius: 22px; font-size: 22px; }
+.pin b { min-width: 28px; height: 28px; border-radius: 14px; font-size: 18px; }
+.rname { min-width: 48px; min-height: 44px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; }
+
+/* 2. 글자와 바탕의 대비(4.5:1 이상, 큰 글씨는 3:1 이상) */
+.pin b { background: var(--coral-d); }
+.badge.many { color: #A32B1B; border-color: #A32B1B; }
+.tchip.t-T b { background: #2E7D47; }
+.tchip.t-A b { background: #2F63B0; }
+.tchip.t-G b { background: #A95F06; }
+.cv-steps li .num, .tb-step .num { background: #5E7882; }
+.cv-steps li.done .num { background: var(--teal); }
+.cv-steps li.on .num, .tb-step.cls .num { background: var(--coral-d); }
+.cv-steps li { color: #4A6470; }
+.cv-steps li.on, .cv-steps li.done { color: var(--ink); }
+
+/* 3. 너무 작은 글씨 */
+.credit { font-size: 12.5px; }
+.inset-note small { font-size: 12px; }
+.tb-step small { font-size: 13px; }
+.tb-item small { font-size: 14px; }
+.rc-body small.by { font-size: 14.5px; }
+
+/* 5. 자원 이름이 길면 두 줄까지 */
+.rc-top { align-items: flex-start; }
+.rc-top b { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; overflow-wrap: anywhere; }
+.rc-top .badge { flex: none; margin-top: 1px; }
+
+/* 6. 조금 작던 단추들 */
+.xbtn { width: 46px; height: 46px; }
+.xbtn.sm { width: 44px; height: 44px; }
+.tcard .xbtn.sm { width: 40px; height: 40px; }
+.chip, .plan-groups .chip { height: 46px; padding: 0 16px; font-size: 20px; }
+.plan-groups .chip { padding: 0 12px; font-size: 19px; }
+.chk { min-height: 46px; padding: 0 4px; cursor: pointer; }
+.chk input { width: 26px; height: 26px; accent-color: var(--teal); }
+
+/* 7. 키보드로 옮겨 다닐 때 지금 있는 곳 표시 */
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.btn.primary:focus-visible, .btn.coral:focus-visible, .tab.on:focus-visible { outline-color: var(--ink); }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: none; }
+.regs path:focus { outline: none; }
+
+/* 8. 고른 화살표 위의 이유 딱지가 통통 */
+.why-badge circle { fill: #fff; stroke: var(--coral-d); stroke-width: 3; }
+.why-badge path { fill: none; stroke: var(--coral-d); stroke-width: 2.4; stroke-linejoin: round; }
+.why-badge { animation: bob 1.5s ease-in-out infinite; filter: drop-shadow(0 3px 0 rgba(201,58,39,.35)); }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* 브라우저가 그리는 부분도 앱 색으로: 글 고르기, 입력 깜빡이, 스크롤 막대 */
+::selection { background: #FFD35C; color: var(--ink); }
+input, textarea { caret-color: var(--coral-d); }
+.panel, .tv-main, .cv-thread, .cv-right, .t-body, .modal.side .sheet { scrollbar-width: thin; scrollbar-color: var(--teal-l) transparent; }
+
+@media (prefers-reduced-motion: reduce) { .why-badge { animation: none; } }

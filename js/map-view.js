@@ -1,6 +1,6 @@
 // 지도 그리기: 시군 모양(확대되는 층) 위에 이름·핀·화살표(글자 크기가 그대로인 층)를 얹습니다.
 // 확대는 [+] [−] [처음 크기] 단추와 "이 시군 크게 보기"로만 합니다. 한 손가락으로 밀면 지도가 움직입니다.
-import { esc } from './util.js?v=24';
+import { esc } from './util.js?v=26';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAD = 22;
@@ -111,11 +111,38 @@ export function createMapView(el, data, h) {
   // ---------- 그리기 ----------
   function paint() {
     world.setAttribute('transform', `translate(${view.tx} ${view.ty}) scale(${view.s})`);
-    labelEls.forEach(({ node, pt }) => {
-      const [x, y] = toScreen(pt);
-      node.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+    const pos = labelEls.map(({ pt }) => toScreen(pt));
+    spread(pos);
+    labelEls.forEach(({ node }, i) => {
+      node.style.transform = `translate(${pos[i][0].toFixed(1)}px, ${pos[i][1].toFixed(1)}px)`;
     });
     paintArrows();
+  }
+
+  // 시군 핀과 이름이 서로 겹치면 겹친 만큼만 조금씩 밀어냅니다(제자리에서 최대 32px까지).
+  // 핀이 있는 시군을 먼저 지키고, 이름만 있는 쪽을 더 많이 밉니다.
+  function spread(pos) {
+    const items = labelEls.map((l, i) => ({ i, w: l.w, h: l.h, pin: l.pin, x0: pos[i][0], y0: pos[i][1] })).filter((l) => l.w);
+    for (let round = 0; round < 10; round++) {
+      let moved = false;
+      for (let a = 0; a < items.length; a++) for (let b = a + 1; b < items.length; b++) {
+        const A = items[a], B = items[b];
+        const pa = pos[A.i], pb = pos[B.i];
+        const ox = (A.w + B.w) / 2 + 2 - Math.abs(pa[0] - pb[0]);
+        const oy = (A.h + B.h) / 2 + 2 - Math.abs(pa[1] - pb[1]);
+        if (ox <= 0 || oy <= 0) continue;
+        const wa = A.pin && !B.pin ? 0.25 : !A.pin && B.pin ? 0.75 : 0.5;
+        if (ox < oy) { const s = pa[0] < pb[0] ? -1 : 1; pa[0] += s * ox * wa; pb[0] -= s * ox * (1 - wa); }
+        else { const s = pa[1] < pb[1] ? -1 : 1; pa[1] += s * oy * wa; pb[1] -= s * oy * (1 - wa); }
+        moved = true;
+      }
+      for (const it of items) {
+        const p = pos[it.i];
+        p[0] = Math.min(it.x0 + 32, Math.max(it.x0 - 32, p[0]));
+        p[1] = Math.min(it.y0 + 32, Math.max(it.y0 - 32, p[1]));
+      }
+      if (!moved) break;
+    }
   }
 
   function pinPoint(id) {
@@ -154,7 +181,11 @@ export function createMapView(el, data, h) {
           ? `<path class="arw-under" d="${d}"></path><path class="arw sel" d="${d}" marker-end="url(#ahs)"></path>`
           : `<path class="arw flow" d="${d}" marker-end="url(#ah)"></path>`;
         const hit = `<path class="arw-hit" data-arrow="${esc(a.key)}" d="${d}"></path>`;
-        if (sel) selHtml += part + hit; else html += part + hit;
+        if (sel) {
+          // 곡선의 한가운데(Q 곡선에서 t=0.5)에 이유 딱지를 얹습니다.
+          const mx = (sx + 2 * cx + ex) / 4, my = (sy + 2 * cy + ey) / 4;
+          selHtml += part + hit + `<g transform="translate(${mx.toFixed(1)} ${my.toFixed(1)})"><g class="why-badge"><circle r="19"></circle><path d="M-9 -7 H9 A2.5 2.5 0 0 1 11.5 -4.5 V3 A2.5 2.5 0 0 1 9 5.5 H0 L-5 10 V5.5 H-9 A2.5 2.5 0 0 1 -11.5 3 V-4.5 A2.5 2.5 0 0 1 -9 -7 Z"></path></g></g>`;
+        } else html += part + hit;
       });
     });
     arrowsG.innerHTML = html + selHtml;
@@ -183,7 +214,12 @@ export function createMapView(el, data, h) {
     });
     labels.innerHTML = html;
     const nodes = labels.children;
-    labelEls = out.map((o, i) => ({ node: nodes[i], pt: o.pt }));
+    // 시군 핀·이름만 겹침을 풉니다(이웃 지역 이름, 울릉 안내는 제자리).
+    labelEls = out.map((o, i) => {
+      const node = nodes[i];
+      const region = node.matches('.pin, .rname');
+      return { node, pt: o.pt, pin: node.matches('.pin'), w: region ? node.offsetWidth : 0, h: region ? (node.matches('.pin') ? node.offsetHeight : 30) : 0 };
+    });
   }
 
   function update(m) {
