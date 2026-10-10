@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=23';
-import { store } from './store.js?v=23';
-import { createMapView, shortName } from './map-view.js?v=23';
-import { shrinkPhoto } from './photo.js?v=23';
-import { esc, safeLink, josa, timeText } from './util.js?v=23';
-import { MAX_LEN } from './config.js?v=23';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=23';
-import { createTagView } from './tag-view.js?v=23';
-import { createChatView } from './chat-view.js?v=23';
-import { createTeacher, hashCode } from './teacher.js?v=23';
+import mapData from '../data/gyeongbuk-map.js?v=24';
+import { store } from './store.js?v=24';
+import { createMapView, shortName } from './map-view.js?v=24';
+import { shrinkPhoto } from './photo.js?v=24';
+import { esc, safeLink, josa, timeText } from './util.js?v=24';
+import { MAX_LEN } from './config.js?v=24';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=24';
+import { createTagView } from './tag-view.js?v=24';
+import { createChatView } from './chat-view.js?v=24';
+import { createTeacher, hashCode } from './teacher.js?v=24';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -172,6 +172,16 @@ function renderTop() {
   const s = syncInfo();
   $('#sync').className = 'sync ' + s.cls;
   $('#syncText').textContent = s.text;
+  $('#sync').title = s.text;
+  fitTop();
+}
+
+// 위 막대가 넘치면(화면 이름이 길 때) 글씨를 한 단계씩 줄이고, 그래도 넘치면 오른쪽 상태 글을 점만 남깁니다.
+function fitTop() {
+  const top = $('#main .top');
+  top.classList.remove('tight', 'tighter');
+  if (top.scrollWidth > top.clientWidth + 1) top.classList.add('tight');
+  if (top.scrollWidth > top.clientWidth + 1) top.classList.add('tighter');
 }
 
 function renderTabs() {

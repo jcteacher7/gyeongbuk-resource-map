@@ -110,3 +110,16 @@
 .af-main > .field { display: flex; width: auto; }
 .arrow-form:has([data-tip]:not([hidden])) { width: 1160px; }
 .af-body .tip-box { flex: none; width: 380px; margin: 14px 26px 0 0; }
+
+/* 위 막대: 지도 화면에서는 제목을 핀 그림만 남겨 자리를 넓히고, 넘치면 단계별로 줄입니다. */
+#main .top { gap: 10px; }
+#main .logo span { display: none; }
+#main .logo { padding: 0; width: 60px; justify-content: center; flex: none; }
+#main .who { flex: none; max-width: 230px; overflow: hidden; text-overflow: ellipsis; }
+#main .tabs { margin-left: 2px; gap: 6px; flex: none; }
+#main .sync { flex: none; }
+#main .top.tight .tab { font-size: 21px; padding: 0 11px; }
+#main .top.tight .who { font-size: 20px; padding: 0 12px; max-width: 190px; }
+#main .top.tighter #syncText { display: none; }
+#main .top.tighter .sync { padding: 0 12px; }
+#main .top.tighter .tab { font-size: 20px; padding: 0 9px; }
