@@ -203,3 +203,7 @@ input, textarea { caret-color: var(--coral-d); }
 .t-gens.big .t-keyq small { font-size: 18px; }
 .t-gens.big .t-gen { min-height: 250px; }
 .t-gens.big .t-keyq { padding-right: 140px; }
+
+/* 낱말 중간에서 줄이 바뀌지 않게(한글은 띄어쓰기에서만 줄 바꿈). 너무 긴 낱말만 넘치지 않게 끊음 */
+body { word-break: keep-all; overflow-wrap: break-word; }
+.toast, .hint, .lock-card p, .confirm p, .mission, .cv-guide, .cv-keyq, .t-keyq, .tip-box, .arrow-banner, .step-text, .info-row { text-wrap: pretty; }

@@ -134,6 +134,28 @@
   .idea span { font-size: 14.5px; line-height: 1.45; color: var(--mute); }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 14px; font-size: 14.5px; color: var(--mute); }
   .legend i { display: inline-block; width: 16px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 2px solid; }
+  /* ---------- 읽기 편하게: 낱말 중간에서 줄이 바뀌지 않게, 이름표 옆 글은 이름표 아래로 내려가지 않게 ---------- */
+  body { word-break: keep-all; overflow-wrap: break-word; }
+  .keyq { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: start; }
+  .keyq span { margin: 4px 0 0; }
+  .keyq p { margin: 0; text-wrap: balance; }
+  .node p, .hub p, .claim li span, .tc, .num5 li, .remember, .idea span, .lead { text-wrap: pretty; }
+  .hub p { text-wrap: balance; }
+  .claim li { grid-template-columns: max-content 1fr; }
+  .claim li b { margin-top: 2px; }
+  .talk li { display: grid; grid-template-columns: 215px 1fr; column-gap: 10px; align-items: start; }
+  .talk li b { margin: 0; }
+  .four ul { padding-left: 0; list-style: none; display: grid; gap: 4px; }
+  .four ul li { position: relative; padding-left: 16px; }
+  .four ul li::before { content: "·"; position: absolute; left: 4px; font-weight: 700; }
+  .num5 li > span:last-child { min-width: 0; }
+  /* "함께!" 딱지: 길면 줄을 바꾸되, 둘째 줄이 "함께!" 아래로 들어가지 않게 */
+  .plus { display: inline-grid; grid-template-columns: auto 1fr; column-gap: 5px; max-width: 100%; text-wrap: balance; }
+  .plus::before { content: "함께!"; }
+  .c .swap { justify-self: start; }
+  .num5 .plus, .key .plus { white-space: nowrap; }
+  .swap { white-space: nowrap; }
+  .tk { white-space: nowrap; }
   @media print {
     body { background: #fff; }
     body { padding: 8mm; }
@@ -177,7 +199,7 @@
     <figcaption>다 만든 모습 (문경시로 만든 예시)</figcaption>
     <div class="pad">
       <div class="title"><b><span class="cn">1</span>문경시 교류 제안서</b><span class="who2"><b>○모둠</b>이름, 이름, 이름, 이름</span></div>
-      <div class="keyq"><span>탐구 질문</span>가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?</div>
+      <div class="keyq"><span>탐구 질문</span><p>가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?</p></div>
       <div class="tl">
         <div class="trow"><span class="cn">2</span><span class="tk past">과거</span><div class="tc">석탄을 많이 캤어요.</div></div>
         <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: 오미자, 찻사발</span><span class="few">부족한 것: 바다 먹거리, 곶감</span></div></div>
@@ -217,7 +239,7 @@
         <ol>
           <li><b>서로 채워요</b><span>오미자와 찻사발을 보내고, 대게와 곶감을 받아요.</span></li>
           <li><b>함께 만들어요</b><span>맛 축제, 곶감 선물, 배움 여행길을 함께 만들어요.</span></li>
-          <li><b>그래서 달라져요</b><span>먹을 것이 많아지고, 놀러 오는 사람이 늘어나요.</span></li>
+          <li><b>살아가는 방식이 달라져요</b><span>먹을 것이 많아지고, 놀러 오는 사람이 늘어나요.</span></li>
         </ol></div>
     </div>
   </figure>
@@ -228,7 +250,7 @@
       <li><span class="cn">2</span><span><b>과거 ↓ 현재 ↓ 미래</b><br>위에서 아래로 시간이 흘러요. 현재 칸에 <span style="color:#C93A27">많은 것은 빨강</span>, <span style="color:#2F63B0">부족한 것은 파랑</span>.</span></li>
       <li><span class="cn">3</span><span><b>미래: 함께 달라지는 지역 세 곳</b><br>주고받는 것 · 그림 · 한 문장 · <span class="plus" style="font-family:'Gaegu';font-weight:700">만드는 것</span></span></li>
       <li><span class="cn">4</span><span><b>미래: 달라진 우리 지역</b><br>가장 크게! 그림과 한 문장.</span></li>
-      <li><span class="cn">5</span><span><b>우리 지역의 답</b><br>서로 채워요 · 함께 만들어요 · 그래서 달라져요</span></li>
+      <li><span class="cn">5</span><span><b>우리 지역의 답</b><br>서로 채워요 · 함께 만들어요 · 살아가는 방식이 달라져요</span></li>
     </ol>
     <div class="remember"><b>꼭 기억해요</b><br>· 예시를 베끼지 말고 <b>우리가 조사한 것</b>으로 써요.<br>· 지역과 지역을 <b>선이나 길로 이어요.</b><br>· 글씨는 <b>세 걸음 떨어져도 읽히게</b> 크게, 짧게 써요.</div>
   </div>
@@ -273,10 +295,10 @@
 
   <h2><span class="cn">5</span>발표는 이렇게 해요 (5분)</h2>
   <ol class="talk">
-    <li><b>① 우리 지역</b>"우리 ○○은 과거에는 ~. 현재는 ~이 많고 ~이 부족합니다." <small>태블릿으로 화살표도 보여 줘요.</small></li>
-    <li><b>② 미래의 세 지역</b>"○○와는 ~을 주고받습니다. 함께 ~을 만들 수 있습니다. 그래서 ○○ 사람들은 ~."</li>
-    <li><b>③ 미래의 우리 지역</b>"이렇게 교류하면 미래의 우리 ○○은 ~." <small>가운데 그림을 짚어요.</small></li>
-    <li><b>④ 우리 지역의 답</b>탐구 질문을 읽고, 맨 아래 세 줄을 또박또박 읽어요.</li>
+    <li><b>① 우리 지역</b><span>"우리 ○○은 과거에는 ~. 현재는 ~이 많고 ~이 부족합니다." <small>태블릿으로 화살표도 보여 줘요.</small></span></li>
+    <li><b>② 미래의 세 지역</b><span>"○○와는 ~을 주고받습니다. 함께 ~을 만들 수 있습니다. 그래서 ○○ 사람들은 ~."</span></li>
+    <li><b>③ 미래의 우리 지역</b><span>"이렇게 교류하면 미래의 우리 ○○은 ~." <small>가운데 그림을 짚어요.</small></span></li>
+    <li><b>④ 우리 지역의 답</b><span>탐구 질문을 읽고, 맨 아래 세 줄을 또박또박 읽어요.</span></li>
   </ol>
 </section>
 
@@ -286,7 +308,7 @@
     <figcaption>연습 종이 (인쇄해서 먼저 써 봐요)</figcaption>
     <div class="pad blank">
       <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span class="who2"><b class="fill">모둠 이름</b><span class="fill">모둠 친구들 이름</span></span></div>
-      <div class="keyq"><span>탐구 질문</span>가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?</div>
+      <div class="keyq"><span>탐구 질문</span><p>가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?</p></div>
       <div class="tl">
         <div class="trow"><span class="tk past">과거</span><div class="tc"><span class="fill">과거에는 어땠나요?</span></div></div>
         <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: <span class="fill">………</span></span><span class="few">부족한 것: <span class="fill">………</span></span></div></div>
@@ -326,7 +348,7 @@
         <ol>
           <li><b>서로 채워요</b><span class="fill">무엇을 보내고, 무엇을 받나요?</span></li>
           <li><b>함께 만들어요</b><span class="fill">힘을 합쳐 무엇을 함께 만드나요?</span></li>
-          <li><b>그래서 달라져요</b><span class="fill">사람들의 생활이 어떻게 달라지나요?</span></li>
+          <li><b>살아가는 방식이 달라져요</b><span class="fill">사람들이 살아가는 방식이 어떻게 달라지나요?</span></li>
         </ol></div>
     </div>
   </figure>
