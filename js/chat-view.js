@@ -4,8 +4,8 @@
 // - AI가 모둠의 대답이 단계 기준을 채웠다고 판정하면 "미션 성공!"이 뜹니다(넘어가는 것은 선생님이 정함).
 // - 대화는 모둠마다 하나로 쌓이고, 아이 말과 AI 답이 한 쌍으로 서버(중계 함수)에 저장됩니다.
 // - AI가 실패해도 아이가 쓴 말은 지워지지 않고 [다시 보내기]가 나옵니다.
-import { splitTemplate } from './defaults.js?v=28';
-import { josa, timeText, markBlanks } from './util.js?v=28';
+import { splitTemplate } from './defaults.js?v=29';
+import { josa, timeText, markBlanks } from './util.js?v=29';
 
 const BLANK_MAX = 20;
 

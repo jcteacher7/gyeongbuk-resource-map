@@ -1,6 +1,6 @@
 // 지도 그리기: 시군 모양(확대되는 층) 위에 이름·핀·화살표(글자 크기가 그대로인 층)를 얹습니다.
 // 확대는 [+] [−] [처음 크기] 단추와 "이 시군 크게 보기"로만 합니다. 한 손가락으로 밀면 지도가 움직입니다.
-import { esc } from './util.js?v=28';
+import { esc } from './util.js?v=29';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAD = 22;
@@ -200,7 +200,8 @@ export function createMapView(el, data, h) {
       html += `<span class="nbname">${esc(n.name)}</span>`;
     });
     // 울릉 상자 안내
-    out.push({ pt: [ib[0] + ib[2] / 2, ib[1]] });
+    // 상자 아래에 둡니다(위쪽은 교류 제안서의 [화살표 잇기] 단추가 가리기 때문).
+    out.push({ pt: [ib[0] + ib[2] / 2, ib[1] + ib[3]] });
     html += '<span class="inset-note">울릉군<small>보기 편하게 위치와 크기를 바꿨어요</small></span>';
     out.push({ pt: ull.inset.dokdo });
     html += `<span class="dokdo-note" data-id="${ull.id}">독도</span>`;

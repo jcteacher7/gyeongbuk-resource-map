@@ -190,3 +190,6 @@ input, textarea { caret-color: var(--coral-d); }
 .cv-input .btn { height: 56px; }
 .tb-item p { white-space: pre-wrap; }
 .cv-input textarea { scrollbar-width: thin; scrollbar-color: var(--teal-l) transparent; }
+
+/* 울릉 상자 안내는 상자 아래에(위쪽은 [화살표 잇기] 단추에 가려짐) */
+.inset-note { translate: -50% 5px !important; }
