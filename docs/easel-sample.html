@@ -23,6 +23,13 @@
   .title b { font-size: 40px; color: var(--coral-d); }
   .title span { font-size: 22px; color: var(--mute); }
 
+  /* 제목 바로 아래: 우리 지역에 많은 것과 부족한 것(한 줄 소개) */
+  .intro { display: grid; grid-template-columns: auto 1fr 1fr; gap: 10px; align-items: center; margin-top: 10px; }
+  .intro b { font-size: 24px; color: var(--teal); white-space: nowrap; }
+  .chip { border-radius: 12px; padding: 4px 12px; font-size: 23px; line-height: 1.25; border: 3px solid; }
+  .chip small { font-size: 16px; margin-right: 8px; }
+  .chip.many { border-color: #C93A27; color: #C93A27; background: #FFF0EC; }
+  .chip.few { border-color: #2F63B0; color: #2F63B0; background: #EDF3FD; }
   /* 가운데에 달라진 우리 지역, 양옆과 아래에 함께 달라지는 세 지역 */
   .web { display: grid; grid-template-columns: 198px 24px 1fr 24px 198px; grid-template-rows: auto 26px auto; margin-top: 12px; align-items: center; }
   .node { background: #fff; border: 3px solid var(--teal); border-radius: 18px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
@@ -48,7 +55,12 @@
   .swap { align-self: flex-start; padding: 2px 9px; border-radius: 999px; background: #fff; border: 3px solid var(--coral-d); color: var(--coral-d); font-size: 18px; line-height: 1.2; }
   .plus { display: inline-block; align-self: flex-start; padding: 2px 9px; border-radius: 10px; background: var(--sun); border: 2px solid #E0A100; font-size: 18px; line-height: 1.2; }
   .plus::before { content: "함께! "; color: var(--coral-d); }
-  .claim { margin-top: 12px; border: 4px solid var(--coral-d); border-radius: 16px; padding: 10px 14px; font-size: 25px; line-height: 1.32; background: #FFF6D6; }
+  .claim { margin-top: 12px; border: 4px solid var(--coral-d); border-radius: 16px; padding: 10px 14px; font-size: 25px; line-height: 1.3; background: #FFF6D6; }
+  .claim ol { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+  .claim li { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: baseline; font-size: 21px; line-height: 1.28; }
+  .claim li b { justify-self: start; padding: 0 9px; border-radius: 9px; font-size: 18px; color: #fff; background: var(--teal); white-space: nowrap; }
+  .claim li:nth-child(2) b { background: #B07A00; }
+  .claim li:nth-child(3) b { background: var(--coral-d); }
   .claim u { text-decoration-color: var(--coral-d); text-decoration-thickness: 3px; text-underline-offset: 4px; }
   .blank .fill { color: #B7C7CC; }
   .blank .plus { color: #B79B4A; }
@@ -83,6 +95,9 @@
     <figcaption>견본 (예시 지역: 문경시)</figcaption>
     <div class="pad">
       <div class="title"><b>문경시 교류 제안서</b><span>○모둠</span></div>
+      <div class="intro"><b>우리 문경은</b>
+        <div class="chip many"><small>많은 것</small>오미자, 찻사발</div>
+        <div class="chip few"><small>부족한 것</small>바다 먹거리, 곶감</div></div>
       <div class="web">
         <div class="node a">
           <h3>달라진 영덕</h3>
@@ -112,7 +127,12 @@
           <p>밥상이 풍성해지고, 문경을 찾아오는 손님이 늘어요.</p>
         </div>
       </div>
-      <div class="claim">문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 서로 <u>부족한 것을 채우고</u>, 함께하면 <u>새로운 것도 만들 수 있기</u> 때문입니다.</div>
+      <div class="claim">문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 왜냐하면
+        <ol>
+          <li><b>서로 채워요</b><span>오미자·찻사발을 보내고 대게·곶감을 받아, 서로 없던 것이 생겨요.</span></li>
+          <li><b>함께 만들어요</b><span>맛 축제, 찻사발 곶감 선물, 배움 여행길을 두 지역이 함께 만들어요.</span></li>
+          <li><b>그래서 달라져요</b><span>밥상이 풍성해지고, 찾아오는 손님과 일거리가 늘어나요.</span></li>
+        </ol></div>
     </div>
   </figure>
 
@@ -120,6 +140,9 @@
     <figcaption>빈 틀 (아이들에게 보여 줄 것)</figcaption>
     <div class="pad blank">
       <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span>○모둠</span></div>
+      <div class="intro"><b>우리 <span class="fill">○○</span>은</b>
+        <div class="chip many"><small>많은 것</small><span class="fill">………</span></div>
+        <div class="chip few"><small>부족한 것</small><span class="fill">………</span></div></div>
       <div class="web">
         <div class="node a">
           <h3>달라진 <span class="fill">○○</span></h3>
@@ -149,26 +172,34 @@
           <p class="fill">어떻게 달라지나요? (한 문장)</p>
         </div>
       </div>
-      <div class="claim">우리는 <span class="fill">○○·○○·○○</span>와 교류해야 합니다. 서로 <span class="fill">………………</span>, 함께하면 <span class="fill">………………</span> 때문입니다.</div>
+      <div class="claim">우리는 <span class="fill">○○·○○·○○</span>와 교류해야 합니다. 왜냐하면
+        <ol>
+          <li><b>서로 채워요</b><span class="fill">무엇을 보내고 무엇을 받아서, 무엇이 생기나요?</span></li>
+          <li><b>함께 만들어요</b><span class="fill">두 지역이 힘을 합쳐 무엇을 만드나요?</span></li>
+          <li><b>그래서 달라져요</b><span class="fill">사람들의 생활이 어떻게 달라지나요?</span></li>
+        </ol></div>
     </div>
   </figure>
 
   <div class="notes">
-    <h2>종이에 적는 것은 세 가지뿐</h2>
+    <h2>종이에 적는 것</h2>
+    <p style="margin:0 0 8px"><b>제목 아래 한 줄</b>: 우리 지역에 많은 것(빨강)과 부족한 것(파랑). 낱말로만 씁니다.</p>
+    <p style="margin:0 0 4px"><b>지역마다 세 가지</b></p>
     <div class="key">
       <span><span class="swap" style="font-size:17px">오미자 ⇄ 대게</span><span>주고받는 것 (왜 ①: 서로 부족한 것을 채움)</span></span>
       <span><span class="plus" style="font-size:17px">맛 축제</span><span>함께 만드는 것 (왜 ②: 힘을 합치면 새로 생기는 것)</span></span>
       <span>그림 + 한 문장: 그래서 생활이 어떻게 달라지는지</span>
     </div>
-    <p style="margin:8px 0 0">무엇이 많고 부족한지, 어떤 환경인지, 화살표의 자세한 이유는 종이에 쓰지 않습니다. 발표할 때 옆에 둔 태블릿의 <b>교류 제안서 화면</b>을 짚으며 말로 설명합니다.</p>
+    <p style="margin:8px 0 4px"><b>맨 아래 주장</b>: "왜냐하면"을 세 줄로 나눠 씁니다. ① 무엇을 주고받아 서로 채웠는지 ② 함께 무엇을 만들었는지 ③ 그래서 생활이 어떻게 달라졌는지. 줄마다 실제 자원과 만든 것의 이름을 넣어 구체적으로, 한 줄을 넘기지 않게 씁니다.</p>
+    <p style="margin:8px 0 0">어떤 환경인지, 화살표의 자세한 이유는 종이에 쓰지 않습니다. 발표할 때 옆에 둔 태블릿의 <b>교류 제안서 화면</b>을 짚으며 말로 설명합니다.</p>
 
     <h2>발표 5분에 이렇게 써요</h2>
     <table>
       <tr><th>순서</th><th>하는 말</th><th>시간</th></tr>
-      <tr><td>태블릿</td><td>우리 지역에 많은 것과 부족한 것, 이은 화살표를 짧게 보여 줌</td><td>1분</td></tr>
+      <tr><td>제목 아래 + 태블릿</td><td>우리 지역에 많은 것과 부족한 것을 말하고, 태블릿으로 이은 화살표를 짧게 보여 줌</td><td>1분</td></tr>
       <tr><td>둘레 세 곳</td><td>한 곳씩: 무엇을 주고받고 → 함께 무엇을 만들고 → 그래서 그 지역이 어떻게 달라지는지</td><td>2분 30초</td></tr>
       <tr><td>가운데</td><td>그래서 우리 지역은 이렇게 달라진다</td><td>1분</td></tr>
-      <tr><td>맨 아래</td><td>주장 한 문장으로 마무리</td><td>30초</td></tr>
+      <tr><td>맨 아래</td><td>주장과 세 가지 까닭(채워요 → 함께 만들어요 → 그래서 달라져요)으로 마무리</td><td>30초</td></tr>
     </table>
 
     <h2>만들 때 지킬 것</h2>
