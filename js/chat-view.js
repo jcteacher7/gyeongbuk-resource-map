@@ -4,8 +4,8 @@
 // - AI가 모둠의 대답이 단계 기준을 채웠다고 판정하면 "미션 성공!"이 뜹니다(넘어가는 것은 선생님이 정함).
 // - 대화는 모둠마다 하나로 쌓이고, 아이 말과 AI 답이 한 쌍으로 서버(중계 함수)에 저장됩니다.
 // - AI가 실패해도 아이가 쓴 말은 지워지지 않고 [다시 보내기]가 나옵니다.
-import { splitTemplate } from './defaults.js?v=29';
-import { josa, timeText, markBlanks } from './util.js?v=29';
+import { splitTemplate } from './defaults.js?v=31';
+import { josa, timeText, markBlanks } from './util.js?v=31';
 
 const BLANK_MAX = 20;
 
@@ -28,7 +28,7 @@ export function createChatView(el, ctx) {
 
   function shell() {
     const cfg = ctx.chatCfg();
-    const sig = JSON.stringify([cfg.guide, cfg.max, me().g, me().n]);
+    const sig = JSON.stringify([cfg.guide, cfg.max, cfg.keyQuestion, me().g, me().n]);
     if (sig === shellSig) return;
     if (shellSig && el.contains(document.activeElement) && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
     shellSig = sig;
@@ -47,7 +47,8 @@ export function createChatView(el, ctx) {
         </div>
       </section>
       <aside class="cv-right">
-        <h3>${ICON.star}우리 모둠 문장</h3>
+        <div class="cv-keyq"><small>핵심 질문</small>${esc(cfg.keyQuestion)}</div>
+        <h3>${ICON.star}우리 모둠의 답</h3>
         <div class="cv-saved" data-saved></div>
         <div class="cv-edit" data-edit></div>
       </aside>

@@ -193,3 +193,13 @@ input, textarea { caret-color: var(--coral-d); }
 
 /* 울릉 상자 안내는 상자 아래에(위쪽은 [화살표 잇기] 단추에 가려짐) */
 .inset-note { translate: -50% 5px !important; }
+
+/* 핵심 질문: 챗봇 화면의 모둠 문장 위, 선생님 화면의 모둠 문장 위 */
+.cv-keyq { padding: 10px 12px; border-radius: 14px; background: var(--ink); color: #fff; font-family: var(--hand); font-weight: 700; font-size: 22px; line-height: 1.3; }
+.cv-keyq small, .t-keyq small { display: block; width: fit-content; margin-bottom: 4px; padding: 0 8px; border-radius: 8px; background: #FFD35C; color: var(--ink); font-family: var(--body); font-weight: 400; font-size: 14px; }
+.t-keyq { margin-bottom: 14px; padding: 12px 18px; border-radius: 16px; background: var(--ink); color: #fff; font-family: var(--hand); font-weight: 700; font-size: 30px; line-height: 1.3; }
+.t-keyq small { font-size: 15px; }
+.t-gens.big .t-keyq { font-size: 40px; padding: 16px 22px; }
+.t-gens.big .t-keyq small { font-size: 18px; }
+.t-gens.big .t-gen { min-height: 250px; }
+.t-gens.big .t-keyq { padding-right: 140px; }
