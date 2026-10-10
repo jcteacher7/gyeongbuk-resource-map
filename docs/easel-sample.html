@@ -22,6 +22,11 @@
   .title { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 4px solid var(--coral-d); padding-bottom: 6px; }
   .title b { font-size: 40px; color: var(--coral-d); }
   .title span { font-size: 22px; color: var(--mute); }
+  .title .who2 { display: flex; flex-direction: column; align-items: flex-end; font-size: 18px; line-height: 1.15; }
+  .title .who2 b { font-size: 24px; color: var(--ink); }
+  /* 제목 바로 아래의 핵심 질문 */
+  .keyq { margin-top: 8px; padding: 6px 12px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 24px; line-height: 1.25; }
+  .keyq span { display: inline-block; margin-right: 10px; padding: 0 8px; border-radius: 8px; background: var(--sun); color: var(--ink); font-size: 17px; vertical-align: 2px; }
 
   /* 제목 바로 아래: 우리 지역에 많은 것과 부족한 것(한 줄 소개) */
   .intro { display: grid; grid-template-columns: auto 1fr 1fr; gap: 10px; align-items: center; margin-top: 10px; }
@@ -129,7 +134,7 @@
   <h2><span class="cn">1</span>종이에 넣는 것 다섯 가지</h2>
   <p>아래 "다 만든 모습"에 붙은 번호와 같아요.</p>
   <div class="cards">
-    <div class="card"><b class="t"><span class="cn">1</span>제목</b>"○○ 교류 제안서"와 모둠 이름을 크게 써요.</div>
+    <div class="card"><b class="t"><span class="cn">1</span>제목과 핵심 질문</b>"○○ 교류 제안서"를 크게 쓰고, 옆에 <b>모둠 이름과 모둠 친구들 이름</b>을 써요. 바로 아래에 <b>핵심 질문</b>을 써요. 이 종이 전체가 그 질문의 답이에요.</div>
     <div class="card"><b class="t"><span class="cn">2</span>많은 것 · 부족한 것</b>우리 지역에 <em>많은 것은 빨강</em>, <span style="color:#2F63B0">부족한 것은 파랑</span>으로 낱말만 써요.</div>
     <div class="card"><b class="t"><span class="cn">3</span>함께 달라지는 지역 (세 곳)</b>지역마다 네 가지를 넣어요.<br>· 주고받는 것 <small>예: 오미자 ⇄ 대게</small><br>· 교류한 뒤의 그림 한 장<br>· 어떻게 달라지는지 한 문장<br>· <span class="plus" style="font-family:'Gaegu';font-weight:700">함께 만드는 것</span></div>
     <div class="card"><b class="t"><span class="cn">4</span>달라진 우리 지역</b>가장 크게! 교류한 뒤의 그림 한 장과, 어떻게 달라지는지 한 문장을 써요.</div>
@@ -144,7 +149,8 @@
   <figure>
     <figcaption>다 만든 모습 (문경시로 만든 예시)</figcaption>
     <div class="pad">
-      <div class="title"><b><span class="cn">1</span>문경시 교류 제안서</b><span>○모둠</span></div>
+      <div class="title"><b><span class="cn">1</span>문경시 교류 제안서</b><span class="who2"><b>○모둠</b>이름, 이름, 이름, 이름</span></div>
+      <div class="keyq"><span>핵심 질문</span>가진 것이 서로 다른 지역이 교류하면, 사람들의 생활은 어떻게 달라질까?</div>
       <div class="intro"><b><span class="cn">2</span>우리 문경은</b>
         <div class="chip many"><small>많은 것</small>오미자, 찻사발</div>
         <div class="chip few"><small>부족한 것</small>바다 먹거리, 곶감</div></div>
@@ -188,7 +194,8 @@
   <figure>
     <figcaption>빈 틀 (무엇을 쓸지 물음이 적혀 있어요)</figcaption>
     <div class="pad blank">
-      <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span>○모둠</span></div>
+      <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span class="who2"><b class="fill">모둠 이름</b><span class="fill">모둠 친구들 이름</span></span></div>
+      <div class="keyq"><span>핵심 질문</span>가진 것이 서로 다른 지역이 교류하면, 사람들의 생활은 어떻게 달라질까?</div>
       <div class="intro"><b>우리 <span class="fill">○○</span>은</b>
         <div class="chip many"><small>많은 것</small><span class="fill">………</span></div>
         <div class="chip few"><small>부족한 것</small><span class="fill">………</span></div></div>
@@ -241,7 +248,7 @@
     <li><b>그림 네 장 만들기</b><br>우리 지역 한 장, 세 지역 한 장씩이에요. 모두 <b>교류한 뒤의 모습</b>이에요. 아래 틀에 맞춰 AI에게 부탁할 글을 쓰고, 그림을 만들어 선생님께 인쇄를 부탁해요.
       <div class="say"><b>그림 부탁 글 틀</b>: ( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 / 함께 무엇을 만들어서 ) ( 어떻게 하고 있는 ) 모습<br><small>예: 영덕 바닷가 축제에서 사람들이 대게를 먹으며 문경 오미자차를 마시고 있는 모습</small></div></li>
     <li><b>놓을 자리 정하기</b><br>아래 4번의 여러 모양 가운데 하나를 고르거나 새로 생각해요. 연필로 연하게 자리를 먼저 잡아요.</li>
-    <li><b>쓰고 붙이기</b><br>제목 → 많은 것·부족한 것 → 그림 붙이기 → 주고받는 것, 함께 만드는 것, 한 문장 순서로 해요. 지역과 지역 사이를 <b>선이나 길로 이어요.</b></li>
+    <li><b>쓰고 붙이기</b><br>제목과 이름 → 핵심 질문 → 많은 것·부족한 것 → 그림 붙이기 → 주고받는 것, 함께 만드는 것, 한 문장 순서로 해요. 지역과 지역 사이를 <b>선이나 길로 이어요.</b></li>
     <li><b>맨 아래에 우리의 주장 쓰기</b><br>위에 쓴 것을 모아서 세 줄로 써요. 자원 이름과 함께 만든 것의 이름을 넣으면 좋아요.</li>
   </ol>
   <p style="margin-top:12px"><b>글씨는 이렇게 써요.</b> 친구가 <b>세 걸음 떨어져서도 읽을 수 있게</b> 크게 써요. 긴 글 대신 낱말과 짧은 문장으로 써요. 자세한 이야기는 발표할 때 말로 해요.</p>
@@ -254,6 +261,7 @@
     <span><i style="background:#FFF0C2;border-color:#C93A27"></i>달라진 우리 지역</span>
     <span><i style="background:#EAF6F8;border-color:#2A6F7D"></i>함께 달라지는 지역</span>
     <span><i style="background:#FFF6D6;border-color:#C93A27"></i>우리의 주장</span>
+    <span><i style="background:#1E3A4C;border-color:#1E3A4C"></i>핵심 질문</span>
     <span><i style="background:#FFE1DB;border-color:#C93A27"></i><i style="background:#DDE8FB;border-color:#2F63B0"></i>많은 것 · 부족한 것</span>
   </div>
   <div class="ideas-grid" id="ideas"></div>
@@ -262,7 +270,8 @@
 <section class="kid">
   <h2><span class="cn">5</span>다 만들었나요? 확인해요</h2>
   <ul class="check">
-    <li>제목과 모둠 이름이 있어요.</li>
+    <li>제목, 모둠 이름, 모둠 친구들 이름이 있어요.</li>
+    <li>제목 아래에 핵심 질문을 썼어요.</li>
     <li>우리 지역에 많은 것(빨강)과 부족한 것(파랑)을 썼어요.</li>
     <li>교류하는 지역 세 곳마다 <b>주고받는 것, 그림, 한 문장, 함께 만드는 것</b>이 다 있어요.</li>
     <li>달라진 우리 지역의 그림과 한 문장이 가장 크게 있어요.</li>
@@ -277,17 +286,10 @@
     <li><b>우리 지역 소개하기</b> (1분)<div class="say">"우리 ○○은 ( 많은 것 )이 많고, ( 부족한 것 )이 부족합니다." 태블릿의 교류 제안 화면에서 우리가 이은 화살표를 보여 줘요.</div></li>
     <li><b>세 지역을 하나씩 말하기</b> (2분 30초)<div class="say">"○○와는 ( 무엇 )을 주고받습니다. 함께 ( 무엇 )을 만들 수 있습니다. 그래서 ○○ 사람들은 ( 어떻게 달라집니다 )."</div></li>
     <li><b>달라진 우리 지역 말하기</b> (1분)<div class="say">"이렇게 교류하면 우리 ○○ 사람들의 생활은 ( 어떻게 달라집니다 )." 가운데 그림을 짚으며 말해요.</div></li>
-    <li><b>주장으로 마무리하기</b> (30초)<div class="say">맨 아래의 주장과 세 가지 까닭을 또박또박 읽어요. 그다음 친구들의 질문을 받아요.</div></li>
+    <li><b>주장으로 마무리하기</b> (30초)<div class="say">핵심 질문을 한 번 읽고, 그 답으로 맨 아래의 주장과 세 가지 까닭을 또박또박 읽어요. 그다음 친구들의 질문을 받아요.</div></li>
   </ol>
 </section>
 
-<details class="teacher">
-  <summary>선생님께</summary>
-  <p>이젤패드의 중심은 "교류하면 생활 모습이 어떻게, 왜 달라지는가"입니다. 자원 지도와 화살표의 자세한 내용은 종이에 옮기지 않고, 발표 때 옆에 둔 태블릿의 교류 제안 화면으로 보여 줍니다.</p>
-  <p>"주고받는 것"은 서로 부족한 것을 채우는 까닭, "함께 만드는 것"은 힘을 합쳐 새로 생기는 것(시너지)에 해당합니다. 주고받는 것만 쓰면 "없으니까 받는다"에서 멈추므로 "함께 만드는 것"을 지역마다 하나씩 적게 했습니다.</p>
-  <p>그림은 모둠당 네 장(우리 지역 한 장, 세 지역 한 장씩)입니다. 시간이 모자라면 세 지역은 손그림으로 해도 됩니다. 예시의 내용(상주 곶감, 포항 제철소 등)은 배치를 보여 주려고 지은 것입니다.</p>
-  <p>인쇄하면 "다 만든 모습", "빈 틀", "여러 가지 모양"이 쪽을 나누어 나옵니다.</p>
-</details>
 
 <script>
   // 작은 배치 그림을 그립니다. 종이는 200×240, 제목과 "많은 것·부족한 것" 줄은 늘 위에 있습니다.
@@ -298,7 +300,8 @@
   const line = (a, b) => `<path d="M${a[0]} ${a[1]} L${b[0]} ${b[1]}" ${LINK}/>`;
   const head = `<rect x="3" y="3" width="194" height="234" rx="6" fill="#fff" stroke="#2A6F7D" stroke-width="2.5"/>
     <rect x="12" y="11" width="96" height="9" rx="3" fill="#C93A27"/><path d="M12 25 H188" stroke="#C93A27" stroke-width="2"/>
-    <rect x="12" y="30" width="60" height="9" rx="3" fill="#FFE1DB" stroke="#C93A27"/><rect x="76" y="30" width="60" height="9" rx="3" fill="#DDE8FB" stroke="#2F63B0"/>`;
+    <rect x="12" y="28" width="176" height="7" rx="3" fill="#1E3A4C"/>
+    <rect x="12" y="38" width="60" height="7" rx="3" fill="#FFE1DB" stroke="#C93A27"/><rect x="76" y="38" width="60" height="7" rx="3" fill="#DDE8FB" stroke="#2F63B0"/>`;
   const claim = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#FFF6D6" stroke="#C93A27" stroke-width="2"/>` +
     [0, 1, 2].map((i) => `<path d="M${x + 6} ${y + 8 + i * (h - 12) / 3} h${w - 12}" stroke="#C9B37A" stroke-width="2.5" stroke-linecap="round"/>`).join('');
   const IDEAS = [
