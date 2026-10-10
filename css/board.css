@@ -56,3 +56,11 @@
 
 /* 모둠 문장에서 빈칸에 써 넣은 말 */
 .fill { color: var(--coral-d); background: linear-gradient(transparent 62%, #FFD35C 62%); padding: 0 3px; border-radius: 3px; }
+
+/* 교류 제안서 화면 */
+.plan-groups { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px dashed var(--teal-l); }
+.plan-groups .chip { height: 38px; padding: 0 12px; font-size: 18px; }
+.plan-focus { display: flex; align-items: center; gap: 6px; color: var(--coral-d); font-size: 17px; }
+.plan-focus svg { width: 20px; height: 20px; }
+.t-grid3 { grid-template-columns: repeat(4, 1fr); }
+#teacher .tog { font-size: 17px; padding: 0 12px 0 6px; }

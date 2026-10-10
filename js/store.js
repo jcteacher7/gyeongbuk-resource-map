@@ -4,13 +4,14 @@
 //   그래서 인터넷이 끊겨도, 새로고침해도 글이 사라지지 않고 연결이 돌아오면 다시 보냅니다.
 // - 읽기는 몇 초마다 "마지막으로 본 뒤 바뀐 줄"만 가져오고, 가끔 전체를 다시 읽습니다.
 // - 지우기는 줄을 없애지 않고 deleted 표시를 붙입니다(다른 기기에도 지운 것이 전해지도록).
-import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=14';
+import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=16';
 
 const CACHE_KEY = 'gb-cache-v1';
 const OUTBOX_KEY = 'gb-outbox-v1';
 const FULL_EVERY_MS = 180000;
 // cstep: 모둠의 챗봇 단계, gen: 모둠 일반화 문장
-const KINDS = ['cfg', 'res', 'arrow', 'tag', 'chat', 'gen', 'cstep'];
+// plan: 모둠이 교류 제안서에서 고른 제안 지역(key g<모둠>)
+const KINDS = ['cfg', 'res', 'arrow', 'plan', 'tag', 'chat', 'gen', 'cstep'];
 
 const rows = new Map(); // 'kind/key' → { kind, key, value, updated_at, pending }
 let outbox = []; // { kind, key, value, photo: {full, thumb} (dataURL) | null }

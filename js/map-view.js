@@ -1,6 +1,6 @@
 // 지도 그리기: 시군 모양(확대되는 층) 위에 이름·핀·화살표(글자 크기가 그대로인 층)를 얹습니다.
 // 확대는 [+] [−] [처음 크기] 단추와 "이 시군 크게 보기"로만 합니다. 한 손가락으로 밀면 지도가 움직입니다.
-import { esc } from './util.js?v=14';
+import { esc } from './util.js?v=16';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAD = 22;
@@ -85,9 +85,11 @@ export function createMapView(el, data, h) {
     anim = requestAnimationFrame(step);
   }
 
+  let sizedW = 0; // 처음 크기를 마지막으로 맞춘 때의 지도 칸 너비(화면이 숨겨져 있을 때는 0)
   function home(instant) {
     const v = fit(data.home);
     homeS = v.s;
+    sizedW = W();
     go(v, instant);
   }
   function zoomBy(f) {
@@ -236,7 +238,8 @@ export function createMapView(el, data, h) {
     update,
     home,
     focus,
-    resize() { const v = fit(data.home); homeS = v.s; go(view, true); },
+    // 지도 칸이 숨겨져 있다가 보이게 되었으면(너비가 달라졌으면) 처음 크기로 다시 맞춥니다.
+    resize() { if (!W()) return; if (sizedW !== W()) { home(true); return; } const v = fit(data.home); homeS = v.s; go(view, true); },
     regionName: (id) => (regById.get(id) || {}).name || '',
     regions: data.regions,
   };

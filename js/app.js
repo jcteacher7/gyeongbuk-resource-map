@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=14';
-import { store } from './store.js?v=14';
-import { createMapView, shortName } from './map-view.js?v=14';
-import { shrinkPhoto } from './photo.js?v=14';
-import { esc, safeLink, josa, timeText } from './util.js?v=14';
-import { MAX_LEN } from './config.js?v=14';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=14';
-import { createTagView } from './tag-view.js?v=14';
-import { createChatView } from './chat-view.js?v=14';
-import { createTeacher, hashCode } from './teacher.js?v=14';
+import mapData from '../data/gyeongbuk-map.js?v=16';
+import { store } from './store.js?v=16';
+import { createMapView, shortName } from './map-view.js?v=16';
+import { shrinkPhoto } from './photo.js?v=16';
+import { esc, safeLink, josa, timeText } from './util.js?v=16';
+import { MAX_LEN } from './config.js?v=16';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=16';
+import { createTagView } from './tag-view.js?v=16';
+import { createChatView } from './chat-view.js?v=16';
+import { createTeacher, hashCode } from './teacher.js?v=16';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -71,6 +71,17 @@ const tagCfg = () => withDefaults(store.get('cfg', 'tagcfg'), DEFAULT_TAG);
 const chatCfg = () => withDefaults(store.get('cfg', 'chatcfg'), DEFAULT_CHAT);
 const stages = () => store.get('cfg', 'stages') || {};
 const regionName = (id) => (mapData.regions.find((r) => r.id === id) || {}).name || '';
+// 교류 제안서 화면: 완성된 자원 지도 위에서 모둠이 제안 지역 하나를 정하고 화살표를 잇습니다. 화살표는 모둠별로 따로 봅니다.
+const isPlan = () => S.tab === 'plan';
+const onMapView = () => S.tab === 'map' || S.tab === 'plan';
+const planOf = (g) => (store.get('plan', 'g' + g) || {}).cid ?? null;
+const planView = () => {
+  const ids = roster().groups.map((g) => g.id);
+  if (ids.includes(S.planGroup)) return S.planGroup;
+  return !isTeacher() && ids.includes(S.me.g) ? S.me.g : ids[0];
+};
+const planMine = () => !isTeacher() && planView() === S.me.g;
+const planArrows = () => arrowsAll().filter((a) => a.by && a.by.g === planView());
 const sameMe = (by) => !!by && !!S.me && by.g === S.me.g && by.n === S.me.n;
 const byText = (by) => (by ? (by.g === 0 ? '선생님' : `${groupName(by.g)} · ${by.n}`) : '');
 const ENV = { nat: '자연환경', hum: '인문환경' };
@@ -100,7 +111,7 @@ function renderAll() {
   if (!S.me) { renderEnter(); return; }
   renderTop();
   renderTabs();
-  if (S.tab === 'map') {
+  if (onMapView() && (S.tab === 'map' || stages().plan || isTeacher())) {
     renderMap();
     renderPanel();
   }
@@ -151,7 +162,9 @@ function renderTop() {
   $('#who').innerHTML = isTeacher() ? `${ICON.key}선생님 화면으로` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
   const t = texts(), st = stages();
   const tab = (id, label, open) => `<button type="button" class="tab ${S.tab === id ? 'on' : ''} ${open ? '' : 'locked'}" data-tab="${id}">${open ? '' : ICON.lock}${esc(label)}</button>`;
-  const html = isTeacher() ? tab('map', t.tabMap, true) : tab('map', t.tabMap, true) + tab('tag', t.tabTag, !!st.tag) + tab('chat', t.tabChat, !!st.chat);
+  const html = isTeacher()
+    ? tab('map', t.tabMap, true) + tab('plan', t.tabPlan, true)
+    : tab('map', t.tabMap, true) + tab('plan', t.tabPlan, !!st.plan) + tab('tag', t.tabTag, !!st.tag) + tab('chat', t.tabChat, !!st.chat);
   if ($('#tabs').innerHTML !== html) $('#tabs').innerHTML = html;
   const s = syncInfo();
   $('#sync').className = 'sync ' + s.cls;
@@ -159,7 +172,16 @@ function renderTop() {
 }
 
 function renderTabs() {
-  $('#view-map').hidden = S.tab !== 'map';
+  const planOpen = !!stages().plan || isTeacher();
+  $('#view-map').hidden = !(S.tab === 'map' || (S.tab === 'plan' && planOpen));
+  const pv = $('#view-plan');
+  pv.hidden = !(S.tab === 'plan' && !planOpen);
+  if (!pv.hidden) {
+    const html = `<div class="locked-view"><div class="lock-card">${ICON.lockBig}<h2>${esc(texts().tabPlan)}</h2>
+      <p>자원 지도를 다 만들면 선생님이 열어 줘요.</p>
+      <button type="button" class="btn" data-tab="map">${esc(texts().tabMap)}(으)로 가기</button></div></div>`;
+    if (pv.innerHTML !== html) pv.innerHTML = html;
+  }
   ['tag', 'chat'].forEach((id) => {
     const v = $('#view-' + id);
     const view = id === 'tag' ? tagView : chatView;
@@ -181,12 +203,14 @@ function renderTabs() {
 function renderMap() {
   const counts = {};
   resAll().forEach((r) => { counts[r.cid] = (counts[r.cid] || 0) + 1; });
-  const arrows = arrowsAll().map((a) => ({ key: a.key, from: a.fromRes.cid, to: a.toRes.cid }));
+  // 지도 화면에는 자원만, 화살표는 교류 제안서 화면에서 보고 있는 모둠의 것만 그립니다.
+  const arrows = isPlan() ? planArrows().map((a) => ({ key: a.key, from: a.fromRes.cid, to: a.toRes.cid })) : [];
+  const focus = isPlan() ? planOf(planView()) : null;
   const pickRes = S.arrowMode && S.arrowMode.from ? store.get('res', S.arrowMode.from) : null;
   const m = {
     counts,
     selected: S.selected,
-    mine: new Set(myCounties()),
+    mine: new Set(isPlan() ? (focus != null ? [focus] : []) : myCounties()),
     arrows,
     pick: pickRes ? pickRes.cid : null,
     selArrow: S.selArrow,
@@ -195,6 +219,7 @@ function renderMap() {
   if (sig !== lastMapSig) { lastMapSig = sig; mapView.update(m); }
 
   const btn = $('#arrowBtn');
+  btn.hidden = !(isPlan() && planMine());
   btn.classList.toggle('on', !!S.arrowMode);
   btn.innerHTML = S.arrowMode ? `${ICON.x}화살표 그만두기` : `${ICON.arrow}화살표 잇기`;
   const ban = $('#arrowBanner');
@@ -203,7 +228,7 @@ function renderMap() {
     const from = pickRes;
     ban.innerHTML = from
       ? `<span class="num">2</span><span>이어질 자원을 골라요. <b>${esc(shortName(regionName(from.cid)))} ${esc(from.name)}</b>에서 출발해요.<br><small>다른 시군을 누르고 오른쪽에서 골라요.</small></span>`
-      : '<span class="num">1</span><span>출발할 자원을 골라요.<br><small>지도에서 시군을 누르고, 오른쪽에서 자원을 골라요.</small></span>';
+      : `<span class="num">1</span><span>출발할 자원을 골라요.<br><small>지도에서 시군을 누르고, 오른쪽에서 자원을 골라요. 한쪽은 우리 제안 지역(${esc(regionName(planOf(S.me.g)))})이어야 해요.</small></span>`;
   }
 }
 
@@ -226,12 +251,51 @@ function resCard(r, pickMode) {
     </span>${pick}</button>`;
 }
 
+function planPanel(all) {
+  const gid = planView();
+  const mine = planMine();
+  const focus = planOf(gid);
+  const arrows = planArrows();
+  const aitem = (a) => `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.arrowSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`;
+  let html = `<div class="plan-groups">${roster().groups.map((g) => `<button type="button" class="chip ${g.id === gid ? 'on' : ''}" data-plang="${g.id}">${esc(g.name)}${!isTeacher() && g.id === S.me.g ? ' (우리)' : ''}</button>`).join('')}</div>`;
+  if (S.selected == null) {
+    html += `<div class="p-head"><h2>${esc(groupName(gid))} 교류 제안서</h2></div>`;
+    html += focus != null
+      ? `<button type="button" class="mycounty" data-county="${focus}"><b>${esc(regionName(focus))}</b><span>제안 지역</span></button>`
+      : `<p class="hint">${mine ? '먼저 지도에서 우리 모둠이 제안할 시군을 누르고, [제안 지역으로 정하기]를 눌러요.' : '아직 제안 지역을 정하지 않았어요.'}</p>`;
+    html += `<h3 class="p-h3">${ICON.arrowSmall}화살표 ${arrows.length}개</h3>`;
+    html += arrows.length ? `<div class="alist">${arrows.map(aitem).join('')}</div>`
+      : `<p class="hint">${mine && focus != null ? '[화살표 잇기]를 눌러 제안 지역의 자원과 다른 시군의 자원을 이어요.' : '아직 이은 화살표가 없어요.'}</p>`;
+  } else {
+    const id = S.selected;
+    const list = all.filter((r) => r.cid === id);
+    html += `<div class="p-head"><h2>${esc(regionName(id))}</h2>
+      <button type="button" class="btn small" data-act="focus">${ICON.zoom}크게 보기</button>
+      <button type="button" class="xbtn" data-act="unselect" aria-label="닫기">${ICON.x}</button></div>`;
+    if (id === focus) html += `<div class="p-sub plan-focus">${ICON.flag}${esc(groupName(gid))}의 제안 지역이에요</div>`;
+    else if (mine && !S.arrowMode) {
+      const owner = ownerOf(id);
+      const ok = owner == null || owner === S.me.g;
+      html += `<div class="add-row"><button type="button" class="btn small ${ok ? 'primary' : 'off'}" data-act="plan-set" data-why="우리 모둠이 맡은 시군 가운데에서 골라요">${ICON.flag}제안 지역으로 정하기</button>
+        <small>${focus != null ? `지금은 ${esc(regionName(focus))}` : '아직 정하지 않았어요'}</small></div>`;
+    }
+    html += list.length
+      ? '<div class="cards">' + list.map((r) => resCard(r, !!S.arrowMode)).join('') + '</div>'
+      : '<p class="hint">올라온 자원이 없어요.</p>';
+    const here = arrows.filter((a) => a.fromRes.cid === id || a.toRes.cid === id);
+    if (here.length && !S.arrowMode) html += `<h3 class="p-h3">${ICON.arrowSmall}이어진 화살표 ${here.length}개</h3><div class="alist">${here.map(aitem).join('')}</div>`;
+  }
+  return html;
+}
+
 function renderPanel() {
   const panel = $('#panel');
   let html = '';
   const all = resAll();
-  const arrows = arrowsAll();
-  if (S.selected == null) {
+  const arrows = [];
+  if (isPlan()) {
+    html = planPanel(all);
+  } else if (S.selected == null) {
     const mine = myCounties();
     html += `<div class="p-head"><h2>${mine.length ? '우리 모둠이 맡은 시군' : '시군을 골라요'}</h2></div>`;
     if (mine.length) {
@@ -243,7 +307,7 @@ function renderPanel() {
     } else {
       html += `<p class="hint big">${S.arrowMode ? '지도에서 시군을 눌러요.' : '지도에서 시군을 누르면<br>그 시군의 자원 카드가 여기에 나와요.'}</p>`;
     }
-    html += `<div class="summary">${ICON.pinSmall}지도 전체: 자원 ${all.length}개 · 화살표 ${arrows.length}개</div>`;
+    html += `<div class="summary">${ICON.pinSmall}지도 전체: 자원 ${all.length}개</div>`;
   } else {
     const id = S.selected;
     const list = all.filter((r) => r.cid === id);
@@ -583,7 +647,9 @@ function pickForArrow(key) {
   if (from === key) { S.arrowMode.from = null; requestRender(); return; }
   const fr = store.get('res', from);
   if (fr && fr.cid === r.cid) { toast('다른 시군의 자원을 골라 주세요.'); return; }
-  const dup = arrowsAll().find((a) => a.from === from && a.to === key);
+  const focus = planOf(S.me.g);
+  if (fr && fr.cid !== focus && r.cid !== focus) { toast(`화살표 한쪽은 우리 제안 지역(${regionName(focus)})의 자원이어야 해요.`, 3200); return; }
+  const dup = arrowsAll().find((a) => a.from === from && a.to === key && a.by && a.by.g === S.me.g);
   if (dup) { toast('이미 이어진 화살표예요.'); S.arrowMode = null; S.selArrow = dup.key; requestRender(); showArrow(dup.key); return; }
   openArrowForm(from, key);
 }
@@ -602,15 +668,21 @@ document.addEventListener('click', (e) => {
   const tabB = t.closest('[data-tab]');
   if (tabB) {
     const id = tabB.dataset.tab;
-    if (id !== 'map' && !stages()[id]) { toast('선생님이 열어 주면 쓸 수 있어요.'); }
+    if (id !== 'map' && !stages()[id] && !isTeacher()) { toast('선생님이 열어 주면 쓸 수 있어요.'); }
+    if (id !== S.tab) {
+      S.arrowMode = null; S.selArrow = null; S.planGroup = null;
+      if (modal && (modal.type === 'res' || modal.type === 'arrow')) closeModal();
+      lastPanel = ''; lastMapSig = '';
+    }
     S.tab = id;
-    if (id !== 'map') { S.arrowMode = null; if (modal && (modal.type === 'res' || modal.type === 'arrow')) closeModal(); }
     requestRender();
-    if (id === 'map' && mapView) setTimeout(() => mapView.resize(), 0);
+    if ((id === 'map' || id === 'plan') && mapView) setTimeout(() => mapView.resize(), 0);
     return;
   }
   if (t.closest('#arrowBtn')) {
-    if (S.arrowMode) { S.arrowMode = null; toast('화살표 잇기를 그만두었어요.'); } else { S.arrowMode = { from: null }; S.selArrow = null; if (modal) closeModal(); }
+    if (S.arrowMode) { S.arrowMode = null; toast('화살표 잇기를 그만두었어요.'); }
+    else if (planOf(S.me.g) == null) { toast('먼저 우리 모둠의 제안 지역을 정해요. 지도에서 시군을 누르고 [제안 지역으로 정하기]를 눌러요.', 3600); return; }
+    else { S.arrowMode = { from: null }; S.selArrow = null; if (modal) closeModal(); }
     requestRender();
     return;
   }
@@ -622,6 +694,13 @@ document.addEventListener('click', (e) => {
   }
   const ak = t.closest('[data-arrowkey]');
   if (ak) { S.selArrow = ak.dataset.arrowkey; showArrow(ak.dataset.arrowkey); requestRender(); return; }
+  const pg = t.closest('[data-plang]');
+  if (pg) {
+    S.planGroup = +pg.dataset.plang; S.arrowMode = null; S.selArrow = null;
+    if (modal && (modal.type === 'res' || modal.type === 'arrow')) closeModal();
+    requestRender();
+    return;
+  }
   const cty = t.closest('[data-county]');
   if (cty) { S.selected = +cty.dataset.county; requestRender(); return; }
   if (!act) {
@@ -665,6 +744,14 @@ document.addEventListener('click', (e) => {
   else if (a === 'unselect') { S.selected = null; requestRender(); }
   else if (a === 'focus') mapView.focus(S.selected);
   else if (a === 'add') openResForm(S.selected);
+  else if (a === 'plan-set') {
+    const cid = S.selected;
+    const set = () => { store.put('plan', 'g' + S.me.g, { cid, by: { g: S.me.g, n: S.me.n }, at: Date.now() }); toast(`${josa(regionName(cid), '을', '를')} 우리 모둠 제안 지역으로 정했어요.`); };
+    const had = planOf(S.me.g);
+    if (had != null && had !== cid && arrowsAll().some((x) => x.by && x.by.g === S.me.g)) {
+      confirmBox(`제안 지역을 ${esc(regionName(cid))}(으)로 바꿀까요?<br><small>이미 이은 화살표는 그대로 남아요. 필요 없는 것은 지워 주세요.</small>`, '바꾸기', set);
+    } else set();
+  }
   else if (a === 'retry') { store.retry(); toast('다시 보내 볼게요.'); }
   else if (a === 'edit-res') { const k = modal.key; const r = store.get('res', k); openResForm(r.cid, k); }
   else if (a === 'edit-arrow') { openArrowForm(null, null, modal.key); }
@@ -765,7 +852,7 @@ function start() {
       requestRender();
     },
     onArrow(key) {
-      if (S.arrowMode) return;
+      if (S.arrowMode || !isPlan()) return;
       S.selArrow = key;
       showArrow(key);
       requestRender();

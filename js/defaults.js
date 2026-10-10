@@ -13,7 +13,7 @@ export const DEMO_ROSTER = {
   assign: {},
 };
 
-export const DEFAULT_TEXTS = { tabMap: '우리 지도', tabTag: 'TAG', tabChat: 'AI 챗봇' };
+export const DEFAULT_TEXTS = { tabMap: '우리 지도', tabPlan: '교류 제안서', tabTag: 'TAG', tabChat: 'AI 챗봇' };
 
 export const TAG_KEYS = ['T', 'A', 'G'];
 export const DEFAULT_TAG = {

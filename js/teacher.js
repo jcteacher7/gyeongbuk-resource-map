@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=14';
-import { esc, timeText, josa, markBlanks } from './util.js?v=14';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=16';
+import { esc, timeText, josa, markBlanks } from './util.js?v=16';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -42,8 +42,8 @@ export function createTeacher(root, ctx) {
     root.querySelector('[data-ttabs]').innerHTML = TABS.map(([id, label]) => `<button type="button" class="tab ${tab === id ? 'on' : ''}" data-ttab="${id}">${label}</button>`).join('');
     const st = ctx.stages();
     const t = ctx.texts();
-    const tog = (k, label) => `<button type="button" class="tog ${st[k] ? 'on' : ''}" data-stage="${k}"><span class="sw"></span>${esc(label)} 화면 ${st[k] ? '열림' : '닫힘'}</button>`;
-    root.querySelector('[data-tstage]').innerHTML = tog('tag', t.tabTag) + tog('chat', t.tabChat);
+    const tog = (k, label) => `<button type="button" class="tog ${st[k] ? 'on' : ''}" data-stage="${k}"><span class="sw"></span>${esc(label)} ${st[k] ? '열림' : '닫힘'}</button>`;
+    root.querySelector('[data-tstage]').innerHTML = tog('plan', t.tabPlan) + tog('tag', t.tabTag) + tog('chat', t.tabChat);
   }
 
   // ---------- 현황 ----------
@@ -65,7 +65,7 @@ export function createTeacher(root, ctx) {
       const idle = g.members.filter((n) => !cnt(res, g.id, n) && !cnt(arr, g.id, n));
       const counties = regions.filter((x) => (r.assign || {})[x.id] === g.id).map((x) => x.name.replace(/(시|군)$/, ''));
       return `<div class="t-card"><h3>${esc(g.name)}</h3>
-        <p class="t-sub">맡은 시군: ${counties.length ? esc(counties.join(', ')) : '아직 없음'}</p>
+        <p class="t-sub">맡은 시군: ${counties.length ? esc(counties.join(', ')) : '아직 없음'} · 제안 지역: ${esc(((regions.find((x) => x.id === (store.get('plan', 'g' + g.id) || {}).cid) || {}).name) || '아직 없음')}</p>
         <table class="t-table"><tr><th></th><td>자원</td><td>화살표</td><td>TAG</td><td>챗봇</td></tr>${rows}</table>
         <p class="t-sub ${idle.length ? 'warn' : ''}">${idle.length ? `지도에 아직 안 올린 아이: ${esc(idle.join(', '))}` : '모두 지도에 올렸어요'}</p></div>`;
     }).join('') + '</div>';
@@ -189,6 +189,7 @@ export function createTeacher(root, ctx) {
       <section class="t-sec"><h3>3. 화면 이름</h3>
         <div class="t-grid3">
           <label>지도 화면<input class="t-in" data-txt="tabMap" value="${esc(t.tabMap)}" maxlength="10"></label>
+          <label>교류 제안서 화면<input class="t-in" data-txt="tabPlan" value="${esc(t.tabPlan)}" maxlength="10"></label>
           <label>TAG 화면<input class="t-in" data-txt="tabTag" value="${esc(t.tabTag)}" maxlength="10"></label>
           <label>챗봇 화면<input class="t-in" data-txt="tabChat" value="${esc(t.tabChat)}" maxlength="10"></label></div>
         <button type="button" class="btn primary" data-save="texts">화면 이름 저장</button></section>
@@ -308,7 +309,7 @@ export function createTeacher(root, ctx) {
 
   async function wipe(id) {
     const jobs = {
-      map: async () => { const n = await store.wipePhotos(); await store.wipe(['res', 'arrow']); return `사진 ${n}장과 지도 기록을 지웠어요.`; },
+      map: async () => { const n = await store.wipePhotos(); await store.wipe(['res', 'arrow', 'plan']); return `사진 ${n}장과 지도 기록을 지웠어요.`; },
       tag: async () => { await store.wipe(['tag']); return 'TAG를 지웠어요.'; },
       chat: async () => { await store.wipe(['chat', 'cstep']); await store.wipe(['cfg'], 'chatstep'); return '챗봇 기록을 지우고 1단계로 돌렸어요.'; },
       gen: async () => { await store.wipe(['gen']); return '모둠 문장을 지웠어요.'; },
@@ -351,7 +352,7 @@ export function createTeacher(root, ctx) {
       const st = { ...ctx.stages() };
       st[k] = !st[k];
       store.put('cfg', 'stages', st);
-      ctx.toast(`${k === 'tag' ? ctx.texts().tabTag : ctx.texts().tabChat} 화면을 ${st[k] ? '열었어요' : '닫았어요'}.`);
+      ctx.toast(`${{ plan: ctx.texts().tabPlan, tag: ctx.texts().tabTag, chat: ctx.texts().tabChat }[k]} 화면을 ${st[k] ? '열었어요' : '닫았어요'}.`);
       return;
     }
     const a = t.closest('[data-t]');
