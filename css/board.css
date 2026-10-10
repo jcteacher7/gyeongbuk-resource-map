@@ -71,3 +71,19 @@
 .chip.on .gdot { border-color: #fff; }
 .t-plan { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 14px; }
 .t-plan label { color: var(--ink); }
+
+/* 옛날과 비교(시간), 입력칸 예시, 예시 지역 */
+.era { display: inline-flex; align-items: center; height: 26px; padding: 0 9px; margin-right: 6px; border-radius: 8px; font-size: 15px; border: 2px solid var(--teal); white-space: nowrap; vertical-align: middle; }
+.era.old { background: #F1E7D6; }
+.era.more { background: #FFE3D2; }
+.era.less { background: #E3E6F5; }
+.ex { margin: -4px 2px 0; font-size: 14.5px; line-height: 1.3; color: var(--teal); }
+.ex-note { display: flex; align-items: center; gap: 6px; color: #A9781A; }
+.ex-note svg { width: 20px; height: 20px; flex: none; }
+.seg3 .seg button { font-size: 20px; padding: 0 4px; }
+.form .col { gap: 8px; }
+.form .q { margin-top: 8px; font-size: 23px; }
+.form .field input { height: 52px; }
+.form .seg button { height: 50px; }
+.form .photo-prev { height: 150px; width: 220px; }
+.pop-foot .by svg { width: 18px; height: 18px; vertical-align: -3px; margin-right: 4px; color: #C9961A; }

@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=17';
-import { store } from './store.js?v=17';
-import { createMapView, shortName } from './map-view.js?v=17';
-import { shrinkPhoto } from './photo.js?v=17';
-import { esc, safeLink, josa, timeText } from './util.js?v=17';
-import { MAX_LEN } from './config.js?v=17';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, withDefaults } from './defaults.js?v=17';
-import { createTagView } from './tag-view.js?v=17';
-import { createChatView } from './chat-view.js?v=17';
-import { createTeacher, hashCode } from './teacher.js?v=17';
+import mapData from '../data/gyeongbuk-map.js?v=20';
+import { store } from './store.js?v=20';
+import { createMapView, shortName } from './map-view.js?v=20';
+import { shrinkPhoto } from './photo.js?v=20';
+import { esc, safeLink, josa, timeText } from './util.js?v=20';
+import { MAX_LEN } from './config.js?v=20';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, withDefaults } from './defaults.js?v=20';
+import { createTagView } from './tag-view.js?v=20';
+import { createChatView } from './chat-view.js?v=20';
+import { createTeacher, hashCode } from './teacher.js?v=20';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -64,7 +64,7 @@ function roster() {
 const groupName = (g) => (g === 0 ? '선생님' : (roster().groups.find((x) => x.id === g) || { name: g + '모둠' }).name);
 const ownerOf = (cid) => (roster().assign || {})[cid];
 const isTeacher = () => !!(S.me && S.me.teacher);
-const canAdd = (cid) => isTeacher() || ownerOf(cid) == null || ownerOf(cid) === S.me.g;
+const canAdd = (cid) => cid !== EXAMPLE_CID && (isTeacher() || ownerOf(cid) == null || ownerOf(cid) === S.me.g);
 const myCounties = () => mapData.regions.filter((r) => S.me && ownerOf(r.id) === S.me.g).map((r) => r.id);
 const texts = () => withDefaults(store.get('cfg', 'texts'), DEFAULT_TEXTS);
 const tagCfg = () => withDefaults(store.get('cfg', 'tagcfg'), DEFAULT_TAG);
@@ -88,9 +88,11 @@ const byText = (by) => (by ? (by.g === 0 ? '선생님' : `${groupName(by.g)} · 
 const ENV = { nat: '자연환경', hum: '인문환경' };
 const AMT = { many: '많아요', few: '적어요' };
 
+// 예시 지역(문경)의 예시 카드는 앱에 들어 있고, 아이들이 올린 카드는 서버에서 옵니다.
 function resAll() {
-  return store.list('res').sort((a, b) => (a.at || 0) - (b.at || 0));
+  return EXAMPLE_RES.concat(store.list('res').filter((r) => r.cid !== EXAMPLE_CID).sort((a, b) => (a.at || 0) - (b.at || 0)));
 }
+const resGet = (key) => resAll().find((r) => r.key === key);
 function resMap() {
   return new Map(resAll().map((r) => [r.key, r]));
 }
@@ -207,7 +209,7 @@ function renderMap() {
   // 지도 화면에는 자원만, 화살표는 교류 제안서 화면에서 보고 있는 모둠의 것만 그립니다.
   const arrows = isPlan() ? planArrows().map((a) => ({ key: a.key, from: a.fromRes.cid, to: a.toRes.cid })) : [];
   const focus = isPlan() ? planOf(planView()) : null;
-  const pickRes = S.arrowMode && S.arrowMode.from ? store.get('res', S.arrowMode.from) : null;
+  const pickRes = S.arrowMode && S.arrowMode.from ? resGet(S.arrowMode.from) : null;
   const m = {
     counts,
     selected: S.selected,
@@ -250,7 +252,8 @@ function resCard(r, pickMode) {
     <span class="rc-body">
       <span class="rc-top"><b>${esc(r.name)}</b><span class="badge ${r.amt}">${AMT[r.amt] || ''}</span></span>
       <small><span class="env ${r.env}">${ENV[r.env] || ''}</span>${esc(r.why)}</small>
-      <small class="by">${esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
+      ${r.era ? `<small><span class="era ${r.era}">${ERA[r.era]}</span>${esc(r.eraWhy || '')}</small>` : ''}
+      <small class="by">${r.example ? '예시 카드' : esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
     </span>${pick}</button>`;
 }
 
@@ -279,8 +282,8 @@ function planPanel(all) {
     if (owners.length) html += `<div class="p-sub plan-focus">${owners.map((g) => `<i class="gdot" style="background:${groupColor(g.id)}"></i>`).join('')}${esc(owners.map((g) => g.name).join(', '))}의 제안 지역이에요</div>`;
     if (id !== focus && mine && !S.arrowMode) {
       const owner = ownerOf(id);
-      const ok = owner == null || owner === S.me.g;
-      html += `<div class="add-row"><button type="button" class="btn small ${ok ? 'primary' : 'off'}" data-act="plan-set" data-why="우리 모둠이 맡은 시군 가운데에서 골라요">${ICON.flag}제안 지역으로 정하기</button>
+      const ok = id !== EXAMPLE_CID && (owner == null || owner === S.me.g);
+      html += `<div class="add-row"><button type="button" class="btn small ${ok ? 'primary' : 'off'}" data-act="plan-set" data-why="${id === EXAMPLE_CID ? '문경시는 예시 지역이라 고를 수 없어요' : '우리 모둠이 맡은 시군 가운데에서 골라요'}">${ICON.flag}제안 지역으로 정하기</button>
         <small>${focus != null ? `지금은 ${esc(regionName(focus))}` : '아직 정하지 않았어요'}</small></div>`;
     }
     html += list.length
@@ -319,11 +322,13 @@ function renderPanel() {
     html += `<div class="p-head"><h2>${esc(regionName(id))}</h2>
       <button type="button" class="btn small" data-act="focus">${ICON.zoom}크게 보기</button>
       <button type="button" class="xbtn" data-act="unselect" aria-label="닫기">${ICON.x}</button></div>`;
-    html += `<div class="p-sub">${owner != null ? `맡은 모둠: ${esc(groupName(owner))}` : '아직 맡은 모둠이 없어요'}</div>`;
+    html += id === EXAMPLE_CID
+      ? `<div class="p-sub ex-note">${ICON.bulb}예시 지역이에요. 카드를 눌러 어떻게 썼는지 살펴봐요.</div>`
+      : `<div class="p-sub">${owner != null ? `맡은 모둠: ${esc(groupName(owner))}` : '아직 맡은 모둠이 없어요'}</div>`;
     html += list.length
       ? '<div class="cards">' + list.map((r) => resCard(r, !!S.arrowMode)).join('') + '</div>'
       : '<p class="hint">아직 올라온 자원이 없어요.</p>';
-    if (!S.arrowMode) {
+    if (!S.arrowMode && id !== EXAMPLE_CID) {
       const ok = canAdd(id);
       html += `<div class="add-row">
         <button type="button" class="btn primary ${ok ? '' : 'off'}" data-act="add">${ICON.plus}자원 올리기</button>
@@ -385,7 +390,7 @@ function closeModal() {
 function refreshModal() {
   if (!modal) return;
   if (modal.type === 'res') {
-    if (!store.get('res', modal.key)) { closeModal(); toast('이 자원은 지워졌어요.'); return; }
+    if (!resGet(modal.key)) { closeModal(); toast('이 자원은 지워졌어요.'); return; }
     showRes(modal.key, true);
   } else if (modal.type === 'arrow') {
     if (!arrowsAll().some((a) => a.key === modal.key)) { closeModal(); toast('이 화살표는 지워졌어요.'); return; }
@@ -399,6 +404,7 @@ function photoBox(p, big) {
 }
 
 function editRow(item, kind) {
+  if (item.example) return `<div class="pop-foot"><span class="by">${ICON.bulb}예시 카드예요. 이렇게 조사해서 올려요.</span></div>`;
   const canEdit = isTeacher() || (S.me && item.by && item.by.g === S.me.g);
   const canDel = isTeacher() || sameMe(item.by);
   const edited = item.edited ? ` · ${esc(item.edited.n)}${josa(item.edited.n, '이', '가').slice(-1)} 고쳤어요` : '';
@@ -411,7 +417,7 @@ function editRow(item, kind) {
 }
 
 function showRes(key, refresh) {
-  const r = store.list('res').find((x) => x.key === key);
+  const r = resGet(key);
   if (!r) return;
   const link = safeLink(r.link);
   const html = `<div class="sheet pop res-pop" role="dialog" aria-label="${esc(r.name)}">
@@ -421,7 +427,8 @@ function showRes(key, refresh) {
     <div class="pop-info">
       <div class="info-row"><span class="num">1</span><span class="env ${r.env}">${ENV[r.env] || ''}</span><span>${esc(r.why)}</span></div>
       <div class="info-row"><span class="num">2</span><b>${esc(r.name)}</b><span class="badge ${r.amt}">이 시군에 ${AMT[r.amt] || ''}</span></div>
-      <div class="info-row"><span class="num">3</span>${link ? `<a class="btn small" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${ICON.link}자료 보기</a>` : '<span class="muted">링크가 없어요</span>'}</div>
+      <div class="info-row"><span class="num">3</span>${r.era ? `<span class="era ${r.era}">${ERA[r.era]}</span><span>${esc(r.eraWhy || '')}</span>` : '<span class="muted">옛날과 비교한 내용이 없어요</span>'}</div>
+      <div class="info-row"><span class="num">4</span>${link ? `<a class="btn small" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${ICON.link}자료 보기</a>` : '<span class="muted">링크가 없어요</span>'}</div>
     </div>
     ${editRow(r, 'res')}
   </div>`;
@@ -449,7 +456,7 @@ function showArrow(key, refresh) {
     </div>
     <ol class="steps3">
       <li><span class="step-name"><span class="num">1</span>환경</span>
-        <span class="step-text"><span class="env ${f.env}">${ENV[f.env] || ''}</span>${esc(f.why)}<br><span class="env ${t.env}">${ENV[t.env] || ''}</span>${esc(t.why)}</span></li>
+        <span class="step-text"><span class="env ${f.env}">${ENV[f.env] || ''}</span>${esc(f.why)}${f.era ? ` <span class="era ${f.era}">${ERA[f.era]}</span>` : ''}<br><span class="env ${t.env}">${ENV[t.env] || ''}</span>${esc(t.why)}${t.era ? ` <span class="era ${t.era}">${ERA[t.era]}</span>` : ''}</span></li>
       <li><span class="step-name"><span class="num">2</span>교류</span><span class="step-text">${esc(a.how)}</span></li>
       <li><span class="step-name"><span class="num">3</span>생활 변화</span><span class="step-text">${esc(a.change)}</span></li>
     </ol>
@@ -524,10 +531,11 @@ function bindForm(f, draftId, validate, onSave) {
 }
 
 function openResForm(cid, key) {
-  const old = key ? store.list('res').find((r) => r.key === key) : null;
+  const old = key ? resGet(key) : null;
   const draftId = key ? 'res-' + key : 'res-new-' + cid;
   const draft = loadDraft(draftId);
-  const f = { env: '', why: '', name: '', amt: '', link: '', ...(old ? { env: old.env, why: old.why, name: old.name, amt: old.amt, link: old.link || '' } : {}), ...(draft || {}) };
+  const f = { env: '', why: '', name: '', amt: '', era: '', eraWhy: '', link: '', ...(old ? { env: old.env, why: old.why, name: old.name, amt: old.amt, era: old.era || '', eraWhy: old.eraWhy || '', link: old.link || '' } : {}), ...(draft || {}) };
+  const eraHint = () => (f.era ? EXAMPLE_HINT.era[f.era] : '위에서 하나를 고르면 예시가 나와요');
   let photo = old && old.photo ? old.photo : null;
   let newPhoto = null;
   let busy = false;
@@ -540,12 +548,18 @@ function openResForm(cid, key) {
         <div class="q"><span class="num">1</span>이 자원은 어떤 환경 때문에 있나요?</div>
         ${seg('env', [['nat', '자연환경'], ['hum', '인문환경']], f.env)}
         ${field('why', f.why, '왜 그런지 한 줄로 써요')}
+        <p class="ex">${esc(EXAMPLE_HINT.why)}</p>
         <div class="q"><span class="num">2</span>자원 이름을 쓰고, 많은지 적은지 골라요</div>
         ${field('name', f.name, '자원 이름')}
+        <p class="ex">${esc(EXAMPLE_HINT.name)}</p>
         ${seg('amt', [['many', '이 시군에 많아요'], ['few', '이 시군에 적어요']], f.amt)}
       </div>
       <div class="col">
-        <div class="q"><span class="num">3</span>링크와 사진 한 장을 넣어요</div>
+        <div class="q"><span class="num">3</span>옛날과 비교하면 어때요?</div>
+        <div class="seg3">${seg('era', Object.entries(ERA), f.era)}</div>
+        ${field('eraWhy', f.eraWhy, '왜 달라졌나요? 쓰는 모습이 어떻게 달라졌나요?')}
+        <p class="ex" data-erahint>${esc(eraHint())}</p>
+        <div class="q"><span class="num">4</span>링크와 사진 한 장을 넣어요</div>
         <span class="field"><input name="link" type="url" inputmode="url" value="${esc(f.link)}" maxlength="500" placeholder="자료 주소 (https://…)" autocomplete="off"></span>
         <div class="photo-box">
           <div class="photo-prev">${photoBox(photo)}</div>
@@ -582,17 +596,22 @@ function openResForm(cid, key) {
   });
   modal.photoDel = () => { newPhoto = null; photo = null; showPhoto(); };
   bindForm(f, draftId, () => {
+    // 고른 것에 맞는 예시를 보여 줍니다(입력칸은 건드리지 않음).
+    const eh = root.querySelector('[data-erahint]');
+    if (eh && eh.textContent !== eraHint()) eh.textContent = eraHint();
     if (busy) return '사진을 줄이는 중이에요. 잠깐만요!';
     if (!f.env) return '1번: 자연환경인지 인문환경인지 골라 주세요';
     if (!f.why.trim()) return '1번: 왜 그런지 써 주세요';
     if (!f.name.trim()) return '2번: 자원 이름을 써 주세요';
     if (!f.amt) return '2번: 많아요 / 적어요를 골라 주세요';
-    if (f.link.trim() && !safeLink(f.link)) return '3번: 링크 주소를 다시 확인해 주세요';
+    if (!f.era) return '3번: 옛날과 비교해서 하나를 골라 주세요';
+    if (f.era !== 'old' && !f.eraWhy.trim()) return '3번: 왜 달라졌는지 한 줄로 써 주세요';
+    if (f.link.trim() && !safeLink(f.link)) return '4번: 링크 주소를 다시 확인해 주세요';
     return '';
   }, () => {
     const k = key || store.newKey('r');
     const v = {
-      cid, env: f.env, why: f.why.trim(), name: f.name.trim(), amt: f.amt, link: safeLink(f.link),
+      cid, env: f.env, why: f.why.trim(), name: f.name.trim(), amt: f.amt, era: f.era, eraWhy: f.eraWhy.trim(), link: safeLink(f.link),
       photo: newPhoto ? null : photo,
       by: old ? old.by : { ...S.me },
       at: old ? old.at : Date.now(),
@@ -644,12 +663,12 @@ function openArrowForm(fromKey, toKey, key) {
 
 // ---------- 화살표 잇기 ----------
 function pickForArrow(key) {
-  const r = store.get('res', key);
+  const r = resGet(key);
   if (!r) return;
   const from = S.arrowMode.from;
   if (!from) { S.arrowMode.from = key; S.selected = null; requestRender(); toast('이제 이어질 자원이 있는 시군을 눌러요.'); return; }
   if (from === key) { S.arrowMode.from = null; requestRender(); return; }
-  const fr = store.get('res', from);
+  const fr = resGet(from);
   if (fr && fr.cid === r.cid) { toast('다른 시군의 자원을 골라 주세요.'); return; }
   const focus = planOf(S.me.g);
   if (fr && fr.cid !== focus && r.cid !== focus) { toast(`화살표 한쪽은 우리 제안 지역(${regionName(focus)})의 자원이어야 해요.`, 3200); return; }
@@ -757,7 +776,7 @@ document.addEventListener('click', (e) => {
     } else set();
   }
   else if (a === 'retry') { store.retry(); toast('다시 보내 볼게요.'); }
-  else if (a === 'edit-res') { const k = modal.key; const r = store.get('res', k); openResForm(r.cid, k); }
+  else if (a === 'edit-res') { const k = modal.key; const r = resGet(k); openResForm(r.cid, k); }
   else if (a === 'edit-arrow') { openArrowForm(null, null, modal.key); }
   else if (a === 'del-res') {
     const k = modal.key;
@@ -867,7 +886,7 @@ function start() {
     },
   });
   const ctx = {
-    store, esc, ICON, regions: mapData.regions,
+    store, esc, ICON, regions: mapData.regions, exampleCid: EXAMPLE_CID,
     me: () => S.me,
     roster, groupName, groupColor, texts, stages, tagCfg, chatCfg, toast,
     classStep: () => Math.min(4, Math.max(1, (store.get('cfg', 'chatstep') || {}).step || 1)),

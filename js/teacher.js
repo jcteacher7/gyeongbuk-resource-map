@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=17';
-import { esc, timeText, josa, markBlanks } from './util.js?v=17';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=20';
+import { esc, timeText, josa, markBlanks } from './util.js?v=20';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -69,7 +69,7 @@ export function createTeacher(root, ctx) {
         <table class="t-table"><tr><th></th><td>자원</td><td>화살표</td><td>TAG</td><td>챗봇</td></tr>${rows}</table>
         <p class="t-sub ${idle.length ? 'warn' : ''}">${idle.length ? `지도에 아직 안 올린 아이: ${esc(idle.join(', '))}` : '모두 지도에 올렸어요'}</p></div>`;
     }).join('') + '</div>';
-    html += '<h3 class="t-h">시군별</h3><div class="t-counties">' + regions.map((x) => {
+    html += '<h3 class="t-h">시군별 <small class="t-sub">(문경시는 예시 지역이라 뺐어요)</small></h3><div class="t-counties">' + regions.filter((x) => x.id !== ctx.exampleCid).map((x) => {
       const n = res.filter((v) => v.cid === x.id).length;
       const a = arr.filter((v) => { const f = res.find((q) => q.key === v.from), t = res.find((q) => q.key === v.to); return (f && f.cid === x.id) || (t && t.cid === x.id); }).length;
       const o = (r.assign || {})[x.id];
@@ -181,8 +181,8 @@ export function createTeacher(root, ctx) {
         <button type="button" class="btn primary" data-save="roster">명단 저장</button></section>
 
       <section class="t-sec"><h3>2. 시군 배정</h3>
-        <p class="t-sub">모둠마다 맡을 시군을 골라요. 나중에 바꿔도 기록은 시군에 붙어 있어 사라지지 않아요. (명단을 먼저 저장해야 새 모둠이 보여요)</p>
-        <div class="t-assign">${regions.map((x) => `<label><span>${esc(x.name)}</span><select class="t-in" data-assign="${x.id}">
+        <p class="t-sub">문경시는 예시 지역이라 여기에 없어요(21개 시군). 모둠마다 맡을 시군을 골라요. 나중에 바꿔도 기록은 시군에 붙어 있어 사라지지 않아요. (명단을 먼저 저장해야 새 모둠이 보여요)</p>
+        <div class="t-assign">${regions.filter((x) => x.id !== ctx.exampleCid).map((x) => `<label><span>${esc(x.name)}</span><select class="t-in" data-assign="${x.id}">
           ${opt('', (r.assign || {})[x.id] ?? '', '없음')}${r.groups.map((g) => opt(g.id, (r.assign || {})[x.id] ?? '', g.name)).join('')}</select></label>`).join('')}</div>
         <button type="button" class="btn primary" data-save="assign">배정 저장</button></section>
 
@@ -190,8 +190,8 @@ export function createTeacher(root, ctx) {
         <p class="t-sub">모둠마다 교류 제안서를 만들 시군을 하나씩 골라 줘요. 지도에서 그 시군이 모둠 색으로 칠해져요. 아이들이 교류 제안서 화면에서 직접 고를 수도 있어요. (시군 배정이 있으면 그 모둠이 맡은 시군만 나와요)</p>
         <div class="t-plan">${r.groups.map((g) => {
           const cur = (store.get('plan', 'g' + g.id) || {}).cid ?? '';
-          const mine = regions.filter((x) => (r.assign || {})[x.id] === g.id);
-          const list = mine.length ? mine : regions;
+          const mine = regions.filter((x) => (r.assign || {})[x.id] === g.id && x.id !== ctx.exampleCid);
+          const list = mine.length ? mine : regions.filter((x) => x.id !== ctx.exampleCid);
           return `<label><span><i class="gdot" style="background:${ctx.groupColor(g.id)}"></i>${esc(g.name)}</span><select class="t-in" data-plan="${g.id}">
             ${opt('', cur, '아직 없음')}${list.map((x) => opt(x.id, cur, x.name)).join('')}</select></label>`;
         }).join('')}</div>
@@ -258,6 +258,7 @@ export function createTeacher(root, ctx) {
       if (r.demo) return ctx.toast('명단을 먼저 저장해 주세요.');
       const assign = {};
       body.querySelectorAll('[data-assign]').forEach((s) => { if (s.value) assign[s.dataset.assign] = +s.value; });
+      delete assign[ctx.exampleCid];
       store.put('cfg', 'roster', { groups: r.groups, assign });
       ctx.toast('시군 배정을 저장했어요.');
       rebuild();

@@ -173,7 +173,8 @@ function systemPrompt(step: number, steps: { name: string; question: string }[],
       ? `pass 정하는 법: 이 단계에서 모둠이 지금까지 한 말(방금 한 말 포함)을 모두 보고, 다음 기준을 채웠으면 true, 아니면 false. 기준: ${PASS_RULE[step - 1]} 장난, 한두 낱말뿐인 대답, 이유가 없는 대답, 질문만 한 경우는 false. 한 번 true였으면 계속 true.`
       : 'pass는 항상 false로 써.',
     'pass가 true여도 reply에 "통과", "성공", "다음 단계" 같은 말은 쓰지 마. 칭찬 한마디와, 더 깊이 생각해 볼 질문 하나를 써.',
-    research ? `이 반 아이들이 지도 앱에 조사해 올린 경상북도 자원(시군: 자원, 많음/적음): ${research}` : '',
+    research ? `이 반 아이들이 지도 앱에 조사해 올린 경상북도 자원(시군: 자원(지금 많음/적음, 옛날과 비교)): ${research}
+아이들이 조사한 이 내용을 넣어서 구체적으로 물어봐. 특히 옛날과 오늘날의 차이를 물을 때는 "요즘 많아짐", "옛날보다 줄어듦"으로 조사한 자원을 예로 들어.` : '',
   ].filter(Boolean).join('\n');
 }
 
@@ -305,9 +306,10 @@ Deno.serve(async (req) => {
     if (step >= 3) {
       const NAMES: Record<string, string> = { '37010': '포항', '37020': '경주', '37030': '김천', '37040': '안동', '37050': '구미', '37060': '영주', '37070': '영천', '37080': '상주', '37090': '문경', '37100': '경산', '37320': '의성', '37330': '청송', '37340': '영양', '37350': '영덕', '37360': '청도', '37370': '고령', '37380': '성주', '37390': '칠곡', '37400': '예천', '37410': '봉화', '37420': '울진', '37430': '울릉' };
       const res = resRows
-        .map((r) => r.value as { cid: number; name: string; amt: string; deleted?: boolean })
+        .map((r) => r.value as { cid: number; name: string; amt: string; era?: string; eraWhy?: string; deleted?: boolean })
         .filter((v) => !v.deleted);
-      research = res.slice(0, 60).map((v) => `${NAMES[String(v.cid)] ?? v.cid}: ${v.name}(${v.amt === 'few' ? '적음' : '많음'})`).join(', ');
+      const ERA: Record<string, string> = { old: '옛날부터 많았음', more: '요즘 많아짐', less: '옛날보다 줄어듦' };
+      research = res.slice(0, 60).map((v) => `${NAMES[String(v.cid)] ?? v.cid}: ${v.name}(${v.amt === 'few' ? '적음' : '많음'}${v.era && ERA[v.era] ? ', ' + ERA[v.era] + (v.eraWhy ? ' — ' + v.eraWhy : '') : ''})`).join(' / ');
     }
 
     const tDb = Date.now() - t0;

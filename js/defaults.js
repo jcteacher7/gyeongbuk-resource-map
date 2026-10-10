@@ -16,6 +16,31 @@ export const DEMO_ROSTER = {
 // 모둠 색(교류 제안서에서 모둠이 고른 제안 지역을 칠함). 땅(노랑)·고른 시군(산호색)과 겹치지 않는 색
 export const GROUP_COLORS = ['#F7A8C4', '#9FD0F7', '#A9DE8B', '#CDB5F7', '#F9B97A', '#8FDCD0', '#E7A0E8', '#C7CF7A'];
 
+// 옛날과 비교(시간): 자원 카드의 세 번째 질문
+export const ERA = { old: '옛날부터 많았어요', more: '요즘 많아졌어요', less: '옛날보다 줄었어요' };
+
+// 예시 지역: 문경시. 아이들이 조사하는 지역에서 빼고, 어떻게 쓰는지 보여 주는 예시 카드를 미리 넣어 둡니다.
+// (서버에 저장하지 않고 앱에 들어 있는 카드라서 고치거나 지울 수 없습니다. 내용은 선생님이 확인해 주세요.)
+export const EXAMPLE_CID = 37090;
+export const EXAMPLE_RES = [
+  { key: 'ex-omija', cid: EXAMPLE_CID, env: 'nat', why: '산이 많고 낮과 밤의 기온 차가 커서', name: '오미자', amt: 'many',
+    era: 'more', eraWhy: '오미자 음료와 축제가 인기를 얻어 기르는 농가가 늘었어요' },
+  { key: 'ex-coal', cid: EXAMPLE_CID, env: 'nat', why: '땅속에 석탄이 많이 묻혀 있어서', name: '석탄', amt: 'few',
+    era: 'less', eraWhy: '탄광이 문을 닫아 지금은 캐지 않고 박물관이 되었어요' },
+  { key: 'ex-bowl', cid: EXAMPLE_CID, env: 'hum', why: '도자기를 굽는 장인들이 모여 살아서', name: '찻사발(도자기)', amt: 'many',
+    era: 'old', eraWhy: '옛날부터 도자기를 구웠고 지금도 축제로 이어져요' },
+].map((r, i) => ({ ...r, link: '', photo: null, by: { g: 0, n: '예시' }, at: i, example: true }));
+// 입력칸 아래에 보여 주는 예시(문경 예시 카드에서 가져옴)
+export const EXAMPLE_HINT = {
+  why: '예: 산이 많고 낮과 밤의 기온 차가 커서 (문경 오미자)',
+  name: '예: 오미자',
+  era: {
+    old: '예: 옛날부터 도자기를 구웠고 지금도 축제로 이어져요 (문경 찻사발)',
+    more: '예: 오미자 음료와 축제가 인기를 얻어 기르는 농가가 늘었어요 (문경 오미자)',
+    less: '예: 탄광이 문을 닫아 지금은 캐지 않고 박물관이 되었어요 (문경 석탄)',
+  },
+};
+
 export const DEFAULT_TEXTS = { tabMap: '우리 지도', tabPlan: '교류 제안서', tabTag: 'TAG', tabChat: 'AI 챗봇' };
 
 export const TAG_KEYS = ['T', 'A', 'G'];
