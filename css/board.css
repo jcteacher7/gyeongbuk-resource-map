@@ -53,3 +53,6 @@
 .cv-steps li .num { margin-right: 6px; }
 .cv-steps li svg { width: 15px; height: 15px; }
 .cv-steps li .pass svg { width: 22px; height: 22px; }
+
+/* 모둠 문장에서 빈칸에 써 넣은 말 */
+.fill { color: var(--coral-d); background: linear-gradient(transparent 62%, #FFD35C 62%); padding: 0 3px; border-radius: 3px; }

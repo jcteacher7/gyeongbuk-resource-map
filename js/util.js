@@ -27,3 +27,19 @@ export function timeText(ms) {
   const d = new Date(ms);
   return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
+
+// 모둠 문장에서 아이들이 빈칸에 써 넣은 말만 색을 다르게 보여 줍니다.
+// 저장된 글(text) 안에서 빈칸 값(parts)을 앞에서부터 차례로 찾아 표시합니다(문장 틀이 나중에 바뀌어도 됨).
+export function markBlanks(text, parts) {
+  text = String(text || '');
+  if (!Array.isArray(parts) || !parts.length) return esc(text);
+  let out = '';
+  let pos = 0;
+  for (const part of parts) {
+    const at = part ? text.indexOf(part, pos) : -1;
+    if (at < 0) continue;
+    out += esc(text.slice(pos, at)) + `<span class="fill">${esc(part)}</span>`;
+    pos = at + part.length;
+  }
+  return out + esc(text.slice(pos));
+}

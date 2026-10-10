@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=13';
-import { esc, timeText, josa } from './util.js?v=13';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=14';
+import { esc, timeText, josa, markBlanks } from './util.js?v=14';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -144,7 +144,7 @@ export function createTeacher(root, ctx) {
         const gen = view === 4 ? store.get('gen', 'g' + g.id) : null;
         return `<div class="tb-col ${passOf(g.id, view) ? 'pass' : ''}">
           <h3>${esc(g.name)}${passOf(g.id, view) ? `<span class="tb-pass">${ICON.star}미션 성공</span>` : ''}</h3>
-          ${view === 4 ? `<div class="tb-gen">${gen && gen.text ? esc(gen.text) : '<span class="hint">아직 문장을 저장하지 않았어요</span>'}</div>` : ''}
+          ${view === 4 ? `<div class="tb-gen">${gen && gen.text ? markBlanks(gen.text, gen.parts) : '<span class="hint">아직 문장을 저장하지 않았어요</span>'}</div>` : ''}
           <div class="tb-list">${list.length ? list.map((c) => `<div class="tb-item"><p>${esc(c.q)}</p>
             ${boardAi ? `<div class="tb-ai">${c.a ? esc(c.a) : 'AI가 답하지 못함'}</div>` : ''}
             <small>${esc(c.n)} · ${timeText(c.at)}${c.pass ? ' · ★' : ''}</small></div>`).join('') : '<p class="hint">아직 대답이 없어요</p>'}</div>
@@ -159,7 +159,7 @@ export function createTeacher(root, ctx) {
       ${big ? '' : `<div class="t-genbar"><span class="t-sub">문장 틀: ${esc(ctx.chatCfg().template)}</span><button type="button" class="btn small primary" data-t="big">${ICON.zoom}크게 띄우기</button></div>`}
       <div class="t-gengrid">${r.groups.map((g) => {
         const v = store.get('gen', 'g' + g.id);
-        return `<div class="t-gen"><h3>${esc(g.name)}</h3>${v && v.text ? `<p>${esc(v.text)}</p><small>${esc(v.by ? josa(v.by.n, '이', '가') : '')} 저장 · ${timeText(v.at)}</small>` : '<p class="hint">아직 저장하지 않았어요</p>'}</div>`;
+        return `<div class="t-gen"><h3>${esc(g.name)}</h3>${v && v.text ? `<p>${markBlanks(v.text, v.parts)}</p><small>${esc(v.by ? josa(v.by.n, '이', '가') : '')} 저장 · ${timeText(v.at)}</small>` : '<p class="hint">아직 저장하지 않았어요</p>'}</div>`;
       }).join('')}</div></div>`;
   }
 

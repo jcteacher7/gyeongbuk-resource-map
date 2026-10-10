@@ -4,8 +4,8 @@
 // - AI가 모둠의 대답이 단계 기준을 채웠다고 판정하면 "미션 성공!"이 뜹니다(넘어가는 것은 선생님이 정함).
 // - 대화는 모둠마다 하나로 쌓이고, 아이 말과 AI 답이 한 쌍으로 서버(중계 함수)에 저장됩니다.
 // - AI가 실패해도 아이가 쓴 말은 지워지지 않고 [다시 보내기]가 나옵니다.
-import { splitTemplate } from './defaults.js?v=13';
-import { josa, timeText } from './util.js?v=13';
+import { splitTemplate } from './defaults.js?v=14';
+import { josa, timeText, markBlanks } from './util.js?v=14';
 
 const BLANK_MAX = 20;
 
@@ -114,7 +114,7 @@ export function createChatView(el, ctx) {
     const g = store.get('gen', gkey());
     const saved = el.querySelector('[data-saved]');
     const html = g && g.text
-      ? `<p class="gen-text">${esc(g.text)}</p><small>${esc(g.by ? josa(g.by.n, '이', '가') : '')} 저장했어요 · ${timeText(g.at)}${g._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>`
+      ? `<p class="gen-text">${markBlanks(g.text, g.parts)}</p><small>${esc(g.by ? josa(g.by.n, '이', '가') : '')} 저장했어요 · ${timeText(g.at)}${g._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>`
       : `<p class="hint">${stepNow() < 4 ? '4단계에서 모둠 문장을 완성해요.' : '아래 빈칸을 채워 모둠 문장을 완성해요.'}</p>`;
     if (saved.innerHTML !== html) saved.innerHTML = html;
 
