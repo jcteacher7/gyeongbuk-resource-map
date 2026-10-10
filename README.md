@@ -41,14 +41,19 @@
 
 다시 만들어야 할 때만: Supabase의 `wigxlmwysuqxiuonucqq` 프로젝트 → **SQL Editor** → **+** → `supabase/schema.sql` 내용을 붙여넣고 **Run**.
 
-### 2. 제미나이 키 만들기 (수업 전용 새 키)
+### 2. 제미나이 키 만들기 (수업 전용 새 키) — 끝남(2026-10-10)
 
 1. https://aistudio.google.com 에 학교 수업용 구글 계정으로 로그인합니다.
 2. 왼쪽 아래(또는 위) **Get API key** → **Create API key**를 누릅니다.
 3. 만들어진 키(`AIza…`로 시작)를 **복사만** 해 둡니다. 이 키는 채팅, 파일, 저장소 어디에도 붙여넣지 마세요. 아래 3번의 Supabase 비밀 값 칸에만 넣습니다.
-4. 요금과 사용량 확인: AI Studio의 **Usage**(사용량)와 **Billing**(결제) 화면에서 한도와 알림을 확인합니다.
+4. 지금은 **무료 등급**으로 씁니다(결제 연결 안 함). 한도는 AI Studio → **Dashboard → Rate limit**에서 봅니다.
+   - 2026-10-10 기준: 가벼운 모델 둘을 합쳐 1분에 30번쯤, 하루 1,000번. 수업 예상(200~300번)에는 충분합니다.
+   - 1분 한도를 잠깐 넘으면 앱이 "AI가 생각 중이에요"를 보여 준 채 몇 초 뒤 저절로 다시 보냅니다.
+   - **수업 당일에는 미리 시험을 많이 하지 마세요.** 하루 한도를 수업 전에 쓰게 됩니다.
 
-### 3. 챗봇 중계 함수 만들기 (Supabase, 10분)
+### 3. 챗봇 중계 함수 만들기 (Supabase) — 끝남(2026-10-10)
+
+함수 코드를 고쳤을 때만 다시 합니다: **Edge Functions → gemini-chat → Code** 탭 → 전체 지우고 새 내용 붙여넣기 → **Deploy updates**.
 
 1. https://supabase.com/dashboard/project/wigxlmwysuqxiuonucqq 로 들어갑니다.
 2. 왼쪽 메뉴 **Edge Functions** → **Secrets**(비밀 값)를 누릅니다.
