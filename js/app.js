@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=16';
-import { store } from './store.js?v=16';
-import { createMapView, shortName } from './map-view.js?v=16';
-import { shrinkPhoto } from './photo.js?v=16';
-import { esc, safeLink, josa, timeText } from './util.js?v=16';
-import { MAX_LEN } from './config.js?v=16';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults } from './defaults.js?v=16';
-import { createTagView } from './tag-view.js?v=16';
-import { createChatView } from './chat-view.js?v=16';
-import { createTeacher, hashCode } from './teacher.js?v=16';
+import mapData from '../data/gyeongbuk-map.js?v=17';
+import { store } from './store.js?v=17';
+import { createMapView, shortName } from './map-view.js?v=17';
+import { shrinkPhoto } from './photo.js?v=17';
+import { esc, safeLink, josa, timeText } from './util.js?v=17';
+import { MAX_LEN } from './config.js?v=17';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, withDefaults } from './defaults.js?v=17';
+import { createTagView } from './tag-view.js?v=17';
+import { createChatView } from './chat-view.js?v=17';
+import { createTeacher, hashCode } from './teacher.js?v=17';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -80,6 +80,7 @@ const planView = () => {
   if (ids.includes(S.planGroup)) return S.planGroup;
   return !isTeacher() && ids.includes(S.me.g) ? S.me.g : ids[0];
 };
+const groupColor = (g) => GROUP_COLORS[Math.max(0, roster().groups.findIndex((x) => x.id === g)) % GROUP_COLORS.length];
 const planMine = () => !isTeacher() && planView() === S.me.g;
 const planArrows = () => arrowsAll().filter((a) => a.by && a.by.g === planView());
 const sameMe = (by) => !!by && !!S.me && by.g === S.me.g && by.n === S.me.n;
@@ -210,7 +211,9 @@ function renderMap() {
   const m = {
     counts,
     selected: S.selected,
-    mine: new Set(isPlan() ? (focus != null ? [focus] : []) : myCounties()),
+    mine: new Set(isPlan() ? [] : myCounties()),
+    // 교류 제안서: 모둠마다 고른 제안 지역을 그 모둠의 색으로 칠합니다.
+    tint: isPlan() ? Object.fromEntries(roster().groups.map((g) => [planOf(g.id), groupColor(g.id)]).filter(([c]) => c != null)) : {},
     arrows,
     pick: pickRes ? pickRes.cid : null,
     selArrow: S.selArrow,
@@ -257,11 +260,11 @@ function planPanel(all) {
   const focus = planOf(gid);
   const arrows = planArrows();
   const aitem = (a) => `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.arrowSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`;
-  let html = `<div class="plan-groups">${roster().groups.map((g) => `<button type="button" class="chip ${g.id === gid ? 'on' : ''}" data-plang="${g.id}">${esc(g.name)}${!isTeacher() && g.id === S.me.g ? ' (우리)' : ''}</button>`).join('')}</div>`;
+  let html = `<div class="plan-groups">${roster().groups.map((g) => `<button type="button" class="chip ${g.id === gid ? 'on' : ''}" data-plang="${g.id}"><i class="gdot" style="background:${groupColor(g.id)}"></i>${esc(g.name)}${!isTeacher() && g.id === S.me.g ? ' (우리)' : ''}</button>`).join('')}</div>`;
   if (S.selected == null) {
     html += `<div class="p-head"><h2>${esc(groupName(gid))} 교류 제안서</h2></div>`;
     html += focus != null
-      ? `<button type="button" class="mycounty" data-county="${focus}"><b>${esc(regionName(focus))}</b><span>제안 지역</span></button>`
+      ? `<button type="button" class="mycounty" data-county="${focus}" style="background:${groupColor(gid)}"><b>${esc(regionName(focus))}</b><span>제안 지역</span></button>`
       : `<p class="hint">${mine ? '먼저 지도에서 우리 모둠이 제안할 시군을 누르고, [제안 지역으로 정하기]를 눌러요.' : '아직 제안 지역을 정하지 않았어요.'}</p>`;
     html += `<h3 class="p-h3">${ICON.arrowSmall}화살표 ${arrows.length}개</h3>`;
     html += arrows.length ? `<div class="alist">${arrows.map(aitem).join('')}</div>`
@@ -272,8 +275,9 @@ function planPanel(all) {
     html += `<div class="p-head"><h2>${esc(regionName(id))}</h2>
       <button type="button" class="btn small" data-act="focus">${ICON.zoom}크게 보기</button>
       <button type="button" class="xbtn" data-act="unselect" aria-label="닫기">${ICON.x}</button></div>`;
-    if (id === focus) html += `<div class="p-sub plan-focus">${ICON.flag}${esc(groupName(gid))}의 제안 지역이에요</div>`;
-    else if (mine && !S.arrowMode) {
+    const owners = roster().groups.filter((g) => planOf(g.id) === id);
+    if (owners.length) html += `<div class="p-sub plan-focus">${owners.map((g) => `<i class="gdot" style="background:${groupColor(g.id)}"></i>`).join('')}${esc(owners.map((g) => g.name).join(', '))}의 제안 지역이에요</div>`;
+    if (id !== focus && mine && !S.arrowMode) {
       const owner = ownerOf(id);
       const ok = owner == null || owner === S.me.g;
       html += `<div class="add-row"><button type="button" class="btn small ${ok ? 'primary' : 'off'}" data-act="plan-set" data-why="우리 모둠이 맡은 시군 가운데에서 골라요">${ICON.flag}제안 지역으로 정하기</button>
@@ -865,7 +869,7 @@ function start() {
   const ctx = {
     store, esc, ICON, regions: mapData.regions,
     me: () => S.me,
-    roster, groupName, texts, stages, tagCfg, chatCfg, toast,
+    roster, groupName, groupColor, texts, stages, tagCfg, chatCfg, toast,
     classStep: () => Math.min(4, Math.max(1, (store.get('cfg', 'chatstep') || {}).step || 1)),
     saved: (msg) => (store.status().mode === 'ok' ? toast(msg) : toast(msg + ' 아직 서버에 못 보냈어요, 이 태블릿에만 있어요.', 4000)),
     confirm: (text, onOk) => confirmBox(text, '네', onOk),

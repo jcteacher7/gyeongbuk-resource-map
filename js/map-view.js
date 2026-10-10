@@ -1,6 +1,6 @@
 // 지도 그리기: 시군 모양(확대되는 층) 위에 이름·핀·화살표(글자 크기가 그대로인 층)를 얹습니다.
 // 확대는 [+] [−] [처음 크기] 단추와 "이 시군 크게 보기"로만 합니다. 한 손가락으로 밀면 지도가 움직입니다.
-import { esc } from './util.js?v=16';
+import { esc } from './util.js?v=17';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAD = 22;
@@ -21,6 +21,7 @@ export function createMapView(el, data, h) {
         <g class="nbs">${data.neighbors.map((n) => `<path d="${n.d}"></path>`).join('')}</g>
         <rect class="inset" data-id="${ull.id}" x="${ib[0]}" y="${ib[1]}" width="${ib[2]}" height="${ib[3]}" rx="6"></rect>
         <g class="regs">${data.regions.map((r) => `<path data-id="${r.id}" d="${r.d}"></path>`).join('')}</g>
+        <path class="sel-outline" d=""></path>
       </g>
     </svg>
     <svg class="arrows-svg">
@@ -42,12 +43,13 @@ export function createMapView(el, data, h) {
   const world = el.querySelector('.world');
   const regPaths = new Map([...el.querySelectorAll('.regs path')].map((p) => [+p.dataset.id, p]));
   const insetRect = el.querySelector('.inset');
+  const selOutline = el.querySelector('.sel-outline');
   const arrowsG = el.querySelector('.arrows');
   const labels = el.querySelector('.labels');
 
   let view = { s: 1, tx: 0, ty: 0 };
   let homeS = 1;
-  let model = { counts: {}, selected: null, mine: new Set(), arrows: [], pick: null, selArrow: null };
+  let model = { counts: {}, selected: null, mine: new Set(), arrows: [], pick: null, selArrow: null, tint: {} };
   let labelEls = [];
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -168,9 +170,9 @@ export function createMapView(el, data, h) {
     });
     // 울릉 상자 안내
     out.push({ pt: [ib[0] + ib[2] / 2, ib[1]] });
-    html += `<span class="inset-note">울릉군(독도 포함)<br><small>${esc(ull.inset.note)}</small></span>`;
+    html += '<span class="inset-note">울릉군<small>보기 편하게 위치와 크기를 바꿨어요</small></span>';
     out.push({ pt: ull.inset.dokdo });
-    html += `<span class="dokdo-note" data-id="${ull.id}">독도<br><small>${esc(ull.inset.dokdoNote.replace(/^독도:\s*/, ''))}</small></span>`;
+    html += `<span class="dokdo-note" data-id="${ull.id}">독도</span>`;
     data.regions.forEach((r) => {
       const n = model.counts[r.id] || 0;
       const cls = [r.id === model.selected ? 'sel' : '', model.mine.has(r.id) ? 'mine' : '', r.id === model.pick ? 'pick' : ''].join(' ');
@@ -190,8 +192,11 @@ export function createMapView(el, data, h) {
       p.classList.toggle('sel', id === model.selected);
       p.classList.toggle('mine', model.mine.has(id));
       p.classList.toggle('has', !!model.counts[id]);
+      p.style.fill = model.tint[id] || '';
     });
     insetRect.classList.toggle('sel', model.selected === ull.id);
+    const selR = model.selected != null && model.selected !== ull.id ? regById.get(model.selected) : null;
+    selOutline.setAttribute('d', selR ? selR.d : '');
     buildLabels();
     paint();
   }

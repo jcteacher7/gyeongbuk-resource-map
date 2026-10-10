@@ -64,3 +64,10 @@
 .plan-focus svg { width: 20px; height: 20px; }
 .t-grid3 { grid-template-columns: repeat(4, 1fr); }
 #teacher .tog { font-size: 17px; padding: 0 12px 0 6px; }
+
+/* 모둠 색 점, 선생님 화면의 제안 지역 고르기 */
+.gdot { display: inline-block; width: 16px; height: 16px; margin-right: 6px; border-radius: 50%; border: 2px solid var(--teal); vertical-align: -2px; flex: none; }
+.chip .gdot { width: 14px; height: 14px; vertical-align: -1px; }
+.chip.on .gdot { border-color: #fff; }
+.t-plan { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 14px; }
+.t-plan label { color: var(--ink); }

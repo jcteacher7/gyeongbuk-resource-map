@@ -13,6 +13,9 @@ export const DEMO_ROSTER = {
   assign: {},
 };
 
+// 모둠 색(교류 제안서에서 모둠이 고른 제안 지역을 칠함). 땅(노랑)·고른 시군(산호색)과 겹치지 않는 색
+export const GROUP_COLORS = ['#F7A8C4', '#9FD0F7', '#A9DE8B', '#CDB5F7', '#F9B97A', '#8FDCD0', '#E7A0E8', '#C7CF7A'];
+
 export const DEFAULT_TEXTS = { tabMap: '우리 지도', tabPlan: '교류 제안서', tabTag: 'TAG', tabChat: 'AI 챗봇' };
 
 export const TAG_KEYS = ['T', 'A', 'G'];

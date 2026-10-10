@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=16';
-import { esc, timeText, josa, markBlanks } from './util.js?v=16';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=17';
+import { esc, timeText, josa, markBlanks } from './util.js?v=17';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -186,6 +186,17 @@ export function createTeacher(root, ctx) {
           ${opt('', (r.assign || {})[x.id] ?? '', '없음')}${r.groups.map((g) => opt(g.id, (r.assign || {})[x.id] ?? '', g.name)).join('')}</select></label>`).join('')}</div>
         <button type="button" class="btn primary" data-save="assign">배정 저장</button></section>
 
+      <section class="t-sec"><h3>교류 제안서: 모둠별 제안 지역</h3>
+        <p class="t-sub">모둠마다 교류 제안서를 만들 시군을 하나씩 골라 줘요. 지도에서 그 시군이 모둠 색으로 칠해져요. 아이들이 교류 제안서 화면에서 직접 고를 수도 있어요. (시군 배정이 있으면 그 모둠이 맡은 시군만 나와요)</p>
+        <div class="t-plan">${r.groups.map((g) => {
+          const cur = (store.get('plan', 'g' + g.id) || {}).cid ?? '';
+          const mine = regions.filter((x) => (r.assign || {})[x.id] === g.id);
+          const list = mine.length ? mine : regions;
+          return `<label><span><i class="gdot" style="background:${ctx.groupColor(g.id)}"></i>${esc(g.name)}</span><select class="t-in" data-plan="${g.id}">
+            ${opt('', cur, '아직 없음')}${list.map((x) => opt(x.id, cur, x.name)).join('')}</select></label>`;
+        }).join('')}</div>
+        <button type="button" class="btn primary" data-save="plan">제안 지역 저장</button></section>
+
       <section class="t-sec"><h3>3. 화면 이름</h3>
         <div class="t-grid3">
           <label>지도 화면<input class="t-in" data-txt="tabMap" value="${esc(t.tabMap)}" maxlength="10"></label>
@@ -249,6 +260,14 @@ export function createTeacher(root, ctx) {
       body.querySelectorAll('[data-assign]').forEach((s) => { if (s.value) assign[s.dataset.assign] = +s.value; });
       store.put('cfg', 'roster', { groups: r.groups, assign });
       ctx.toast('시군 배정을 저장했어요.');
+      rebuild();
+    } else if (what === 'plan') {
+      body.querySelectorAll('[data-plan]').forEach((sel) => {
+        const g = +sel.dataset.plan;
+        const cid = sel.value ? +sel.value : null;
+        if (((store.get('plan', 'g' + g) || {}).cid ?? null) !== cid) store.put('plan', 'g' + g, { cid, by: { g: 0, n: '선생님' }, at: Date.now() });
+      });
+      ctx.toast('제안 지역을 저장했어요.');
     } else if (what === 'texts') {
       const v = {};
       body.querySelectorAll('[data-txt]').forEach((i) => { v[i.dataset.txt] = i.value.trim() || DEFAULT_TEXTS[i.dataset.txt]; });

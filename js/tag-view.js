@@ -2,8 +2,8 @@
 // - 질문(A) 초안은 쓴 사람만 봅니다(화면에서 가리는 정도이며 완전한 잠금은 아님).
 // - 남긴 TAG는 발표 모둠과 선생님, 쓴 사람이 봅니다.
 // - 입력칸이 있는 틀은 한 번만 그리고, 다른 친구 글이 오면 목록만 바꿉니다(한글 입력 보호).
-import { TAG_KEYS } from './defaults.js?v=16';
-import { josa } from './util.js?v=16';
+import { TAG_KEYS } from './defaults.js?v=17';
+import { josa } from './util.js?v=17';
 
 export function createTagView(el, ctx) {
   const { store, esc, ICON } = ctx;
