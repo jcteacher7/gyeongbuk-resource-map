@@ -45,6 +45,13 @@ export const EXAMPLE_HINT = {
   },
 };
 
+// 화살표(교류 제안) 입력 창의 [선생님의 팁]에 나오는 예시
+export const ARROW_TIP = {
+  pair: '문경 오미자 → 영덕 대게',
+  how: { tip: '두 지역에 서로 많은 것과 부족한 것을 떠올려요. 무엇을 보내고 무엇을 받는지 써요.', ex: '문경은 오미자를 보내고, 영덕은 대게를 보내요' },
+  change: { tip: '교류한 뒤에 먹는 것, 하는 일, 사는 모습이 어떻게 바뀌는지 써요.', ex: '산골에서도 대게를, 바닷가에서도 오미자차를 먹어요' },
+};
+
 export const DEFAULT_TEXTS = { tabMap: '우리 지도', tabPlan: '교류 제안서', tabTag: 'TAG', tabChat: 'AI 챗봇' };
 
 export const TAG_KEYS = ['T', 'A', 'G'];

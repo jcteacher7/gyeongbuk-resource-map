@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=21';
-import { store } from './store.js?v=21';
-import { createMapView, shortName } from './map-view.js?v=21';
-import { shrinkPhoto } from './photo.js?v=21';
-import { esc, safeLink, josa, timeText } from './util.js?v=21';
-import { MAX_LEN } from './config.js?v=21';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, withDefaults } from './defaults.js?v=21';
-import { createTagView } from './tag-view.js?v=21';
-import { createChatView } from './chat-view.js?v=21';
-import { createTeacher, hashCode } from './teacher.js?v=21';
+import mapData from '../data/gyeongbuk-map.js?v=23';
+import { store } from './store.js?v=23';
+import { createMapView, shortName } from './map-view.js?v=23';
+import { shrinkPhoto } from './photo.js?v=23';
+import { esc, safeLink, josa, timeText } from './util.js?v=23';
+import { MAX_LEN } from './config.js?v=23';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=23';
+import { createTagView } from './tag-view.js?v=23';
+import { createChatView } from './chat-view.js?v=23';
+import { createTeacher, hashCode } from './teacher.js?v=23';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -636,12 +636,23 @@ function openArrowForm(fromKey, toKey, key) {
   const html = `<div class="sheet form arrow-form" role="dialog">
     <div class="sheet-head">${key ? '화살표 고치기' : '화살표 잇기'}
       ${draft ? '<span class="draft-note">쓰던 글을 불러왔어요</span>' : ''}
+      <button type="button" class="btn small tip-btn" data-act="tip">${ICON.bulb}선생님의 팁</button>
       <button type="button" class="xbtn" data-act="form-cancel" aria-label="닫기">${ICON.x}</button></div>
+    <div class="af-body">
+      <div class="af-main">
     <div class="af-top">${side(fr)}<span class="af-arrow">${ICON.arrow}</span>${side(tr)}</div>
     <div class="q"><span class="num">1</span>어떻게 교류하나요?</div>
     ${field('how', f.how, '한 줄로 써요')}
     <div class="q"><span class="num">2</span>그러면 생활 모습이 어떻게 달라지나요?</div>
     ${field('change', f.change, '한 줄로 써요')}
+      </div>
+    <div class="tip-box" data-tip hidden>
+      <b>${ICON.bulb}선생님의 팁 <small>예시: ${esc(ARROW_TIP.pair)}</small></b>
+      <p><span class="num">1</span>${esc(ARROW_TIP.how.tip)}<br><em>예: ${esc(ARROW_TIP.how.ex)}</em></p>
+      <p><span class="num">2</span>${esc(ARROW_TIP.change.tip)}<br><em>예: ${esc(ARROW_TIP.change.ex)}</em></p>
+      <small>예시를 그대로 쓰지 말고, 우리 모둠이 조사한 자원으로 써요.</small>
+    </div>
+    </div>
     <div class="sheet-foot"><span class="why-not"></span>
       <button type="button" class="btn ghost" data-act="form-cancel">그만두기</button>
       <button type="button" class="btn primary" data-act="form-save">${ICON.check}남기기</button></div>
@@ -764,6 +775,10 @@ document.addEventListener('click', (e) => {
   else if (a === 'form-save') modal.save();
   else if (a === 'form-cancel') modal.cancel();
   else if (a === 'photo-del') modal.photoDel();
+  else if (a === 'tip') {
+    const box = $('#modal [data-tip]');
+    if (box) { box.hidden = !box.hidden; act.classList.toggle('on', !box.hidden); }
+  }
   else if (a === 'unselect') { S.selected = null; requestRender(); }
   else if (a === 'focus') mapView.focus(S.selected);
   else if (a === 'add') openResForm(S.selected);
