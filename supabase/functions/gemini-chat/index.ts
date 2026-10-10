@@ -19,7 +19,9 @@ const HISTORY = 16; // 제미나이에 함께 보내는 앞선 대화 쌍 수
 
 const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 const SB_URL = Deno.env.get('SUPABASE_URL') ?? '';
-const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+// 표는 공개 키로 읽고 쓸 수 있게 되어 있으므로, 앱이 보낸 공개 키(apikey)를 그대로 씁니다.
+// (프로젝트마다 서버 쪽 키 이름과 모양이 달라 생기는 문제를 피하려는 것입니다.)
+let SB_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const MODELS: string[] = [...new Set([Deno.env.get('GEMINI_MODEL') ?? '', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite'])]
   .filter((m) => m !== '');
 
@@ -61,7 +63,7 @@ async function db(path: string, init: RequestInit = {}) {
 }
 async function rowsOf(path: string): Promise<Row[]> {
   const r = await db(path);
-  if (!r.ok) throw new Error('db ' + r.status);
+  if (!r.ok) throw new Error('db ' + r.status + ' ' + (await r.text()).slice(0, 120));
   return await r.json();
 }
 async function countOf(path: string): Promise<number> {
@@ -126,6 +128,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return reply({ ok: false, error: 'method' }, 405);
   if (!GEMINI_KEY) return reply({ ok: false, error: 'nokey' }, 500);
+  SB_KEY = req.headers.get('apikey') || SB_KEY;
 
   let body: { g?: unknown; n?: unknown; text?: unknown; step?: unknown };
   try { body = await req.json(); } catch { return reply({ ok: false, error: 'bad' }, 400); }
@@ -195,13 +198,13 @@ Deno.serve(async (req) => {
     } catch (e) {
       // 실패해도 아이가 보낸 말은 기록에 남깁니다(선생님 화면에서 볼 수 있음).
       await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value: { ...base, a: null, err: String(e).slice(0, 300) } }]) });
-      return reply({ ok: false, error: 'ai' }, 502);
+      return reply({ ok: false, error: 'ai', detail: String(e).slice(0, 300) }, 502);
     }
     const w = await db('gb_entries', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify([{ kind: 'chat', key, value }]) });
     if (!w.ok) return reply({ ok: false, error: 'save' }, 500);
     return reply({ ok: true, key, value });
   } catch (e) {
     console.error(e);
-    return reply({ ok: false, error: 'server' }, 500);
+    return reply({ ok: false, error: 'server', detail: String(e).slice(0, 300) }, 500);
   }
 });
