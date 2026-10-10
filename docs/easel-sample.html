@@ -29,27 +29,33 @@
   .keyq span { display: inline-block; margin-right: 10px; padding: 0 8px; border-radius: 8px; background: var(--sun); color: var(--ink); font-size: 17px; vertical-align: 2px; }
 
   /* 제목 바로 아래: 우리 지역에 많은 것과 부족한 것(한 줄 소개) */
-  /* 제목 아래: 옛날 → 지금 → 앞으로 (시간이 흐르는 줄) */
-  .time { display: grid; grid-template-columns: auto 1.25fr auto 1.5fr auto auto; gap: 6px; align-items: stretch; margin-top: 10px; }
-  .time .tl { align-self: center; font-size: 23px; color: var(--teal); white-space: nowrap; margin-right: 2px; }
-  .time > div { border-radius: 12px; padding: 3px 10px 5px; font-size: 21px; line-height: 1.22; border: 3px solid; display: flex; flex-direction: column; justify-content: center; }
-  .time small { font-size: 15px; width: fit-content; padding: 0 7px; margin-bottom: 2px; border-radius: 7px; color: #fff; }
-  .time > i { align-self: center; font-style: normal; font-size: 26px; color: var(--coral-d); }
-  .t-old { border-color: #8A6D3B !important; background: #F6EEDD; color: #5E4720; }
-  .t-old small { background: #8A6D3B; }
-  .t-now { border-color: var(--teal) !important; background: #fff; }
-  .t-now small { background: var(--teal); }
-  .t-now .many { color: #C93A27; }
-  .t-now .few { color: #2F63B0; }
-  .t-next { border-color: #E0A100 !important; background: #FFF6D6; align-items: center; text-align: center; white-space: nowrap; }
-  .t-next small { background: #B07A00; align-self: center; }
-  .t-next u { text-decoration: none; color: var(--coral-d); font-size: 24px; line-height: .9; }
+  /* 시간의 흐름이 종이의 뼈대: 과거(한 줄) ↓ 현재(한 줄) ↓ 미래(큰 틀) */
+  .tl { display: grid; gap: 18px; margin-top: 10px; }
+  .trow { display: grid; grid-template-columns: 30px 86px 1fr; align-items: center; column-gap: 8px; }
+  .trow > .cn { margin-right: 0; }
+  .trow > .tk { grid-column: 2; }
+  .trow > .cn { grid-column: 1; }
+  .trow > .tc { grid-column: 3; }
+  .tk { position: relative; display: inline-flex; align-items: center; justify-content: center; height: 38px; border-radius: 12px; color: #fff; font-size: 24px; }
+  .tk.past { background: #8A6D3B; }
+  .tk.now { background: var(--teal); }
+  .tk.future { background: #B07A00; }
+  /* 과거 → 현재 → 미래를 잇는 아래 화살표 */
+  .trow .tk::after { content: "↓"; position: absolute; left: 50%; top: 100%; translate: -50% 0; height: 18px; line-height: 18px; font-size: 20px; color: var(--coral-d); }
+  .tc { border: 3px solid; border-radius: 12px; padding: 4px 12px; font-size: 22px; line-height: 1.25; display: flex; flex-wrap: wrap; gap: 2px 18px; min-height: 38px; align-items: center; }
+  .trow:nth-child(1) .tc { border-color: #8A6D3B; background: #F6EEDD; color: #5E4720; }
+  .trow:nth-child(2) .tc { border-color: var(--teal); background: #fff; }
+  .tc .many { color: #C93A27; }
+  .tc .few { color: #2F63B0; }
+  .fut { position: relative; border: 4px solid #E0A100; border-radius: 20px; background: #FFFCEE; padding: 30px 8px 10px; }
+  .fut > .tk { position: absolute; left: 34px; top: -20px; min-width: 86px; padding: 0 14px; gap: 10px; white-space: nowrap; }
+  .fut > .tk small { font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 15px; }
   .chip { border-radius: 12px; padding: 4px 12px; font-size: 23px; line-height: 1.25; border: 3px solid; }
   .chip small { font-size: 16px; margin-right: 8px; }
   .chip.many { border-color: #C93A27; color: #C93A27; background: #FFF0EC; }
   .chip.few { border-color: #2F63B0; color: #2F63B0; background: #EDF3FD; }
   /* 가운데에 달라진 우리 지역, 양옆과 아래에 함께 달라지는 세 지역 */
-  .web { display: grid; grid-template-columns: 198px 24px 1fr 24px 198px; grid-template-rows: auto 26px auto; margin-top: 12px; align-items: center; }
+  .web { display: grid; grid-template-columns: 186px 20px 1fr 20px 186px; grid-template-rows: auto 26px auto; align-items: center; }
   .node { background: #fff; border: 3px solid var(--teal); border-radius: 18px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
   .node h3 { margin: 0; font-size: 23px; line-height: 1.1; color: var(--teal); }
   .node p { margin: 0; font-size: 19px; line-height: 1.22; }
@@ -171,10 +177,10 @@
     <div class="pad">
       <div class="title"><b><span class="cn">1</span>문경시 교류 제안서</b><span class="who2"><b>○모둠</b>이름, 이름, 이름, 이름</span></div>
       <div class="keyq"><span>핵심 질문</span>사람들의 살아가는 방식은 왜, 어떻게 변화할까?</div>
-      <div class="time"><b class="tl"><span class="cn">2</span>우리 문경은</b>
-        <div class="t-old"><small>옛날</small>석탄을 많이 캤어요</div><i>→</i>
-        <div class="t-now"><small>지금</small><span class="many">많은 것: 오미자, 찻사발</span><span class="few">부족한 것: 바다 먹거리, 곶감</span></div><i>→</i>
-        <div class="t-next"><small>앞으로</small>교류하면?<u>↓</u></div></div>
+      <div class="tl">
+        <div class="trow"><span class="cn">2</span><span class="tk past">과거</span><div class="tc">석탄을 많이 캤어요.</div></div>
+        <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: 오미자, 찻사발</span><span class="few">부족한 것: 바다 먹거리, 곶감</span></div></div>
+        <div class="fut"><span class="tk future">미래 <small>교류하면 이렇게 달라져요</small></span>
       <div class="web">
         <div class="node a">
           <h3><span class="cn">3</span>달라진 영덕</h3>
@@ -204,6 +210,8 @@
           <p>밥상에 먹을 것이 많아지고, 문경에 놀러 오는 사람이 늘어요.</p>
         </div>
       </div>
+        </div>
+      </div>
       <div class="claim"><span class="ans">핵심 질문에 대한 우리 지역의 답</span><span class="cn">5</span>문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 왜냐하면
         <ol>
           <li><b>서로 채워요</b><span>오미자와 찻사발을 보내고, 대게와 곶감을 받아요.</span></li>
@@ -216,9 +224,9 @@
     <h2>종이에 넣는 것 다섯 가지</h2>
     <ol class="num5">
       <li><span class="cn">1</span><span><b>제목과 핵심 질문</b><br>모둠 이름, 친구들 이름도 써요.</span></li>
-      <li><span class="cn">2</span><span><b>옛날 → 지금 → 앞으로</b><br>지금 칸에 <span style="color:#C93A27">많은 것은 빨강</span>, <span style="color:#2F63B0">부족한 것은 파랑</span>.</span></li>
-      <li><span class="cn">3</span><span><b>함께 달라지는 지역 세 곳</b><br>주고받는 것 · 그림 · 한 문장 · <span class="plus" style="font-family:'Gaegu';font-weight:700">만드는 것</span></span></li>
-      <li><span class="cn">4</span><span><b>달라진 우리 지역</b><br>가장 크게! 그림과 한 문장.</span></li>
+      <li><span class="cn">2</span><span><b>과거 ↓ 현재 ↓ 미래</b><br>위에서 아래로 시간이 흘러요. 현재 칸에 <span style="color:#C93A27">많은 것은 빨강</span>, <span style="color:#2F63B0">부족한 것은 파랑</span>.</span></li>
+      <li><span class="cn">3</span><span><b>미래: 함께 달라지는 지역 세 곳</b><br>주고받는 것 · 그림 · 한 문장 · <span class="plus" style="font-family:'Gaegu';font-weight:700">만드는 것</span></span></li>
+      <li><span class="cn">4</span><span><b>미래: 달라진 우리 지역</b><br>가장 크게! 그림과 한 문장.</span></li>
       <li><span class="cn">5</span><span><b>우리 지역의 답</b><br>서로 채워요 · 함께 만들어요 · 그래서 달라져요</span></li>
     </ol>
     <div class="remember"><b>꼭 기억해요</b><br>· 예시를 베끼지 말고 <b>우리가 조사한 것</b>으로 써요.<br>· 지역과 지역을 <b>선이나 길로 이어요.</b><br>· 글씨는 <b>세 걸음 떨어져도 읽히게</b> 크게, 짧게 써요.</div>
@@ -230,24 +238,24 @@
   <ol class="four">
     <li><b>고르기</b>
       <ul><li>태블릿 <b>교류 제안</b>에서 화살표로 이은 지역 가운데 <b>세 곳</b>을 골라요.</li>
-      <li><b>자원 지도</b>에서 우리 지역 카드를 보고 옛날과 지금을 살펴봐요.</li></ul></li>
+      <li><b>자원 지도</b>에서 우리 지역 카드를 보고 과거와 현재를 살펴봐요. <small>(카드의 "옛날과 비교"를 봐요)</small></li></ul></li>
     <li><b>연습 종이에 적기</b>
-      <ul><li>우리 지역: 옛날 한 줄, 지금 많은 것과 부족한 것</li>
-      <li>세 지역마다: 주고받는 것, 함께 만드는 것, 어떻게 달라지는지</li>
-      <li>앞으로 우리 지역은 어떻게 달라질까요? 한 문장</li></ul></li>
+      <ul><li><b>과거</b> 한 줄, <b>현재</b> 많은 것과 부족한 것</li>
+      <li><b>미래</b> 세 지역마다: 주고받는 것, 함께 만드는 것, 어떻게 달라지는지</li>
+      <li><b>미래</b> 우리 지역은 어떻게 달라질까요? 한 문장</li></ul></li>
     <li><b>그림 네 장 만들기</b>
       <ul><li>우리 지역 한 장, 세 지역 한 장씩. 모두 <b>교류한 뒤</b>의 모습이에요.</li></ul>
       <div class="say">AI에게 이렇게 부탁해요.<br>( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 ) ( 어떻게 하고 있는 ) 모습</div></li>
     <li><b>큰 종이에 옮기기</b>
       <ul><li>아래에서 <b>모양</b>을 골라 연필로 자리를 잡아요.</li>
-      <li>위에서부터 쓰고, 그림을 붙이고, 선으로 이어요.</li>
+      <li>위에서부터 <b>과거 → 현재 → 미래</b> 순서로 쓰고, 그림을 붙이고, 선으로 이어요.</li>
       <li>맨 아래에 <b>우리 지역의 답</b> 세 줄을 써요.</li></ul></li>
   </ol>
 </section>
 
 <section class="ideas kid">
   <h2><span class="cn">3</span>모양은 우리 모둠이 정해요</h2>
-  <p>넣는 것은 같아요. 놓는 자리만 달라요. 지역들이 <b>서로 이어져 보이면</b> 돼요. 새 모양을 생각해도 좋아요.</p>
+  <p>과거와 현재는 위에 두고, 노란 <b>미래</b> 칸 안의 모양만 바꿔요. 지역들이 <b>서로 이어져 보이면</b> 돼요. 새 모양을 생각해도 좋아요.</p>
   <div class="ideas-grid" id="ideas"></div>
 </section>
 
@@ -255,6 +263,7 @@
   <h2><span class="cn">4</span>다 했는지 확인해요</h2>
   <ul class="check">
     <li>①~⑤ 다섯 가지가 모두 있어요.</li>
+    <li><b>과거, 현재, 미래</b>가 위에서 아래로 차례로 보여요.</li>
     <li>세 지역마다 <b>주고받는 것, 그림, 한 문장, 함께 만드는 것</b>이 있어요.</li>
     <li>지역들이 선이나 길로 이어져 있어요.</li>
     <li>그림 아래에 "AI와 함께 상상해서 그린 그림"이라고 썼어요.</li>
@@ -263,9 +272,9 @@
 
   <h2><span class="cn">5</span>발표는 이렇게 해요 (5분)</h2>
   <ol class="talk">
-    <li><b>① 우리 지역</b>"우리 ○○은 옛날에는 ~. 지금은 ~이 많고 ~이 부족합니다." <small>태블릿으로 화살표도 보여 줘요.</small></li>
-    <li><b>② 세 지역</b>"○○와는 ~을 주고받습니다. 함께 ~을 만들 수 있습니다. 그래서 ○○ 사람들은 ~."</li>
-    <li><b>③ 달라진 우리 지역</b>"이렇게 교류하면 앞으로 우리 ○○은 ~." <small>가운데 그림을 짚어요.</small></li>
+    <li><b>① 우리 지역</b>"우리 ○○은 과거에는 ~. 현재는 ~이 많고 ~이 부족합니다." <small>태블릿으로 화살표도 보여 줘요.</small></li>
+    <li><b>② 미래의 세 지역</b>"○○와는 ~을 주고받습니다. 함께 ~을 만들 수 있습니다. 그래서 ○○ 사람들은 ~."</li>
+    <li><b>③ 미래의 우리 지역</b>"이렇게 교류하면 미래의 우리 ○○은 ~." <small>가운데 그림을 짚어요.</small></li>
     <li><b>④ 우리 지역의 답</b>핵심 질문을 읽고, 맨 아래 세 줄을 또박또박 읽어요.</li>
   </ol>
 </section>
@@ -277,10 +286,10 @@
     <div class="pad blank">
       <div class="title"><b><span class="fill">○○</span> 교류 제안서</b><span class="who2"><b class="fill">모둠 이름</b><span class="fill">모둠 친구들 이름</span></span></div>
       <div class="keyq"><span>핵심 질문</span>사람들의 살아가는 방식은 왜, 어떻게 변화할까?</div>
-      <div class="time"><b class="tl">우리 <span class="fill">○○</span>은</b>
-        <div class="t-old"><small>옛날</small><span class="fill">옛날에는 어땠나요?</span></div><i>→</i>
-        <div class="t-now"><small>지금</small><span class="many">많은 것: <span class="fill">………</span></span><span class="few">부족한 것: <span class="fill">………</span></span></div><i>→</i>
-        <div class="t-next"><small>앞으로</small>교류하면?<u>↓</u></div></div>
+      <div class="tl">
+        <div class="trow"><span class="tk past">과거</span><div class="tc"><span class="fill">과거에는 어땠나요?</span></div></div>
+        <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: <span class="fill">………</span></span><span class="few">부족한 것: <span class="fill">………</span></span></div></div>
+        <div class="fut"><span class="tk future">미래 <small>교류하면 이렇게 달라져요</small></span>
       <div class="web">
         <div class="node a">
           <h3>달라진 <span class="fill">○○</span></h3>
@@ -310,6 +319,8 @@
           <p class="fill">어떻게 달라지나요? (한 문장)</p>
         </div>
       </div>
+        </div>
+      </div>
       <div class="claim"><span class="ans">핵심 질문에 대한 우리 지역의 답</span>우리는 <span class="fill">○○·○○·○○</span>와 교류해야 합니다. 왜냐하면
         <ol>
           <li><b>서로 채워요</b><span class="fill">무엇을 보내고, 무엇을 받나요?</span></li>
@@ -328,10 +339,11 @@
   const dot = (x, y, r, st) => `<circle cx="${x}" cy="${y}" r="${r}" ${st}/>`;
   const line = (a, b) => `<path d="M${a[0]} ${a[1]} L${b[0]} ${b[1]}" ${LINK}/>`;
   const head = `<rect x="3" y="3" width="194" height="234" rx="6" fill="#fff" stroke="#2A6F7D" stroke-width="2.5"/>
-    <rect x="12" y="11" width="96" height="9" rx="3" fill="#C93A27"/><path d="M12 25 H188" stroke="#C93A27" stroke-width="2"/>
-    <rect x="12" y="28" width="176" height="7" rx="3" fill="#1E3A4C"/>
-    <rect x="12" y="38" width="46" height="7" rx="3" fill="#F6EEDD" stroke="#8A6D3B"/><rect x="64" y="38" width="72" height="7" rx="3" fill="#fff" stroke="#2A6F7D"/><rect x="142" y="38" width="46" height="7" rx="3" fill="#FFF6D6" stroke="#E0A100"/>
-    <path d="M59 41.5 h4 M137 41.5 h4" stroke="#C93A27" stroke-width="1.5"/>`;
+    <rect x="12" y="9" width="96" height="8" rx="3" fill="#C93A27"/><path d="M12 20 H188" stroke="#C93A27" stroke-width="2"/>
+    <rect x="12" y="23" width="176" height="6" rx="3" fill="#1E3A4C"/>
+    <rect x="12" y="32" width="22" height="6" rx="3" fill="#8A6D3B"/><rect x="37" y="32" width="100" height="6" rx="3" fill="#F6EEDD" stroke="#8A6D3B"/>
+    <rect x="12" y="41" width="22" height="6" rx="3" fill="#2A6F7D"/><rect x="37" y="41" width="151" height="6" rx="3" fill="#fff" stroke="#2A6F7D"/>
+    <rect x="7" y="52" width="186" height="144" rx="8" fill="#FFFCEE" stroke="#E0A100" stroke-width="2"/><rect x="12" y="49" width="26" height="7" rx="3" fill="#B07A00"/>`;
   const claim = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#FFF6D6" stroke="#C93A27" stroke-width="2"/>` +
     [0, 1, 2].map((i) => `<path d="M${x + 6} ${y + 8 + i * (h - 12) / 3} h${w - 12}" stroke="#C9B37A" stroke-width="2.5" stroke-linecap="round"/>`).join('');
   const IDEAS = [
@@ -363,7 +375,7 @@
       svg: `<circle cx="100" cy="124" r="62" ${LINK}/>` + dot(100, 62, 26, HUB) + dot(38, 124, 23, PAR) + dot(162, 124, 23, PAR) + dot(100, 186, 23, PAR) + claim(66, 104, 68, 40) },
   ];
   document.getElementById('ideas').innerHTML = IDEAS.map((d) =>
-    `<div class="idea"><svg viewBox="0 0 200 240" role="img" aria-label="${d.name} 배치">${head}${d.svg}</svg><b>${d.name}</b><span>${d.say}</span></div>`).join('');
+    `<div class="idea"><svg viewBox="0 0 200 240" role="img" aria-label="${d.name} 배치">${head}<g transform="translate(8 22) scale(.92 .88)">${d.svg}</g></svg><b>${d.name}</b><span>${d.say}</span></div>`).join('');
 </script>
 </body>
 </html>
