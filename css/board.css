@@ -232,3 +232,12 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .ways[data-page="0"] .p1, .ways[data-page="1"] .p0 { display: none; }
 .ways .more { background: var(--teal); border-color: var(--teal); color: #fff; }
 .ways .more small { font-family: var(--body); font-weight: 400; font-size: 14px; margin-left: 4px; opacity: .9; }
+
+/* 모둠 문장: 선생님이 [열기]를 눌러야 보임 */
+.t-gen h3 { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.t-genshut { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 10px 0 6px; }
+.t-genshut span { display: inline-flex; align-items: center; gap: 6px; color: var(--mute); font-size: 19px; }
+.t-genshut .btn { min-width: 180px; }
+.t-gens.big .t-genshut { gap: 20px; padding-top: 34px; }
+.t-gens.big .t-genshut span { font-size: 24px; }
+.t-gens.big .t-genshut .btn { min-width: 240px; height: 72px; font-size: 34px; }

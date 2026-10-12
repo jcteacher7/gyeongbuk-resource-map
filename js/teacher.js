@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=35';
-import { esc, timeText, josa, markBlanks } from './util.js?v=35';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=36';
+import { esc, timeText, josa, markBlanks } from './util.js?v=36';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -22,6 +22,7 @@ export function createTeacher(root, ctx) {
   let lastBody = '';
   let boardStep = null; // null 이면 아이들이 있는 단계를 따라감
   let boardAi = false;
+  const genOpen = new Set(); // 선생님이 [열기]를 누른 모둠만 문장을 보여 줌(이 기기에서만)
 
   root.innerHTML = `
     <header class="top t-top">
@@ -160,7 +161,11 @@ export function createTeacher(root, ctx) {
       ${big ? '' : `<div class="t-genbar"><span class="t-sub">문장 틀: ${esc(ctx.chatCfg().template)}</span><button type="button" class="btn small primary" data-t="big">${ICON.zoom}크게 띄우기</button></div>`}
       <div class="t-gengrid">${r.groups.map((g) => {
         const v = store.get('gen', 'g' + g.id);
-        return `<div class="t-gen"><h3>${esc(g.name)}</h3>${v && v.text ? `<p>${markBlanks(v.text, v.parts)}</p><small>${esc(v.by ? josa(v.by.n, '이', '가') : '')} 저장 · ${timeText(v.at)}</small>` : '<p class="hint">아직 저장하지 않았어요</p>'}</div>`;
+        if (!v || !v.text) return `<div class="t-gen"><h3>${esc(g.name)}</h3><p class="hint">아직 저장하지 않았어요</p></div>`;
+        if (!genOpen.has(g.id)) return `<div class="t-gen shut"><h3>${esc(g.name)}</h3>
+          <div class="t-genshut"><span>${ICON.lock}문장을 저장했어요</span><button type="button" class="btn primary" data-genopen="${g.id}">열기</button></div></div>`;
+        return `<div class="t-gen"><h3>${esc(g.name)}<button type="button" class="btn small ghost" data-genopen="${g.id}">가리기</button></h3>
+          <p>${markBlanks(v.text, v.parts)}</p><small>${esc(v.by ? josa(v.by.n, '이', '가') : '')} 저장 · ${timeText(v.at)}</small></div>`;
       }).join('')}</div></div>`;
   }
 
@@ -386,6 +391,8 @@ export function createTeacher(root, ctx) {
       else if (k === 'unbig') { big = false; rebuild(); }
       return;
     }
+    const go = t.closest('[data-genopen]');
+    if (go) { const g = +go.dataset.genopen; if (genOpen.has(g)) genOpen.delete(g); else genOpen.add(g); render(); return; }
     const bs = t.closest('[data-bstep]');
     if (bs) { boardStep = +bs.dataset.bstep === ctx.classStep() ? null : +bs.dataset.bstep; render(); return; }
     const cs = t.closest('[data-cstep]');
@@ -426,6 +433,6 @@ export function createTeacher(root, ctx) {
 
   return {
     render,
-    open() { tab = 'status'; big = false; draftRoster = null; rebuild(); },
+    open() { tab = 'status'; big = false; draftRoster = null; genOpen.clear(); rebuild(); },
   };
 }

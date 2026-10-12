@@ -1,13 +1,13 @@
-import mapData from '../data/gyeongbuk-map.js?v=35';
-import { store } from './store.js?v=35';
-import { createMapView, shortName } from './map-view.js?v=35';
-import { shrinkPhoto } from './photo.js?v=35';
-import { esc, safeLink, josa, timeText } from './util.js?v=35';
-import { MAX_LEN } from './config.js?v=35';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=35';
-import { createTagView } from './tag-view.js?v=35';
-import { createChatView } from './chat-view.js?v=35';
-import { createTeacher, hashCode } from './teacher.js?v=35';
+import mapData from '../data/gyeongbuk-map.js?v=36';
+import { store } from './store.js?v=36';
+import { createMapView, shortName } from './map-view.js?v=36';
+import { shrinkPhoto } from './photo.js?v=36';
+import { esc, safeLink, josa, timeText } from './util.js?v=36';
+import { MAX_LEN } from './config.js?v=36';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=36';
+import { createTagView } from './tag-view.js?v=36';
+import { createChatView } from './chat-view.js?v=36';
+import { createTeacher, hashCode } from './teacher.js?v=36';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
