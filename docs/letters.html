@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시군에서 온 편지 모아 보기 (선생님 검토용)</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  /* 선생님이 편지 22통을 한 번에 읽고 사실을 확인하는 화면입니다. 아이들 화면에는 이어져 있지 않습니다. */
+  body { margin: 0; padding: 24px 16px 60px; background: #FFF8E7; color: #1E3A4C; font-family: 'Gowun Dodum', sans-serif; word-break: keep-all; }
+  h1 { font-family: 'Gaegu', sans-serif; font-size: 36px; margin: 0 0 4px; color: #C93A27; }
+  .lead { max-width: 860px; margin: 0 auto 20px; font-size: 16px; line-height: 1.6; color: #3F5F6E; }
+  h1, .letter { max-width: 860px; margin-left: auto; margin-right: auto; }
+  .letter { background: #fff; border: 3px solid #9FCFD6; border-radius: 18px; padding: 18px 22px; margin-bottom: 18px; }
+  .letter h2 { font-family: 'Gaegu', sans-serif; font-size: 28px; margin: 0 0 8px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  .letter h2 small { font-family: 'Gowun Dodum', sans-serif; font-size: 15px; color: #3F5F6E; }
+  .letter p { font-size: 17px; line-height: 1.7; margin: 0 0 10px; }
+  .letter p b { background: linear-gradient(transparent 62%, #FFE08A 62%); }
+  .gl { border-bottom: 2px dotted #2A6F7D; }
+  .notes, .src { font-size: 15px; line-height: 1.6; margin: 8px 0 0; padding-left: 20px; color: #3F5F6E; }
+  .src a { color: #2A6F7D; word-break: break-all; }
+  @media print { body { background: #fff; } .letter { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<h1>시군에서 온 편지 모아 보기</h1>
+<p class="lead">선생님 검토용입니다. 편지마다 아래에 바탕이 된 자료가 있습니다. 고칠 곳이 있으면 시군 이름과 문장을 알려 주세요. 굵은 글씨는 아이들이 눈여겨볼 사실이고, 점선 밑줄은 낱말 풀이가 달린 말입니다.</p>
+<div id="list"></div>
+<script type="module">
+  import { LETTERS } from '../data/letters.js';
+  import map from '../data/gyeongbuk-map.js';
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const text = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\{(.+?)\}/g, '<span class="gl">$1</span>');
+  document.getElementById('list').innerHTML = map.regions.filter((r) => LETTERS[r.id]).map((r) => {
+    const L = LETTERS[r.id];
+    return `<section class="letter"><h2>${esc(r.name)}<small>친구 이름(암호): ${esc(L.name)}${r.id === 37090 ? ' · 예시 지역이라 잠그지 않음' : ''}</small></h2>
+      ${L.paras.map((p) => `<p>${text(p)}</p>`).join('')}
+      ${L.notes.length ? `<ul class="notes">${L.notes.map((n) => `<li><b>${esc(n[0])}</b>: ${esc(n[1])}</li>`).join('')}</ul>` : ''}
+      <ul class="src">${L.src.map((s) => `<li><a href="${esc(s[1])}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`).join('')}</ul></section>`;
+  }).join('');
+</script>
+</body>
+</html>
