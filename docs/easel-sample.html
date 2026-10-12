@@ -190,16 +190,45 @@
   .pick li { display: grid; gap: 1px; padding: 7px 12px; border: 2px dashed var(--dash, #7FB5BE); border-radius: 12px; background: #F3FBF9; break-inside: avoid; }
   .pick li b { font-family: 'Gaegu', sans-serif; font-size: 22px; line-height: 1.15; }
   .pick li span { font-size: 15px; color: var(--mute); line-height: 1.35; }
-  @media print {
-    body { background: #fff; }
-    body { padding: 8mm; }
-    details.teacher { display: none; }
-    .wrap { display: block; }
-    figure { break-inside: avoid; break-after: page; }
-    .ideas { break-before: page; }
-    .steps li, .card { break-inside: avoid; }
-    .pad { box-shadow: none; zoom: .92; }
-  }
+  /* A3 세 장으로 인쇄: 1장 "이렇게 만들 거예요"(가로), 2장 만드는 방법 2~5번(가로), 3장 연습 종이(세로).
+     html.pr 은 인쇄 직전에 붙습니다(주소 끝에 ?pr=1 을 붙이면 화면에서 미리 볼 수 있음). 크기는 아래 스크립트가 종이에 꼭 맞게 맞춥니다. */
+  .printbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 16px; padding: 10px 14px; background: #fff; border: 3px solid var(--teal-l); border-radius: 14px; font-size: 15px; line-height: 1.5; color: var(--mute); max-width: 1500px; }
+  .printbar button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: var(--teal); color: #fff; font-family: 'Gaegu', sans-serif; font-weight: 700; font-size: 22px; cursor: pointer; }
+  @page land { size: A3 landscape; margin: 0; }
+  @page port { size: A3 portrait; margin: 0; }
+  html.pr body { padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html.pr .printbar { display: none; }
+  html.pr .sheet { box-sizing: border-box; width: 420mm; height: 297mm; padding: 9mm; overflow: hidden; break-after: page; break-inside: avoid; page: land; display: flex; align-items: center; justify-content: center; }
+  html.pr .sheet.p3 { width: 297mm; height: 420mm; page: port; break-after: auto; }
+  html.pr .fit { flex: none; }
+  html.pr .pad { box-shadow: none; }
+  html.pr .kid, html.pr .ideas, html.pr .pick { max-width: none; }
+  html.pr .kid h2 { margin-top: 0; }
+  /* 1장: 왼쪽에 다 만든 모습, 오른쪽에 질문과 다섯 가지 */
+  html.pr .p1 .fit { width: 1530px; display: grid; grid-template-columns: 720px 1fr; column-gap: 44px; align-items: start; }
+  html.pr .p1 h1 { grid-column: 2; grid-row: 1; font-size: 62px; line-height: 1.1; margin: 0 0 16px; }
+  html.pr .p1 .lead { grid-column: 2; max-width: none; zoom: 1.5; margin: 0 0 12px !important; }
+  html.pr .p1 > .fit > .kid { display: none; }
+  html.pr .p1 .wrap { display: contents; }
+  html.pr .p1 figure { grid-column: 1; grid-row: 1 / span 6; }
+  html.pr .p1 .side { grid-column: 2; max-width: none; zoom: 1.5; margin-top: 8px; gap: 12px; }
+  /* 2장: 위에 네 걸음과 고르기, 아래 왼쪽에 모양, 오른쪽에 확인과 발표 */
+  html.pr .p2 .fit { width: 1980px; display: grid; grid-template-columns: 1.18fr 1fr; gap: 26px 44px; align-items: start; }
+  html.pr .p2 .s2 { grid-column: 1 / -1; }
+  html.pr .p2 .four { grid-template-columns: repeat(4, 1fr); }
+  html.pr .p2 .pick ul { grid-template-columns: repeat(8, 1fr); }
+  html.pr .p2 .ideas { margin-top: 0; }
+  html.pr .p2 .ideas-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  html.pr .p2 .s45 h2 + * + h2 { margin-top: 22px; }
+  html.pr .p2 .check, html.pr .p2 .talk, html.pr .p2 .kid p { max-width: none; }
+  html.pr .p2 .check, html.pr .p2 .talk li { font-size: 21px; }
+  /* 3장: 연습 종이를 종이에 가득 */
+  html.pr .p3 .fit { width: 720px; }
+  html.pr .p3 > .fit > .kid { display: none; } /* 그림 위에 같은 제목이 있어서 */
+  html.pr .p3 .wrap { display: block; }
+  html.pr.preview { background: #888; }
+  html.pr.preview body { background: #888; }
+  html.pr.preview .sheet { background: #fff; margin: 12px auto; }
 
   /* 줄인 안내(4학년용): 그림 옆에 번호 설명, 네 걸음, 짧은 확인표 */
   .side { max-width: 470px; display: grid; gap: 10px; }
@@ -223,6 +252,8 @@
 </style>
 </head>
 <body>
+<div class="printbar"><button type="button" id="printBtn">A3 세 장으로 인쇄하기</button><span>① 이렇게 만들 거예요 ② 만드는 방법(2~5번) ③ 연습 종이. 인쇄 창에서 <b>배율 100%</b>, <b>배경 그래픽 켜기</b>, 머리글·바닥글 끄기를 골라 주세요. 연습 종이만 세로로 나와요.</span></div>
+<div class="sheet p1"><div class="fit">
 <h1>교류 제안서 이젤패드 만들기</h1>
 <p class="lead" style="font-size:19px;color:var(--ink)">큰 종이 한 장으로 이 <b>탐구 질문</b>에 답해요. <b style="background:var(--ink);color:#fff;padding:2px 10px;border-radius:8px">가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?</b></p>
 <p class="lead" style="font-size:16px;margin-top:-10px">이 답을 모으면 나중에 우리 반의 <b>핵심 질문</b> "사람들의 살아가는 방식은 왜, 어떻게 변화할까?"에도 답할 수 있어요.</p>
@@ -293,8 +324,10 @@
     <div class="remember"><b>꼭 기억해요</b><br>· 예시를 베끼지 말고 <b>우리가 조사한 것</b>으로 써요.<br>· 지역과 지역을 <b>선이나 길로 이어요.</b><br>· 글씨는 <b>세 걸음 떨어져도 읽히게</b> 크게, 짧게 써요.</div>
   </div>
 </div>
+</div></div>
 
-<section class="kid">
+<div class="sheet p2"><div class="fit">
+<section class="kid s2">
   <h2><span class="cn">2</span>네 걸음으로 만들어요</h2>
   <ol class="four">
     <li><b>고르기</b>
@@ -325,7 +358,7 @@
   <div class="ideas-grid" id="ideas"></div>
 </section>
 
-<section class="kid">
+<section class="kid s45">
   <h2><span class="cn">4</span>다 했는지 확인해요</h2>
   <ul class="check">
     <li>①~⑤ 다섯 가지가 모두 있어요.</li>
@@ -344,7 +377,9 @@
     <li><b>④ 우리 지역의 답</b><span>탐구 질문을 읽고, 맨 아래 세 줄을 또박또박 읽어요.</span></li>
   </ol>
 </section>
+</div></div>
 
+<div class="sheet p3"><div class="fit">
 <section class="kid"><h2>연습 종이</h2><p>인쇄해서 연필로 먼저 써 봐요. 칸마다 무엇을 쓸지 물음이 적혀 있어요.</p></section>
 <div class="wrap">
   <figure>
@@ -400,6 +435,7 @@
     </div>
   </figure>
 </div>
+</div></div>
 
 <script>
   // 작은 배치 그림을 그립니다. 종이는 200×240, 제목과 "많은 것·부족한 것" 줄은 늘 위에 있습니다.
@@ -446,6 +482,31 @@
   ];
   document.getElementById('ideas').innerHTML = IDEAS.map((d) =>
     `<div class="idea"><svg viewBox="0 0 200 240" role="img" aria-label="${d.name} 배치">${head}<g transform="translate(8 22) scale(.92 .88)">${d.svg}</g></svg><b>${d.name}</b><span>${d.say}</span></div>`).join('');
+</script>
+<script>
+  // 인쇄 직전에 세 장의 틀을 켜고, 장마다 내용이 종이에 꼭 차도록 크기를 맞춥니다(글은 바꾸지 않음).
+  (function () {
+    const root = document.documentElement;
+    function fit() {
+      document.querySelectorAll('.sheet').forEach((sh) => {
+        const box = sh.querySelector('.fit');
+        box.style.zoom = 1;
+        const cs = getComputedStyle(sh);
+        const W = sh.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const H = sh.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        box.style.zoom = Math.min(W / box.offsetWidth, H / box.offsetHeight);
+      });
+    }
+    function on() { root.classList.add('pr'); fit(); }
+    function off() { if (!root.classList.contains('preview')) { root.classList.remove('pr'); document.querySelectorAll('.fit').forEach((b) => { b.style.zoom = ''; }); } }
+    window.addEventListener('beforeprint', on);
+    window.addEventListener('afterprint', off);
+    document.getElementById('printBtn').addEventListener('click', () => { on(); window.print(); });
+    if (/[?&]pr=1/.test(location.search)) {
+      root.classList.add('preview');
+      window.addEventListener('load', () => { (document.fonts ? document.fonts.ready : Promise.resolve()).then(on); });
+    }
+  })();
 </script>
 </body>
 </html>
