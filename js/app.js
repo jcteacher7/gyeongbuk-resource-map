@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=40';
-import { store } from './store.js?v=40';
-import { createMapView, shortName } from './map-view.js?v=40';
-import { shrinkPhoto } from './photo.js?v=40';
-import { esc, safeLink, josa, timeText } from './util.js?v=40';
-import { MAX_LEN } from './config.js?v=40';
-import { LETTERS, ANSWER_CARDS } from '../data/letters.js?v=40';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=40';
-import { createTagView } from './tag-view.js?v=40';
-import { createChatView } from './chat-view.js?v=40';
-import { createTeacher, hashCode } from './teacher.js?v=40';
+import mapData from '../data/gyeongbuk-map.js?v=41';
+import { store } from './store.js?v=41';
+import { createMapView, shortName } from './map-view.js?v=41';
+import { shrinkPhoto } from './photo.js?v=41';
+import { esc, safeLink, josa, timeText } from './util.js?v=41';
+import { MAX_LEN } from './config.js?v=41';
+import { LETTERS, ANSWER_CARDS } from '../data/letters.js?v=41';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=41';
+import { createTagView } from './tag-view.js?v=41';
+import { createChatView } from './chat-view.js?v=41';
+import { createTeacher, hashCode } from './teacher.js?v=41';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -98,8 +98,8 @@ const AMT = { many: '많아요', few: '적어요' };
 // 예시 지역(문경)의 예시 카드는 앱에 들어 있고, 아이들이 올린 카드는 서버에서 옵니다.
 function answerCards() {
   return Object.entries(ANSWER_CARDS).flatMap(([cid, list]) => list.map(([name, env, why, amt, era, eraWhy], i) => (
-    // 원래부터 적은 것은 '옛날과 비교' 딱지를 붙이지 않습니다(고를 말이 없어서)
-    { key: `ans-${cid}-${i}`, cid: +cid, name, env, why, amt, era: amt === 'few' && era === 'old' ? '' : era, eraWhy, example: true, answer: true })));
+    // 원래부터 적은 것은 '옛날부터 적었어요'로 보여 줍니다
+    { key: `ans-${cid}-${i}`, cid: +cid, name, env, why, amt, era: amt === 'few' && era === 'old' ? 'low' : era, eraWhy, example: true, answer: true })));
 }
 function resAll() {
   if (S.answerMode) return EXAMPLE_RES.concat(answerCards());
@@ -640,7 +640,7 @@ function openResForm(cid, key) {
     if (!f.name.trim()) return '2번: 자원 이름을 써 주세요';
     if (!f.amt) return '2번: 많아요 / 적어요를 골라 주세요';
     if (!f.era) return '3번: 옛날과 비교해서 하나를 골라 주세요';
-    if (f.era !== 'old' && !f.eraWhy.trim()) return '3번: 왜 달라졌는지 한 줄로 써 주세요';
+    if (f.era !== 'old' && f.era !== 'low' && !f.eraWhy.trim()) return '3번: 왜 달라졌는지 한 줄로 써 주세요';
     if (f.link.trim() && !safeLink(f.link)) return '4번: 링크 주소를 다시 확인해 주세요';
     return '';
   }, () => {

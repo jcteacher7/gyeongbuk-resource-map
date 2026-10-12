@@ -308,7 +308,7 @@ Deno.serve(async (req) => {
       const res = resRows
         .map((r) => r.value as { cid: number; name: string; amt: string; era?: string; eraWhy?: string; deleted?: boolean })
         .filter((v) => !v.deleted);
-      const ERA: Record<string, string> = { old: '옛날부터 많았음', more: '요즘 많아짐', less: '옛날보다 줄어듦' };
+      const ERA: Record<string, string> = { old: '옛날부터 많았음', more: '요즘 많아짐', less: '옛날보다 줄어듦', low: '옛날부터 적었음' };
       research = res.slice(0, 60).map((v) => `${NAMES[String(v.cid)] ?? v.cid}: ${v.name}(${v.amt === 'few' ? '적음' : '많음'}${v.era && ERA[v.era] ? ', ' + ERA[v.era] + (v.eraWhy ? ' — ' + v.eraWhy : '') : ''})`).join(' / ');
     }
 

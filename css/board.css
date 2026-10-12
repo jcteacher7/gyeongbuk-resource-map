@@ -288,3 +288,7 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .sheet-head .tip-btn svg { width: 22px; height: 22px; }
 .t-top .btn svg { flex: none; }
 .form-body.split .field input::placeholder { font-size: 17px; }
+/* 옛날과 비교: 고를 말이 네 가지라 두 줄로 놓음 */
+.seg3 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.form .seg3 .seg button { height: 44px; }
+.era.low { background: #E6EEF0; }
