@@ -1,13 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=35';
-import { store } from './store.js?v=35';
-import { createMapView, shortName } from './map-view.js?v=35';
-import { shrinkPhoto } from './photo.js?v=35';
-import { esc, safeLink, josa, timeText } from './util.js?v=35';
-import { MAX_LEN } from './config.js?v=35';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=35';
-import { createTagView } from './tag-view.js?v=35';
-import { createChatView } from './chat-view.js?v=35';
-import { createTeacher, hashCode } from './teacher.js?v=35';
+import mapData from '../data/gyeongbuk-map.js?v=36';
+import { store } from './store.js?v=36';
+import { createMapView, shortName } from './map-view.js?v=36';
+import { shrinkPhoto } from './photo.js?v=36';
+import { esc, safeLink, josa, timeText } from './util.js?v=36';
+import { MAX_LEN } from './config.js?v=36';
+import { LETTERS } from '../data/letters.js?v=36';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=36';
+import { createTagView } from './tag-view.js?v=36';
+import { createChatView } from './chat-view.js?v=36';
+import { createTeacher, hashCode } from './teacher.js?v=36';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -57,10 +58,16 @@ let modal = null;
 
 const TEACHER = { g: 0, n: '선생님', teacher: true };
 
+// 시군 배정: 선생님이 정한 것 + 모둠이 쪽지의 친구 이름으로 편지를 연 시군(letter/c<시군>).
 function roster() {
   const r = store.get('cfg', 'roster');
-  return r && Array.isArray(r.groups) && r.groups.length ? r : DEMO_ROSTER;
+  const base = r && Array.isArray(r.groups) && r.groups.length ? r : DEMO_ROSTER;
+  const opened = Object.fromEntries(store.list('letter').map((v) => [v.cid, v.g]));
+  return { ...base, assign: { ...opened, ...(base.assign || {}) } };
 }
+const letterOf = (cid) => LETTERS[cid] || null;
+const letterOpenBy = (cid) => (store.get('letter', 'c' + cid) || {}).g ?? null;
+const canReadLetter = (cid) => !!letterOf(cid) && (cid === EXAMPLE_CID || isTeacher() || (letterOpenBy(cid) != null && letterOpenBy(cid) === S.me.g));
 const groupName = (g) => (g === 0 ? '선생님' : (roster().groups.find((x) => x.id === g) || { name: g + '모둠' }).name);
 const ownerOf = (cid) => (roster().assign || {})[cid];
 const isTeacher = () => !!(S.me && S.me.teacher);
@@ -335,6 +342,12 @@ function renderPanel() {
     html += id === EXAMPLE_CID
       ? `<div class="p-sub ex-note">${ICON.bulb}예시 지역이에요. 카드를 눌러 어떻게 썼는지 살펴봐요.</div>`
       : `<div class="p-sub">${owner != null ? `맡은 모둠: ${esc(groupName(owner))}` : '아직 맡은 모둠이 없어요'}</div>`;
+    if (!S.arrowMode && letterOf(id)) {
+      const place = esc(shortName(regionName(id)));
+      if (canReadLetter(id)) html += `<button type="button" class="letter-btn" data-act="letter">${ICON.mail}<span><b>${place}에서 온 편지</b><small>눌러서 읽어요</small></span></button>`;
+      else if (owner != null && owner !== S.me.g) html += `<div class="letter-btn off">${ICON.mail}<span><b>${place}에서 온 편지</b><small>${esc(groupName(owner))}${josa(groupName(owner), '이', '가').slice(-1)} 받은 편지예요</small></span></div>`;
+      else html += `<button type="button" class="letter-btn locked" data-act="letter-lock">${ICON.lock}<span><b>${place}에서 온 편지</b><small>쪽지에 적힌 친구 이름으로 열어요</small></span></button>`;
+    }
     html += list.length
       ? '<div class="cards">' + list.map((r) => resCard(r, !!S.arrowMode)).join('') + '</div>'
       : '<p class="hint">아직 올라온 자원이 없어요.</p>';
@@ -784,6 +797,15 @@ document.addEventListener('click', (e) => {
     const fn = modal.onOk; closeModal(); fn();
   }
   else if (a === 'close') closeModal();
+  else if (a === 'letter') openLetter(S.selected);
+  else if (a === 'letter-lock') openLetterLock(S.selected);
+  else if (a === 'letter-ok') tryLetter();
+  else if (a === 'copy-link') {
+    const url = act.dataset.url;
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(
+      () => toast('주소를 복사했어요. 자원 카드의 링크 칸에 붙여 넣어요.', 3000),
+      () => toast('복사하지 못했어요. 자료를 열어 주소를 길게 눌러 복사해요.', 3200));
+  }
   else if (a === 'confirm-ok') { const fn = modal.onOk; closeModal(); fn(); }
   else if (a === 'form-save') modal.save();
   else if (a === 'form-cancel') modal.cancel();
@@ -904,6 +926,63 @@ function confirmTyped(word, onOk) {
     <button type="button" class="btn danger" data-act="typed-ok">지우기</button></div></div>`);
 }
 
+// ---------- 시군에서 온 편지 ----------
+// 쪽지에 적힌 친구 이름을 넣으면 편지가 열리고, 그 시군이 우리 모둠이 맡은 시군이 됩니다.
+function openLetterLock(cid) {
+  openModal({ type: 'letter-lock', cid }, `<div class="sheet confirm letter-lock" role="dialog">
+    <p>${esc(shortName(regionName(cid)))}에서 편지가 왔어요!<br><small>편지를 보낸 친구의 이름을 쓰면 열려요. 쪽지를 봐요.</small></p>
+    <div class="code-row"><input data-lname maxlength="4" autocomplete="off" aria-label="친구 이름"></div>
+    <div class="why-not" data-lwhy hidden></div>
+    <div class="confirm-acts"><button type="button" class="btn" data-act="close">그만두기</button>
+    <button type="button" class="btn primary" data-act="letter-ok">${ICON.key}편지 열기</button></div></div>`);
+  setTimeout(() => { const i = $('#modal [data-lname]'); if (i) i.focus(); }, 50);
+}
+function tryLetter() {
+  if (!modal || modal.type !== 'letter-lock') return;
+  const cid = modal.cid;
+  const name = ($('#modal [data-lname]').value || '').replace(/\s/g, '').normalize('NFC');
+  const why = $('#modal [data-lwhy]');
+  const say = (t) => { why.textContent = t; why.hidden = false; };
+  if (!name) return say('친구 이름을 써요.');
+  if (name !== letterOf(cid).name) {
+    const other = Object.keys(LETTERS).find((k) => +k !== EXAMPLE_CID && LETTERS[k].name === name);
+    return say(other ? `${name}${josa(name, '은', '는').slice(-1)} 다른 지역 친구예요. 쪽지에 적힌 지역을 지도에서 눌러요.` : '이름이 달라요. 쪽지를 다시 봐요.');
+  }
+  const owner = ownerOf(cid);
+  if (owner != null && owner !== S.me.g) return say(`${groupName(owner)}${josa(groupName(owner), '이', '가').slice(-1)} 이미 받은 편지예요.`);
+  if (!isTeacher()) store.put('letter', 'c' + cid, { cid, g: S.me.g, by: { g: S.me.g, n: S.me.n }, at: Date.now() });
+  toast(`편지가 열렸어요! ${shortName(regionName(cid))}${josa(shortName(regionName(cid)), '은', '는').slice(-1)} 이제 우리 모둠이 조사해요.`, 3600);
+  openLetter(cid);
+  requestRender();
+}
+function letterText(t, notes) {
+  return esc(t)
+    .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/\{(.+?)\}/g, (m, w) => { const i = notes.findIndex((n) => n[0] === w); return `<span class="gl">${w}${i >= 0 ? `<sup>${i + 1}</sup>` : ''}</span>`; });
+}
+function openLetter(cid) {
+  const L = letterOf(cid);
+  if (!L) return;
+  const place = shortName(regionName(cid));
+  const notes = L.notes || [];
+  openModal({ type: 'letter', cid }, `<div class="sheet letter" role="dialog">
+    <div class="sheet-head">${ICON.mail}<span><b>${esc(place)}</b>에서 온 편지</span><button type="button" class="xbtn" data-act="close" aria-label="닫기">${ICON.x}</button></div>
+    <div class="letter-body">
+      <div class="paper">${L.paras.map((p) => `<p>${letterText(p, notes)}</p>`).join('')}
+        <p class="sign">${esc(place)}에서, ${esc(josa(L.name, '이가', '가'))}</p></div>
+      <div class="letter-side">
+        ${notes.length ? `<div class="lbox"><h4>낱말 풀이</h4><ol>${notes.map((n) => `<li><b>${esc(n[0])}</b> ${esc(n[1])}</li>`).join('')}</ol></div>` : ''}
+        <div class="lbox find"><h4>편지를 읽고 찾아봐요</h4><ol>
+          <li>${esc(place)}에 <b>많은 것</b>은 무엇인가요? 왜 많을까요?</li>
+          <li>${esc(place)}에 <b>부족할 것 같은 것</b>은 무엇인가요? 어느 문장을 보고 그렇게 생각했나요?</li>
+          <li><b>옛날과 달라진 것</b>은 무엇인가요? 왜 달라졌나요?</li></ol></div>
+        <div class="lbox"><h4>이 편지가 바탕으로 삼은 자료</h4>
+          ${L.src.map((s) => `<div class="lsrc"><a href="${esc(safeLink(s[1]))}" target="_blank" rel="noopener">${ICON.link}${esc(s[0])}</a><button type="button" class="btn small" data-act="copy-link" data-url="${esc(s[1])}">주소 복사</button></div>`).join('')}
+          <p class="lnote">이 편지는 위 자료를 보고 선생님과 AI가 꾸며 쓴 글이에요. ${esc(josa(L.name, '이는', '는'))} 지어낸 친구예요.</p></div>
+      </div>
+    </div></div>`);
+}
+
 // ---------- 시작 ----------
 function start() {
   fitStage();
@@ -929,7 +1008,7 @@ function start() {
   const ctx = {
     store, esc, ICON, regions: mapData.regions, exampleCid: EXAMPLE_CID,
     me: () => S.me,
-    roster, groupName, groupColor, texts, stages, tagCfg, chatCfg, toast,
+    roster, groupName, groupColor, texts, stages, tagCfg, chatCfg, toast, letters: LETTERS,
     classStep: () => Math.min(4, Math.max(1, (store.get('cfg', 'chatstep') || {}).step || 1)),
     saved: (msg) => (store.status().mode === 'ok' ? toast(msg) : toast(msg + ' 아직 서버에 못 보냈어요, 이 태블릿에만 있어요.', 4000)),
     confirm: (text, onOk) => confirmBox(text, '네', onOk),
@@ -966,6 +1045,7 @@ const ICON = {
   trash: sv('<path d="M5 7 H19 M9 7 V4 H15 V7 M7 7 L8 20 H16 L17 7"/>', 18),
   check: sv('<path d="M5 12 L10 17 L19 7"/>', 22),
   zoom: sv('<circle cx="11" cy="11" r="6.5"/><path d="M16 16 L20 20 M11 8 V14 M8 11 H14"/>', 18),
+  mail: sv('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5 L12 13.5 L20.5 7.5"/>', 26),
   key: sv('<circle cx="8" cy="15" r="4"/><path d="M11 12 L20 3 M17 6 L20 9 M15 8 L17 10"/>', 22),
   inbox: sv('<path d="M3 13 L6 5 H18 L21 13 V19 H3 Z"/><path d="M3 13 H8 L9 16 H15 L16 13 H21"/>', 22),
   bulb: sv('<path d="M9 18 H15 M10 21 H14 M12 3 a6 6 0 0 0-3.5 10.9 V16 H15.5 V13.9 A6 6 0 0 0 12 3 Z"/>', 26),

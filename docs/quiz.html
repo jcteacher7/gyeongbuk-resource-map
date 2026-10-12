@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>편지 쪽지 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  /* 전자칠판에 띄우는 퀴즈 판. 번호를 누르면 문제, 한 번 더 누르면 정답. 맞힌 모둠이 편지 쪽지를 뽑습니다. */
+  :root { --ink: #1E3A4C; --teal: #2A6F7D; --teal-l: #9FCFD6; --coral: #FF6B57; --coral-d: #C93A27; --cream: #FFF8E7; --card: #fff; --mute: #3F5F6E;
+    --g1: #C93A27; --g2: #2F63B0; --g3: #2E7D4F; --g4: #8A4FB0; --hand: 'Gaegu', 'Gowun Dodum', sans-serif; --body: 'Gowun Dodum', sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--cream); color: var(--ink); font-family: var(--body); word-break: keep-all; display: flex; flex-direction: column; overflow: hidden; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  header { display: flex; align-items: center; gap: 1.2vw; padding: 1.2vh 2vw; border-bottom: .4vh dashed var(--teal-l); }
+  h1 { font-family: var(--hand); font-size: 4.4vh; margin: 0; color: var(--coral-d); white-space: nowrap; }
+  .score { display: flex; gap: .8vw; margin-left: auto; }
+  .score div { display: flex; align-items: center; gap: .5vw; padding: .5vh 1vw; border-radius: 1.4vh; background: #fff; border: .35vh solid; font-family: var(--hand); font-size: 3.2vh; }
+  .score b { font-size: 3.8vh; min-width: 1.2em; text-align: center; }
+  .left { font-family: var(--hand); font-size: 3vh; color: var(--mute); white-space: nowrap; }
+  .ghost { border: .3vh solid var(--teal-l); background: #fff; border-radius: 1.2vh; padding: .6vh 1vw; font-size: 2.1vh; min-height: 44px; }
+  main { flex: 1; min-height: 0; padding: 2vh 2vw; }
+  .board { height: 100%; display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(4, 1fr); gap: 1.4vh 1vw; }
+  .tile { border: .5vh solid var(--teal); border-radius: 2.4vh; background: #fff; box-shadow: 0 .8vh 0 rgba(42,111,125,.3); font-family: var(--hand); font-size: 8vh; display: grid; place-items: center; position: relative; }
+  .tile:active { translate: 0 .5vh; box-shadow: 0 .3vh 0 rgba(42,111,125,.3); }
+  .tile.done { box-shadow: none; background: #F1EEE4; border-style: dashed; color: #8A8676; font-size: 3.4vh; }
+  .tile.done[data-g] { color: #fff; border-style: solid; }
+  .tile.done small { display: block; font-size: 2.2vh; opacity: .9; }
+  [data-g="1"] { --gc: var(--g1); } [data-g="2"] { --gc: var(--g2); } [data-g="3"] { --gc: var(--g3); } [data-g="4"] { --gc: var(--g4); }
+  .tile.done[data-g] { background: var(--gc); border-color: var(--gc); }
+  .score div { border-color: var(--gc); color: var(--gc); }
+
+  .q { position: fixed; inset: 0; background: rgba(30,58,76,.45); display: grid; place-items: center; padding: 3vh 3vw; }
+  .q[hidden] { display: none; }
+  .qcard { width: 100%; max-width: 150vh; max-height: 100%; overflow: auto; background: #fff; border: .6vh solid var(--teal); border-radius: 3.6vh; padding: 3vh 3.4vw 3vh; box-shadow: 0 1.2vh 0 rgba(42,111,125,.3); }
+  .qtop { display: flex; align-items: center; gap: 1.2vw; margin-bottom: 1.6vh; }
+  .qno { font-family: var(--hand); font-size: 5vh; width: 8vh; height: 8vh; border-radius: 50%; background: var(--teal); color: #fff; display: grid; place-items: center; flex: none; }
+  .lens { font-family: var(--hand); font-size: 3.2vh; padding: .3vh 1.2vw; border-radius: 1.2vh; color: #fff; }
+  .lens.S { background: #2E7D4F; } .lens.T { background: #8A6D3B; } .lens.B { background: var(--teal); } .lens.X { background: var(--coral-d); }
+  .kind { font-size: 2.4vh; color: var(--mute); }
+  .qx { margin-left: auto; }
+  .qtext { font-family: var(--hand); font-size: 5.2vh; line-height: 1.3; margin: 0 0 2vh; text-wrap: pretty; }
+  .qtext small { display: block; font-family: var(--body); font-size: 2.8vh; line-height: 1.5; color: var(--mute); margin-top: 1vh; }
+  .opts { display: grid; gap: 1.2vh; margin: 0 0 2vh; padding: 0; list-style: none; }
+  .opts li { display: flex; gap: 1vw; align-items: center; font-size: 3.5vh; line-height: 1.35; padding: 1.2vh 1.4vw; border: .4vh solid var(--teal-l); border-radius: 1.8vh; }
+  .opts li i { font-style: normal; font-family: var(--hand); width: 5vh; height: 5vh; border-radius: 50%; background: var(--teal-l); display: grid; place-items: center; flex: none; }
+  .opts li.right { border-color: #2E7D4F; background: #E7F5EC; }
+  .opts li.right i { background: #2E7D4F; color: #fff; }
+  .ans { border: .4vh dashed #E0B84A; background: #FFF6D6; border-radius: 1.8vh; padding: 1.4vh 1.6vw; font-size: 3.2vh; line-height: 1.45; margin-bottom: 2vh; }
+  .ans b { font-family: var(--hand); font-size: 3.8vh; color: var(--coral-d); margin-right: .6vw; }
+  .acts { display: flex; flex-wrap: wrap; gap: 1vw; align-items: center; }
+  .btn { min-height: 7vh; padding: 0 2vw; border-radius: 1.8vh; border: .4vh solid var(--teal); background: var(--teal); color: #fff; font-family: var(--hand); font-size: 3.6vh; box-shadow: 0 .6vh 0 rgba(42,111,125,.35); }
+  .btn.g { background: var(--gc); border-color: var(--gc); box-shadow: 0 .6vh 0 rgba(0,0,0,.2); }
+  .btn.none { background: #fff; color: var(--ink); border-color: var(--teal-l); box-shadow: none; }
+  .acts span { font-size: 2.6vh; color: var(--mute); }
+  .how { position: fixed; inset: 0; background: rgba(30,58,76,.45); display: grid; place-items: center; padding: 4vh 4vw; }
+  .how[hidden] { display: none; }
+  .how div { max-width: 110vh; background: #fff; border: .6vh solid var(--teal); border-radius: 3vh; padding: 3vh 3vw; font-size: 3vh; line-height: 1.6; }
+  .how h2 { font-family: var(--hand); font-size: 4.6vh; margin: 0 0 1vh; color: var(--coral-d); }
+  .how ol { margin: 0 0 2vh; padding-left: 1.4em; }
+  :focus-visible { outline: .5vh solid #FFB300; outline-offset: .4vh; }
+</style>
+</head>
+<body>
+<header>
+  <h1>편지 쪽지 퀴즈</h1>
+  <span class="left" id="left"></span>
+  <div class="score" id="score"></div>
+  <button type="button" class="ghost" id="howBtn">하는 방법</button>
+  <button type="button" class="ghost" id="resetBtn">처음부터</button>
+</header>
+<main><div class="board" id="board"></div></main>
+
+<div class="q" id="q" hidden><div class="qcard" id="qcard" role="dialog" aria-modal="true"></div></div>
+<div class="how" id="how" hidden><div>
+  <h2>하는 방법</h2>
+  <ol>
+    <li>모둠이 차례로 번호를 하나 골라요.</li>
+    <li>문제를 읽고 모둠이 의논해서 답해요. <b>까닭까지 말해야</b> 해요.</li>
+    <li>[정답 보기]를 눌러 확인해요.</li>
+    <li>맞히면 <b>편지 쪽지 한 장</b>을 뽑아요. 쪽지에는 지역 이름과 편지를 보낸 친구 이름이 있어요.</li>
+    <li>자원 지도에서 그 지역을 누르고 친구 이름을 쓰면 편지가 열려요.</li>
+  </ol>
+  <button type="button" class="btn" id="howClose">시작!</button>
+</div></div>
+
+<script>
+  // 문제: lens(S 공간 렌즈, T 시간 렌즈, B 두 렌즈, X 희소성과 교류), kind(고르기/오엑스/말하기/차례), q, sub(덧붙임), opts, right(정답 번호), ans(정답과 까닭)
+  // 낱말을 외워서 푸는 문제가 아니라, 조사한 것을 이어서 까닭을 말하는 문제입니다.
+  const QS = [
+    { lens: 'S', kind: '고르기', q: '문경 사람들이 논농사보다 오미자와 사과를 많이 기르는 까닭으로 가장 알맞은 것은?', opts: ['문경 사람들이 쌀을 좋아하지 않아서', '산이 많고 낮과 밤의 기온 차가 커서', '바다가 가까워서'], right: 1, ans: '자연환경(산, 기온 차)에 맞는 것을 골라 기르기 때문이에요. 자연환경이 땅을 이용하는 방식을 바꿔요.' },
+    { lens: 'S', kind: '말하기', q: '김제에는 "지평선 축제"가 있는데 문경에는 없어요. 그 까닭을 자연환경으로 설명해 봐요.', ans: '예: 김제는 넓고 평평한 들(평야)이라 땅과 하늘이 맞닿은 지평선이 보이지만, 문경은 산이 많아서 보이지 않아요.' },
+    { lens: 'S', kind: '오엑스', q: '"부산 사람들과 문경 사람들이 하는 일이 다른 것은, 사는 때(시간)가 다르기 때문이다."', opts: ['맞아요 (O)', '아니에요 (X)'], right: 1, ans: '둘 다 지금 살고 있어요. 때가 아니라 사는 곳(공간)의 자연환경이 달라서 하는 일이 달라요.' },
+    { lens: 'S', kind: '고르기', q: '만약 문경이 바닷가에 있었다면, 가장 크게 달라졌을 것은?', opts: ['사람들이 쓰는 말', '사람들이 하는 일과 자주 먹는 것', '학교에 들어가는 나이'], right: 1, ans: '자연환경이 달라지면 그것을 이용하는 방식이 달라지고, 하는 일과 먹는 것 같은 생활 모습이 달라져요.' },
+    { lens: 'S', kind: '차례', q: '앞의 일 때문에 뒤의 일이 생기도록 차례대로 놓아 봐요.', sub: 'ㄱ. 논농사를 크게 짓는다 ㄴ. 넓고 평평한 들이 있다 ㄷ. 쌀 축제를 열고 큰 저수지를 만든다', ans: 'ㄴ → ㄱ → ㄷ. 자연환경(넓은 들) → 이용 방식(논농사) → 생활 모습(축제, 저수지) 차례예요.' },
+    { lens: 'S', kind: '고르기', q: '셋 가운데 "자연환경"이 아닌 것 하나는? 까닭도 말해요.', opts: ['낮과 밤의 기온 차', '넓은 평야', '배가 드나드는 항구'], right: 2, ans: '항구는 사람이 바다를 이용하려고 만든 것(인문환경)이에요. 바다는 자연환경, 항구는 인문환경.' },
+    { lens: 'S', kind: '말하기', q: '"산, 평야, 바다 가운데 어디가 가장 살기 좋을까?" 이 물음의 답이 하나로 정해지지 않는 까닭은?', ans: '예: 곳마다 자연환경이 다르고, 사람들은 그 자연환경에 맞게 이용하는 방법을 찾아 살아가기 때문이에요. 좋은 점과 어려운 점이 곳마다 달라요.' },
+    { lens: 'S', kind: '고르기', q: '김제 사람들은 아주 오랜 옛날에 큰 저수지(벽골제)를 만들었어요. 이 일이 보여 주는 것은?', opts: ['사람들은 자연환경을 더 잘 이용하려고 무언가를 만든다', '평야에는 비가 오지 않는다', '옛날 사람들은 물놀이를 좋아했다'], right: 0, ans: '넓은 들에서 농사를 지으려면 물이 필요해요. 자연환경을 이용하려고 사람이 만든 것이 인문환경이에요.' },
+    { lens: 'B', kind: '오엑스', q: '"자연환경이 같으면, 사람들이 그 땅을 이용하는 방식은 언제나 똑같다."', opts: ['맞아요 (O)', '아니에요 (X)'], right: 1, ans: '문경의 산은 그대로인데, 예전에는 석탄을 캤고 지금은 박물관과 관광지로 이용해요. 같은 곳도 때에 따라 이용 방식이 달라져요.' },
+    { lens: 'T', kind: '고르기', q: '탄광 시절 문경 마을에 이발소와 가게가 많이 생겼던 까닭은?', opts: ['산이 높아서', '석탄을 캐려고 많은 사람이 모여 살아서', '놀러 오는 사람이 많아서'], right: 1, ans: '땅을 이용하는 방식(석탄 캐기) 때문에 사람이 모였고, 사람이 모이니 마을 모습이 달라졌어요.' },
+    { lens: 'T', kind: '차례', q: '일어난 차례대로 놓고, 앞의 일이 왜 뒤의 일을 불렀는지 말해요.', sub: 'ㄱ. 땅속에서 나온 물이 냇물을 더럽혔다 ㄴ. 탄광이 문을 닫았다 ㄷ. 물풀을 심어 물을 깨끗하게 하는 곳을 만들었다', ans: 'ㄴ → ㄱ → ㄷ. 탄광을 닫자 돌보지 않은 굴에서 더러운 물이 나왔고, 그 문제를 풀려고 사람들이 깨끗하게 하는 곳을 만들었어요.' },
+    { lens: 'T', kind: '말하기', q: '문경 사람들이 산을 이용하는 방식은 어떻게 달라졌나요? 이 틀로 말해요.', sub: '"예전에는 (        ), 지금은 (        )."', ans: '예: 예전에는 산에서 석탄을 캤고, 지금은 탄광 자리를 박물관과 놀이 공간으로 만들어 손님을 맞아요.' },
+    { lens: 'T', kind: '오엑스', q: '"탄광이 문을 닫자 문경의 자연환경이 완전히 다른 것으로 바뀌었다."', opts: ['맞아요 (O)', '아니에요 (X)'], right: 1, ans: '산이 많은 자연환경은 그대로예요. 바뀐 것은 사람들이 그 산을 이용하는 방식이에요.' },
+    { lens: 'T', kind: '고르기', q: '옛날 광부 가족과 지금 문경 사람들의 생활이 다른 가장 큰 까닭은?', opts: ['사는 곳이 달라서', '같은 곳이지만, 환경을 이용하는 방식이 달라져서', '사람들의 성격이 달라져서'], right: 1, ans: '둘 다 문경에 살아요. 시간이 흐르며 이용 방식이 달라졌고, 그래서 생활 모습도 달라졌어요.' },
+    { lens: 'T', kind: '말하기', q: '문경의 과거와 현재를 견주어, "바뀐 것" 하나와 "그대로인 것" 하나를 말해요.', ans: '예: 바뀐 것은 산을 이용하는 방식(석탄 캐기 → 관광)과 사람들이 하는 일. 그대로인 것은 산이 많다는 것, 사람들이 산에 기대어 산다는 것.' },
+    { lens: 'T', kind: '고르기', q: '"예전처럼 탄광에 일하러 가는 사람은 없지만, 대신 놀러 오는 사람들로 북적여요." 이 말에서 알 수 있는 것은?', opts: ['땅을 이용하는 방식이 바뀌면 사람들이 하는 일도 바뀐다', '문경에는 이제 사람이 살지 않는다', '탄광이 다시 문을 열었다'], right: 0, ans: '이용 방식(탄광 → 관광)이 달라지자 하는 일(석탄 캐기 → 손님 맞이)이 달라졌어요.' },
+    { lens: 'T', kind: '말하기', q: '"문경의 탄광이 사라진 것"의 좋은 점 하나와 아쉬운 점 하나를 말해요.', sub: '둘 다 말해야 통과!', ans: '예: 좋은 점은 물과 자연이 깨끗해지고 새로운 볼거리가 생긴 것. 아쉬운 점은 일자리가 없어져 많은 사람이 떠난 것. (한 가지 일도 보는 사람에 따라 다르게 보여요)' },
+    { lens: 'T', kind: '고르기', q: '"문경은 앞으로도 계속 바뀔 것이다."라고 말할 수 있는 가장 좋은 근거는?', opts: ['지금까지 이용 방식이 바뀔 때마다 생활 모습이 바뀌어 왔으니까', '산이 조금씩 낮아지고 있으니까', '옛날로 돌아가기로 약속했으니까'], right: 0, ans: '과거에서 현재까지 이어진 흐름(이용 방식이 바뀌면 생활이 바뀐다)을 보면 미래도 짐작할 수 있어요.' },
+    { lens: 'B', kind: '고르기', q: '두 사진을 견주려면 어떤 렌즈가 필요할까요?', sub: '사진 ①: 탄광 시절의 문경 마을   사진 ②: 지금 문경 에코월드', opts: ['공간 렌즈 (곳이 달라서)', '시간 렌즈 (때가 달라서)'], right: 1, ans: '같은 곳(문경)인데 때가 달라요. 그래서 시간 렌즈로 봐요.' },
+    { lens: 'B', kind: '고르기', q: '두 사진을 견주려면 어떤 렌즈가 필요할까요?', sub: '사진 ①: 오늘 부산의 생선 시장   사진 ②: 오늘 문경의 오미자밭', opts: ['공간 렌즈 (곳이 달라서)', '시간 렌즈 (때가 달라서)'], right: 0, ans: '같은 때(오늘)인데 곳이 달라요. 그래서 공간 렌즈로 봐요.' },
+    { lens: 'B', kind: '말하기', q: '"할머니가 어릴 때 살던 부산"과 "지금 내가 사는 문경"의 생활을 견주려면 렌즈가 몇 개 필요할까요? 까닭도 말해요.', ans: '두 개 모두 필요해요. 곳(부산과 문경)도 다르고 때(할머니 어릴 때와 지금)도 다르기 때문이에요.' },
+    { lens: 'B', kind: '오엑스', q: '"같은 곳에 살았다면, 100년 전 사람과 지금 사람의 생활 모습은 같다."', opts: ['맞아요 (O)', '아니에요 (X)'], right: 1, ans: '같은 곳이어도 시간이 흐르며 환경을 이용하는 방식이 달라지면 생활 모습이 달라져요.' },
+    { lens: 'B', kind: '고르기', q: '처음 가 본 마을을 "시간 렌즈"로 조사하려고 해요. 알맞은 물음은?', opts: ['이 마을은 산에 있을까, 바닷가에 있을까?', '이 마을은 옛날과 지금 무엇이 달라졌을까?', '이 마을은 옆 마을과 무엇이 다를까?'], right: 1, ans: '시간 렌즈는 같은 곳의 옛날과 지금을 견주는 거예요. 나머지 둘은 공간 렌즈의 물음이에요.' },
+    { lens: 'B', kind: '말하기', q: '부산 바닷가 마을 이야기예요. "바뀐 것" 하나와 "그대로인 것" 하나를 찾아 말해요.', sub: '예전에는 작은 배를 타고 물고기를 잡았고, 지금은 큰 항구에서 배로 물건을 실어 나른다.', ans: '예: 바뀐 것은 바다를 이용하는 방식과 사람들이 하는 일. 그대로인 것은 사람들이 바다에 기대어 산다는 것.' },
+    { lens: 'X', kind: '고르기', q: '어떤 섬에는 논이 거의 없어요. "이 섬에서는 쌀이 희소하다"는 말의 뜻은?', opts: ['섬사람들이 쌀을 싫어한다', '쌀을 원하는 만큼 얻기 어렵다', '쌀이 맛이 없다'], right: 1, ans: '희소하다는 것은 원하는 것에 견주어 가진 것이 모자란다는 뜻이에요. 싫어하거나 필요 없다는 뜻이 아니에요.' },
+    { lens: 'X', kind: '말하기', q: '산골 마을에는 버섯이 많고 생선이 없어요. 바닷가 마을은 그 반대예요. 두 마을은 어떻게 하면 좋을까요? 그러면 밥상은 어떻게 달라질까요?', ans: '예: 버섯과 생선을 서로 주고받아요(교류). 그러면 두 마을 밥상에 버섯도 생선도 올라와서 먹는 것이 달라져요.' },
+    { lens: 'X', kind: '오엑스', q: '"어떤 지역에 무엇이 많고 무엇이 부족한지는 그 지역의 자연환경과 아무 관계가 없다."', opts: ['맞아요 (O)', '아니에요 (X)'], right: 1, ans: '바다가 있으면 물고기가, 넓은 들이 있으면 쌀이 많아요. 자연환경에 따라 많은 것과 부족한 것이 달라져요.' },
+    { lens: 'X', kind: '고르기', q: '문경에는 예전에 석탄이 많았지만 지금은 거의 캐지 않아요. "많던 것이 적어진 일"은 어떤 렌즈로 본 것일까요?', opts: ['공간 렌즈', '시간 렌즈'], right: 1, ans: '같은 곳에서도 때에 따라 많은 것과 부족한 것이 달라져요. 곳에 따라서만이 아니라 때에 따라서도 달라져요.' },
+  ];
+  const LENS = { S: '공간 렌즈', T: '시간 렌즈', B: '두 렌즈', X: '희소성과 교류' };
+  const GROUPS = [1, 2, 3, 4], SLIPS = 21, KEY = 'gb-quiz-v1';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // done[번호] = 맞힌 모둠 번호(1~4) 또는 0(아무도 못 맞힘). 새로 고쳐도 남도록 이 기기에 적어 둡니다.
+  let done = {};
+  try { done = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { done = {}; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { /* 저장이 막혀도 게임은 계속 */ } };
+  let cur = null, shown = false;
+
+  function drawBoard() {
+    $('board').innerHTML = QS.map((x, i) => {
+      const d = done[i];
+      if (d == null) return `<button type="button" class="tile" data-i="${i}" aria-label="${i + 1}번 문제">${i + 1}</button>`;
+      return `<button type="button" class="tile done" data-i="${i}" ${d ? `data-g="${d}"` : ''}><span>${d ? d + '모둠<small>쪽지!</small>' : (i + 1) + '<small>지나감</small>'}</span></button>`;
+    }).join('');
+    const got = (g) => Object.values(done).filter((v) => v === g).length;
+    $('score').innerHTML = GROUPS.map((g) => `<div data-g="${g}">${g}모둠 <b>${got(g)}</b></div>`).join('');
+    const left = SLIPS - Object.values(done).filter((v) => v > 0).length;
+    $('left').textContent = left > 0 ? `남은 쪽지 ${left}장` : '쪽지를 모두 뽑았어요!';
+  }
+  function drawQ() {
+    const x = QS[cur];
+    $('qcard').innerHTML = `
+      <div class="qtop"><span class="qno">${cur + 1}</span><span class="lens ${x.lens}">${LENS[x.lens]}</span><span class="kind">${x.kind}</span>
+        <button type="button" class="ghost qx" data-a="close">닫기</button></div>
+      <p class="qtext">${esc(x.q)}${x.sub ? `<small>${esc(x.sub)}</small>` : ''}</p>
+      ${x.opts ? `<ol class="opts">${x.opts.map((o, j) => `<li class="${shown && j === x.right ? 'right' : ''}"><i>${j + 1}</i>${esc(o)}</li>`).join('')}</ol>` : ''}
+      ${shown ? `<div class="ans"><b>정답</b>${esc(x.ans)}</div>
+        <div class="acts"><span>맞힌 모둠은?</span>${GROUPS.map((g) => `<button type="button" class="btn g" data-g="${g}" data-a="win">${g}모둠</button>`).join('')}
+          <button type="button" class="btn none" data-a="pass">아무도 못 맞혔어요</button>${done[cur] != null ? '<button type="button" class="btn none" data-a="undo">이 칸 되돌리기</button>' : ''}</div>`
+        : `<div class="acts"><button type="button" class="btn" data-a="show">정답 보기</button><span>${x.opts ? '번호를 고르고 까닭도 말해요.' : '모둠이 의논해서 말로 답해요.'}</span></div>`}`;
+  }
+  function closeQ() { cur = null; $('q').hidden = true; drawBoard(); }
+
+  $('board').addEventListener('click', (e) => {
+    const t = e.target.closest('.tile');
+    if (!t) return;
+    cur = +t.dataset.i; shown = done[cur] != null;
+    drawQ(); $('q').hidden = false;
+  });
+  $('q').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-a]');
+    if (!b) { if (e.target === $('q')) closeQ(); return; }
+    const a = b.dataset.a;
+    if (a === 'show') { shown = true; drawQ(); }
+    else if (a === 'win') { done[cur] = +b.dataset.g; save(); closeQ(); }
+    else if (a === 'pass') { done[cur] = 0; save(); closeQ(); }
+    else if (a === 'undo') { delete done[cur]; save(); closeQ(); }
+    else closeQ();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('q').hidden) closeQ(); $('how').hidden = true; } });
+  $('howBtn').onclick = () => { $('how').hidden = false; };
+  $('howClose').onclick = () => { $('how').hidden = true; };
+  let armed = 0;
+  $('resetBtn').onclick = () => {
+    // 잘못 눌러 지워지지 않게 3초 안에 두 번 눌러야 처음으로 돌아갑니다.
+    if (Date.now() - armed < 3000) { done = {}; save(); drawBoard(); $('resetBtn').textContent = '처음부터'; armed = 0; }
+    else { armed = Date.now(); $('resetBtn').textContent = '한 번 더 누르면 지워요'; setTimeout(() => { $('resetBtn').textContent = '처음부터'; }, 3000); }
+  };
+  drawBoard();
+  if (!Object.keys(done).length) $('how').hidden = false;
+</script>
+</body>
+</html>

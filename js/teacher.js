@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=35';
-import { esc, timeText, josa, markBlanks } from './util.js?v=35';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=36';
+import { esc, timeText, josa, markBlanks } from './util.js?v=36';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -187,6 +187,15 @@ export function createTeacher(root, ctx) {
           ${opt('', (r.assign || {})[x.id] ?? '', '없음')}${r.groups.map((g) => opt(g.id, (r.assign || {})[x.id] ?? '', g.name)).join('')}</select></label>`).join('')}</div>
         <button type="button" class="btn primary" data-save="assign">배정 저장</button></section>
 
+      <section class="t-sec"><h3>시군에서 온 편지 (쪽지와 친구 이름)</h3>
+        <p class="t-sub">퀴즈를 맞힌 모둠이 쪽지를 뽑고, 지도에서 그 시군을 눌러 친구 이름을 쓰면 편지가 열려요. 편지를 연 시군은 저절로 그 모둠이 맡은 시군이 돼요(위 2번에서 따로 배정한 것이 있으면 그것이 먼저예요). 문경은 예시라 누구나 읽어요.</p>
+        <div class="t-letters">${regions.filter((x) => x.id !== ctx.exampleCid).map((x) => {
+          const L = ctx.letters[x.id], o = store.get('letter', 'c' + x.id);
+          return `<div class="t-letter ${L ? '' : 'none'}"><b>${esc(x.name)}</b><span>${L ? esc(L.name) : '편지 없음'}</span>
+            <span>${o ? esc(gname(o.g)) + ' 열음' : '잠김'}</span>${o ? `<button type="button" class="btn small ghost" data-relock="${x.id}">다시 잠그기</button>` : '<i></i>'}</div>`;
+        }).join('')}</div>
+        <button type="button" class="btn primary" data-slips>쪽지 인쇄하기</button></section>
+
       <section class="t-sec"><h3>교류 제안서: 모둠별 제안 지역</h3>
         <p class="t-sub">모둠마다 교류 제안서를 만들 시군을 하나씩 골라 줘요. 지도에서 그 시군이 모둠 색으로 칠해져요. 아이들이 교류 제안서 화면에서 직접 고를 수도 있어요. (시군 배정이 있으면 그 모둠이 맡은 시군만 나와요)</p>
         <div class="t-plan">${r.groups.map((g) => {
@@ -329,13 +338,34 @@ export function createTeacher(root, ctx) {
       <p class="t-sub">제미나이 키는 여기서 지워지지 않아요. Supabase 화면에서 직접 지워 주세요(README의 수업 뒤 정리).</p></div>`;
   }
 
+  // 쪽지: 시군 이름과 친구 이름(암호). 새 창에 띄워 인쇄합니다.
+  function printSlips() {
+    const list = regions.filter((x) => x.id !== ctx.exampleCid && ctx.letters[x.id]);
+    const w = window.open('', '_blank');
+    if (!w) { ctx.toast('새 창이 막혔어요. 주소창 옆의 팝업 허용을 눌러 주세요.', 4000); return; }
+    w.document.write(`<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>편지 쪽지</title><style>
+      @page { size: A4; margin: 10mm; }
+      body { margin: 0; font-family: 'Malgun Gothic', sans-serif; color: #1E3A4C; }
+      p.how { font-size: 12pt; margin: 0 0 6mm; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+      .slip { border: 1px dashed #888; height: 36mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5mm; text-align: center; break-inside: avoid; }
+      .slip small { font-size: 9pt; color: #555; }
+      .slip b { font-size: 20pt; }
+      .slip span { font-size: 12pt; }
+      .slip em { font-style: normal; font-weight: 700; font-size: 17pt; border: 2px solid #1E3A4C; border-radius: 3mm; padding: 0 4mm; }
+      @media print { p.how { display: none; } }
+    </style></head><body><p class="how">점선을 따라 오려서 접어 주세요. 인쇄는 Ctrl+P 를 눌러요. (이 안내 글은 인쇄되지 않아요)</p>
+    <div class="grid">${list.map((x) => `<div class="slip"><small>편지가 왔어요! 지도에서 이 지역을 눌러요</small><b>${esc(x.name)}</b><span>편지를 보낸 친구 이름</span><em>${esc(ctx.letters[x.id].name)}</em></div>`).join('')}</div></body></html>`);
+    w.document.close();
+  }
+
   async function wipe(id) {
     const jobs = {
       map: async () => { const n = await store.wipePhotos(); await store.wipe(['res', 'arrow', 'plan']); return `사진 ${n}장과 지도 기록을 지웠어요.`; },
       tag: async () => { await store.wipe(['tag']); return 'TAG를 지웠어요.'; },
       chat: async () => { await store.wipe(['chat', 'cstep']); await store.wipe(['cfg'], 'chatstep'); return '챗봇 기록을 지우고 1단계로 돌렸어요.'; },
       gen: async () => { await store.wipe(['gen']); return '모둠 문장을 지웠어요.'; },
-      roster: async () => { await store.wipe(['cfg'], 'roster'); return '명단을 지웠어요.'; },
+      roster: async () => { await store.wipe(['cfg'], 'roster'); await store.wipe(['letter']); return '명단과 편지 열림 기록을 지웠어요.'; },
     };
     jobs.all = async () => { for (const k of ['map', 'tag', 'chat', 'gen', 'roster']) await jobs[k](); return '수업 기록을 모두 지웠어요.'; };
     ctx.confirmTyped('지우기', async () => {
@@ -407,6 +437,15 @@ export function createTeacher(root, ctx) {
     if (td) { ctx.confirm('이 TAG를 지울까요?', () => { store.remove('tag', td.dataset.tdel, { g: 0, n: '선생님', at: Date.now() }); }); return; }
     const sv = t.closest('[data-save]');
     if (sv) { save(sv.dataset.save); return; }
+    const rl = t.closest('[data-relock]');
+    if (rl) {
+      const old = store.get('letter', 'c' + rl.dataset.relock);
+      if (old) store.put('letter', 'c' + rl.dataset.relock, { ...old, deleted: true });
+      ctx.toast('다시 잠갔어요.');
+      body.innerHTML = settingsHtml();
+      return;
+    }
+    if (t.closest('[data-slips]')) { printSlips(); return; }
     if (t.closest('[data-radd]')) {
       readRosterInputs();
       const id = Math.max(0, ...draftRoster.groups.map((g) => g.id)) + 1;
