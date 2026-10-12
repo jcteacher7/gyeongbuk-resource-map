@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=41';
-import { store } from './store.js?v=41';
-import { createMapView, shortName } from './map-view.js?v=41';
-import { shrinkPhoto } from './photo.js?v=41';
-import { esc, safeLink, josa, timeText } from './util.js?v=41';
-import { MAX_LEN } from './config.js?v=41';
-import { LETTERS, ANSWER_CARDS } from '../data/letters.js?v=41';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=41';
-import { createTagView } from './tag-view.js?v=41';
-import { createChatView } from './chat-view.js?v=41';
-import { createTeacher, hashCode } from './teacher.js?v=41';
+import mapData from '../data/gyeongbuk-map.js?v=42';
+import { store } from './store.js?v=42';
+import { createMapView, shortName } from './map-view.js?v=42';
+import { shrinkPhoto } from './photo.js?v=42';
+import { esc, safeLink, josa, timeText } from './util.js?v=42';
+import { MAX_LEN } from './config.js?v=42';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=42';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=42';
+import { createTagView } from './tag-view.js?v=42';
+import { createChatView } from './chat-view.js?v=42';
+import { createTeacher, hashCode } from './teacher.js?v=42';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -97,9 +97,10 @@ const AMT = { many: '많아요', few: '적어요' };
 
 // 예시 지역(문경)의 예시 카드는 앱에 들어 있고, 아이들이 올린 카드는 서버에서 옵니다.
 function answerCards() {
-  return Object.entries(ANSWER_CARDS).flatMap(([cid, list]) => list.map(([name, env, why, amt, era, eraWhy], i) => (
-    // 원래부터 적은 것은 '옛날부터 적었어요'로 보여 줍니다
-    { key: `ans-${cid}-${i}`, cid: +cid, name, env, why, amt, era: amt === 'few' && era === 'old' ? 'low' : era, eraWhy, example: true, answer: true })));
+  // 편지에서 찾을 수 있는 카드를 먼저, 더 찾아본 카드를 그 아래에 놓습니다. 원래부터 적은 것은 '옛날부터 적었어요'.
+  const card = (cid, extra) => ([name, env, why, amt, era, eraWhy], i) => (
+    { key: `ans-${cid}-${extra ? 'x' : ''}${i}`, cid: +cid, name, env, why, amt, era: amt === 'few' && era === 'old' ? 'low' : era, eraWhy, example: true, answer: true, extra });
+  return Object.keys(ANSWER_CARDS).flatMap((cid) => ANSWER_CARDS[cid].map(card(cid, false)).concat((ANSWER_EXTRA[cid] || []).map(card(cid, true))));
 }
 function resAll() {
   if (S.answerMode) return EXAMPLE_RES.concat(answerCards());
@@ -175,7 +176,7 @@ function renderTop() {
   $('#enter').hidden = true;
   $('#teacher').hidden = true;
   $('#main').hidden = false;
-  $('#who').innerHTML = isTeacher() ? `${ICON.key}${S.answerMode ? '정답 예시 보는 중 · ' : ''}선생님 화면으로` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
+  $('#who').innerHTML = isTeacher() ? `${ICON.key}${S.answerMode ? '정답 예시 닫기' : '선생님 화면으로'}` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
   const t = texts(), st = stages();
   const tab = (id, label, open) => `<button type="button" class="tab ${S.tab === id ? 'on' : ''} ${open ? '' : 'locked'}" data-tab="${id}">${open ? '' : ICON.lock}${esc(label)}</button>`;
   const html = isTeacher()
@@ -276,7 +277,7 @@ function resCard(r, pickMode) {
       <span class="rc-top"><b>${esc(r.name)}</b><span class="badge ${r.amt}">${AMT[r.amt] || ''}</span></span>
       <small><span class="env ${r.env}">${ENV[r.env] || ''}</span>${esc(r.why)}</small>
       ${r.era ? `<small><span class="era ${r.era}">${ERA[r.era]}</span>${esc(r.eraWhy || '')}</small>` : ''}
-      <small class="by">${r.answer ? '정답 예시' : r.example ? '예시 카드' : esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
+      <small class="by">${r.answer ? (r.extra ? '정답 예시 · 더 찾아본 것' : '정답 예시 · 편지에 있는 것') : r.example ? '예시 카드' : esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
     </span>${pick}</button>`;
 }
 
@@ -433,7 +434,7 @@ function photoBox(p, big) {
 }
 
 function editRow(item, kind) {
-  if (item.answer) return `<div class="pop-foot"><span class="by">${ICON.bulb}편지를 읽고 이렇게 쓸 수 있다는 본보기예요. 답이 하나뿐인 것은 아니에요.</span></div>`;
+  if (item.answer) return `<div class="pop-foot"><span class="by">${ICON.bulb}${item.extra ? '편지에는 없거나 짧게만 나온 자원이에요. 다른 자료에서 찾은 본보기예요.' : '편지를 읽고 이렇게 쓸 수 있다는 본보기예요. 답이 하나뿐인 것은 아니에요.'}</span></div>`;
   if (item.example) return `<div class="pop-foot"><span class="by">${ICON.bulb}예시 카드예요. 이렇게 조사해서 올려요.</span></div>`;
   const canEdit = isTeacher() || (S.me && item.by && item.by.g === S.me.g);
   const canDel = isTeacher() || sameMe(item.by);
