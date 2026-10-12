@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>편지 쪽지 퀴즈</title>
+<title>편지 암호 퀴즈</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Gowun+Dodum&display=swap" rel="stylesheet">
@@ -24,11 +24,12 @@
   .ghost { border: .3vh solid var(--teal-l); background: #fff; border-radius: 1.2vh; padding: .6vh 1vw; font-size: 2.1vh; min-height: 44px; }
   main { flex: 1; min-height: 0; padding: 2vh 2vw; }
   .board { height: 100%; display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(3, 1fr); gap: 1.8vh 1vw; }
-  .tile { border: .5vh solid var(--teal); border-radius: 2.4vh; background: #fff; box-shadow: 0 .8vh 0 rgba(42,111,125,.3); font-family: var(--hand); font-size: 10vh; display: grid; place-items: center; position: relative; }
+  .tile { border: .5vh solid var(--teal); border-radius: 2.4vh; background: #fff; box-shadow: 0 .8vh 0 rgba(42,111,125,.3); font-family: var(--hand); font-size: 6.4vh; display: grid; place-items: center; position: relative; transition: background .12s, translate .12s; }
+  .tile:not(.done):hover { background: #FFF6D6; translate: 0 -.3vh; }
   .tile:active { translate: 0 .5vh; box-shadow: 0 .3vh 0 rgba(42,111,125,.3); }
-  .tile.done { box-shadow: none; background: #F1EEE4; border-style: dashed; color: #8A8676; font-size: 3.4vh; }
-  .tile.done[data-g] { color: #fff; border-style: solid; }
-  .tile.done small { display: block; font-size: 2.2vh; opacity: .9; }
+  .tile.done { box-shadow: none; color: #fff; font-size: 3.4vh; line-height: 1.15; }
+  .tile.done small { display: block; font-size: 2.6vh; opacity: .92; }
+  .tile.done b { display: block; font-size: 6.2vh; }
   [data-g="1"] { --gc: var(--g1); } [data-g="2"] { --gc: var(--g2); } [data-g="3"] { --gc: var(--g3); } [data-g="4"] { --gc: var(--g4); }
   .tile.done[data-g] { background: var(--gc); border-color: var(--gc); }
   .score div { border-color: var(--gc); color: var(--gc); }
@@ -37,7 +38,7 @@
   .q[hidden] { display: none; }
   .qcard { width: 100%; max-width: 150vh; max-height: 100%; overflow: auto; background: #fff; border: .6vh solid var(--teal); border-radius: 3.6vh; padding: 3vh 3.4vw 3vh; box-shadow: 0 1.2vh 0 rgba(42,111,125,.3); }
   .qtop { display: flex; align-items: center; gap: 1.2vw; margin-bottom: 1.6vh; }
-  .qno { font-family: var(--hand); font-size: 5vh; width: 8vh; height: 8vh; border-radius: 50%; background: var(--teal); color: #fff; display: grid; place-items: center; flex: none; }
+  .qno { font-family: var(--hand); font-size: 4.4vh; height: 7.4vh; padding: 0 2.4vh; border-radius: 3.7vh; background: var(--teal); color: #fff; display: grid; place-items: center; flex: none; white-space: nowrap; }
   .lens { font-family: var(--hand); font-size: 3.2vh; padding: .3vh 1.2vw; border-radius: 1.2vh; color: #fff; }
   .lens.S { background: #2E7D4F; } .lens.T { background: #8A6D3B; } .lens.B { background: var(--teal); }
   .kind { font-size: 2.4vh; color: var(--mute); }
@@ -45,10 +46,28 @@
   .qtext { font-family: var(--hand); font-size: 5.2vh; line-height: 1.3; margin: 0 0 2vh; text-wrap: pretty; }
   .qtext small { display: block; font-family: var(--body); font-size: 2.8vh; line-height: 1.5; color: var(--mute); margin-top: 1vh; }
   .opts { display: grid; gap: 1.2vh; margin: 0 0 2vh; padding: 0; list-style: none; }
-  .opts li { display: flex; gap: 1vw; align-items: center; font-size: 3.5vh; line-height: 1.35; padding: 1.2vh 1.4vw; border: .4vh solid var(--teal-l); border-radius: 1.8vh; }
-  .opts li i { font-style: normal; font-family: var(--hand); width: 5vh; height: 5vh; border-radius: 50%; background: var(--teal-l); display: grid; place-items: center; flex: none; }
-  .opts li.right { border-color: #2E7D4F; background: #E7F5EC; }
-  .opts li.right i { background: #2E7D4F; color: #fff; }
+  .opts li { display: block; }
+  .opt { display: flex; gap: 1vw; align-items: center; width: 100%; text-align: left; font-size: 3.5vh; line-height: 1.35; padding: 1.2vh 1.4vw; border: .4vh solid var(--teal-l); border-radius: 1.8vh; background: #fff; transition: background .12s, border-color .12s, translate .12s; }
+  .opt i { font-style: normal; font-family: var(--hand); width: 5vh; height: 5vh; border-radius: 50%; background: var(--teal-l); display: grid; place-items: center; flex: none; }
+  /* 누르기 직전: 마우스를 올리면 색이 바뀜 */
+  .opt:not(:disabled):hover { background: #FFF6D6; border-color: #E0B84A; translate: .4vw 0; }
+  .opt:not(:disabled):hover i { background: #FFD35C; }
+  .opt:not(:disabled):active { background: #FFE9A8; }
+  .opt:disabled { cursor: default; color: inherit; }
+  .opt.right { border-color: #2E7D4F; background: #E7F5EC; }
+  .opt.right i { background: #2E7D4F; color: #fff; }
+  .opt.wrong { border-color: #D9A39B; background: #FBEDEA; color: #9A6A63; }
+  .opt.wrong i { background: #C93A27; color: #fff; }
+  .opt.wrong span { text-decoration: line-through; text-decoration-thickness: .3vh; }
+  .opt.shake { animation: shake .42s; }
+  @keyframes shake { 0%, 100% { translate: 0 0; } 15% { translate: -1.2vw 0; } 30% { translate: 1.1vw 0; } 45% { translate: -.9vw 0; } 60% { translate: .7vw 0; } 80% { translate: -.4vw 0; } }
+  .pass { border: .5vh solid var(--gc); border-radius: 2.2vh; padding: 1.6vh 2vw; margin-bottom: 2vh; display: grid; justify-items: center; gap: .4vh; background: #fff; text-align: center; }
+  .pass span { font-size: 2.8vh; color: var(--mute); }
+  .pass b { font-family: var(--hand); font-size: 8vh; line-height: 1.1; color: var(--gc); }
+  .pass small { font-size: 2.4vh; color: var(--mute); }
+  .pass.pop { animation: pop .5s; }
+  @keyframes pop { 0% { scale: .7; opacity: 0; } 60% { scale: 1.06; opacity: 1; } 100% { scale: 1; } }
+  @media (prefers-reduced-motion: reduce) { .opt.shake, .pass.pop { animation: none; } }
   .ans { border: .4vh dashed #E0B84A; background: #FFF6D6; border-radius: 1.8vh; padding: 1.4vh 1.6vw; font-size: 3.2vh; line-height: 1.45; margin-bottom: 2vh; }
   .ans b { font-family: var(--hand); font-size: 3.8vh; color: var(--coral-d); margin-right: .6vw; }
   .acts { display: flex; flex-wrap: wrap; gap: 1vw; align-items: center; }
@@ -66,7 +85,7 @@
 </head>
 <body>
 <header>
-  <h1>편지 쪽지 퀴즈</h1>
+  <h1>편지 암호 퀴즈</h1>
   <span class="left" id="left"></span>
   <div class="score" id="score"></div>
   <button type="button" class="ghost" id="howBtn">하는 방법</button>
@@ -78,16 +97,18 @@
 <div class="how" id="how" hidden><div>
   <h2>하는 방법</h2>
   <ol>
-    <li>모둠이 차례로 번호를 하나 골라요.</li>
+    <li>모둠이 차례로 편지를 받고 싶은 지역을 하나 골라요.</li>
     <li>문제를 읽고 모둠이 의논해서 답해요. OX 퀴즈, 객관식, 단답형이 있어요.</li>
-    <li>[정답 보기]를 눌러 확인해요.</li>
-    <li>맞히면 <b>편지 쪽지 한 장</b>을 뽑아요. 쪽지에는 지역 이름과 편지를 보낸 친구 이름이 있어요.</li>
+    <li>답을 누르면 맞았는지 바로 알 수 있어요.</li>
+    <li>맞히면 그 지역 <b>편지의 암호(친구 이름)</b>가 나와요. 모둠 번호와 함께 칸에 적혀요.</li>
     <li>자원 지도에서 그 지역을 누르고 친구 이름을 쓰면 편지가 열려요.</li>
   </ol>
   <button type="button" class="btn" id="howClose">시작!</button>
 </div></div>
 
-<script>
+<script type="module">
+  import { LETTERS } from '../data/letters.js';
+  import map from '../data/gyeongbuk-map.js';
   // 문제 21개(쪽지 21장): lens(S 공간 탐구, T 시간 탐구, B 공간과 시간), kind(OX 퀴즈/객관식/단답형), q, sub(덧붙임), opts, right(정답 번호), ans(정답과 까닭)
   // 일반화하기까지 배운 뒤에 하는 퀴즈입니다. 낱말을 외워서 푸는 문제가 아니라, 탐구한 것을 이어서 까닭을 찾는 문제입니다.
   // 실제로 하지 않은 수업(꺾은선그래프, 보고하는 글, 문경의 미래)과 아직 배우지 않은 것(희소성과 교류)은 넣지 않았습니다.
@@ -115,55 +136,74 @@
     { lens: 'B', kind: '단답형', q: '우리 반이 찾은 문장의 빈칸 두 개를 채워요.', sub: '"우리가 살고 있는 (        )과 (        )은 우리가 살아가는 방식을 변화시킨다."', ans: '공간, 시간. 어디에 사는지와 언제 사는지에 따라 살아가는 방식이 달라져요.' },
   ];
   const LENS = { S: '공간 탐구', T: '시간 탐구', B: '공간과 시간' };
-  const GROUPS = [1, 2, 3, 4], SLIPS = 21, KEY = 'gb-quiz-v2';
+  const GROUPS = [1, 2, 3, 4], KEY = 'gb-quiz-v3';
   const $ = (id) => document.getElementById(id);
+  const eul = (w) => w + ((w.charCodeAt(w.length - 1) - 0xac00) % 28 ? '을' : '를'); // 받침에 따라 을/를
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  // done[번호] = 맞힌 모둠 번호(1~4) 또는 0(아무도 못 맞힘). 새로 고쳐도 남도록 이 기기에 적어 둡니다.
+  // 칸 하나가 시군 하나(문경은 예시라 뺌). 칸마다 문제 하나를 붙입니다. 종류가 고루 섞이도록 정해 둔 차례입니다.
+  const ORDER = [0, 8, 16, 3, 11, 19, 6, 14, 1, 9, 17, 4, 12, 20, 7, 15, 2, 10, 18, 5, 13];
+  const TILES = map.regions.filter((r) => r.id !== 37090 && LETTERS[r.id]).map((r, i) => ({ cid: r.id, name: r.name, friend: LETTERS[r.id].name, q: QS[ORDER[i]] }));
+
+  // done[시군 번호] = 맞힌 모둠 번호(1~4). 새로 고쳐도 남도록 이 기기에 적어 둡니다.
   let done = {};
   try { done = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { done = {}; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { /* 저장이 막혀도 게임은 계속 */ } };
-  let cur = null, shown = false;
+  let cur = null, shown = false, wrong = [], justWon = false;
 
   function drawBoard() {
-    $('board').innerHTML = QS.map((x, i) => {
-      const d = done[i];
-      if (d == null) return `<button type="button" class="tile" data-i="${i}" aria-label="${i + 1}번 문제">${i + 1}</button>`;
-      return `<button type="button" class="tile done" data-i="${i}" ${d ? `data-g="${d}"` : ''}><span>${d ? d + '모둠<small>쪽지!</small>' : (i + 1) + '<small>지나감</small>'}</span></button>`;
+    $('board').innerHTML = TILES.map((t, i) => {
+      const d = done[t.cid];
+      if (!d) return `<button type="button" class="tile" data-i="${i}">${esc(t.name)}</button>`;
+      return `<button type="button" class="tile done" data-i="${i}" data-g="${d}"><span><small>${esc(t.name)}</small>${d}모둠<b>${esc(t.friend)}</b></span></button>`;
     }).join('');
     const got = (g) => Object.values(done).filter((v) => v === g).length;
     $('score').innerHTML = GROUPS.map((g) => `<div data-g="${g}">${g}모둠 <b>${got(g)}</b></div>`).join('');
-    const left = SLIPS - Object.values(done).filter((v) => v > 0).length;
-    $('left').textContent = left > 0 ? `남은 쪽지 ${left}장` : '쪽지를 모두 뽑았어요!';
+    const left = TILES.length - Object.keys(done).length;
+    $('left').textContent = left > 0 ? `남은 편지 ${left}통` : '편지를 모두 받았어요!';
   }
   function drawQ() {
-    const x = QS[cur];
+    const t = TILES[cur], x = t.q, d = done[t.cid];
+    const opt = (o, j) => {
+      const cls = shown && j === x.right ? 'right' : wrong.includes(j) ? 'wrong' : '';
+      return `<li><button type="button" class="opt ${cls}" data-a="pick" data-j="${j}" ${shown || wrong.includes(j) ? 'disabled' : ''}><i>${j + 1}</i><span>${esc(o)}</span></button></li>`;
+    };
     $('qcard').innerHTML = `
-      <div class="qtop"><span class="qno">${cur + 1}</span><span class="lens ${x.lens}">${LENS[x.lens]}</span><span class="kind">${x.kind}</span>
+      <div class="qtop"><span class="qno">${esc(t.name)}</span><span class="lens ${x.lens}">${LENS[x.lens]}</span><span class="kind">${x.kind}</span>
         <button type="button" class="ghost qx" data-a="close">닫기</button></div>
       <p class="qtext">${esc(x.q)}${x.sub ? `<small>${esc(x.sub)}</small>` : ''}</p>
-      ${x.opts ? `<ol class="opts">${x.opts.map((o, j) => `<li class="${shown && j === x.right ? 'right' : ''}"><i>${j + 1}</i>${esc(o)}</li>`).join('')}</ol>` : ''}
-      ${shown ? `<div class="ans"><b>정답</b>${esc(x.ans)}</div>
-        <div class="acts"><span>맞힌 모둠은?</span>${GROUPS.map((g) => `<button type="button" class="btn g" data-g="${g}" data-a="win">${g}모둠</button>`).join('')}
-          <button type="button" class="btn none" data-a="pass">아무도 못 맞혔어요</button>${done[cur] != null ? '<button type="button" class="btn none" data-a="undo">이 칸 되돌리기</button>' : ''}</div>`
-        : `<div class="acts"><button type="button" class="btn" data-a="show">정답 보기</button><span>${x.opts ? '모둠이 의논해서 하나를 골라요.' : '모둠이 의논해서 답을 말해요.'}</span></div>`}`;
+      ${x.opts ? `<ol class="opts">${x.opts.map(opt).join('')}</ol>` : ''}
+      ${!shown ? `<div class="acts">${x.opts ? '<span>모둠이 의논해서 하나를 눌러요.</span><button type="button" class="ghost" data-a="show">정답 그냥 보기</button>' : '<button type="button" class="btn" data-a="show">정답 보기</button><span>모둠이 의논해서 답을 말해요.</span>'}</div>`
+        : `<div class="ans"><b>정답</b>${esc(x.ans)}</div>
+        ${d ? `<div class="pass ${justWon ? 'pop' : ''}" data-g="${d}"><span>${esc(t.name)} 편지의 암호</span><b>${d}모둠 / ${esc(t.friend)}</b><small>자원 지도에서 ${esc(eul(t.name))} 누르고 친구 이름 "${esc(t.friend)}"${eul(t.friend).slice(-1)} 써요.</small></div>
+          <div class="acts"><button type="button" class="btn" data-a="close">확인</button><button type="button" class="ghost" data-a="undo">이 칸 되돌리기</button></div>`
+          : `<div class="acts"><span>맞힌 모둠은?</span>${GROUPS.map((g) => `<button type="button" class="btn g" data-g="${g}" data-a="win">${g}모둠</button>`).join('')}
+          <button type="button" class="btn none" data-a="close">아무도 못 맞혔어요 (나중에 다시)</button></div>`}`}`;
   }
   function closeQ() { cur = null; $('q').hidden = true; drawBoard(); }
 
   $('board').addEventListener('click', (e) => {
-    const t = e.target.closest('.tile');
-    if (!t) return;
-    cur = +t.dataset.i; shown = done[cur] != null;
+    const b = e.target.closest('.tile');
+    if (!b) return;
+    cur = +b.dataset.i; shown = !!done[TILES[cur].cid]; wrong = []; justWon = false;
     drawQ(); $('q').hidden = false;
   });
   $('q').addEventListener('click', (e) => {
     const b = e.target.closest('[data-a]');
     if (!b) { if (e.target === $('q')) closeQ(); return; }
-    const a = b.dataset.a;
-    if (a === 'show') { shown = true; drawQ(); }
-    else if (a === 'win') { done[cur] = +b.dataset.g; save(); closeQ(); }
-    else if (a === 'pass') { done[cur] = 0; save(); closeQ(); }
-    else if (a === 'undo') { delete done[cur]; save(); closeQ(); }
+    const a = b.dataset.a, t = TILES[cur];
+    if (a === 'pick') {
+      const j = +b.dataset.j;
+      if (j === t.q.right) { shown = true; drawQ(); }
+      else {
+        // 틀린 답: 부르르 흔들고 흐리게 바꿉니다(다른 답은 계속 누를 수 있음)
+        wrong.push(j);
+        b.classList.add('wrong', 'shake'); b.disabled = true;
+      }
+    }
+    else if (a === 'show') { shown = true; drawQ(); }
+    else if (a === 'win') { done[t.cid] = +b.dataset.g; save(); justWon = true; drawQ(); drawBoard(); }
+    else if (a === 'undo') { delete done[t.cid]; save(); closeQ(); }
     else closeQ();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('q').hidden) closeQ(); $('how').hidden = true; } });
