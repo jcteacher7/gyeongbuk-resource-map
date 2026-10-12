@@ -277,3 +277,14 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .t-gens.big .t-genshut { gap: 20px; padding-top: 34px; }
 .t-gens.big .t-genshut span { font-size: 24px; }
 .t-gens.big .t-genshut .btn { min-width: 240px; height: 72px; font-size: 34px; }
+
+/* 자원 올리기 창: 편지를 옆에 두고 쓰기(입력은 한 줄로 세워 위아래로 넘김) */
+.form-body.split { display: grid; grid-template-columns: 1fr 1fr; }
+.form-body.split .form-cols { flex-direction: column; gap: 6px; height: 566px; overflow-y: auto; padding-right: 14px; padding-bottom: 12px; scrollbar-width: thin; scrollbar-color: var(--teal-l) transparent; }
+.form-body.split .col { flex: none; }
+.form-letter { padding: 6px 22px 0 4px; min-width: 0; }
+.form-letter .paper { height: 566px; font-size: 19px; line-height: 1.65; padding: 14px 20px; }
+.paper-notes { margin: 12px 0 0; padding: 10px 10px 0 28px; border-top: 2px dashed #EADFAE; font-size: 16px; line-height: 1.5; color: var(--mute); }
+.sheet-head .tip-btn svg { width: 22px; height: 22px; }
+.t-top .btn svg { flex: none; }
+.form-body.split .field input::placeholder { font-size: 17px; }

@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=38';
-import { esc, timeText, josa, markBlanks } from './util.js?v=38';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=40';
+import { esc, timeText, josa, markBlanks } from './util.js?v=40';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -29,6 +29,7 @@ export function createTeacher(root, ctx) {
       <div class="logo t-logo">${ICON.key}<span>선생님 화면</span></div>
       <div class="t-stage" data-tstage></div>
       <button type="button" class="btn small" data-t="map">${ICON.pinSmall}지도 보기</button>
+      <button type="button" class="btn small" data-t="answers">${ICON.bulb}정답 예시 지도</button>
       <button type="button" class="btn small ghost" data-t="exit">나가기</button>
     </header>
     <nav class="tabs t-tabs" data-ttabs></nav>
@@ -416,6 +417,7 @@ export function createTeacher(root, ctx) {
     if (a) {
       const k = a.dataset.t;
       if (k === 'map') ctx.openMap();
+      else if (k === 'answers') ctx.openMap(true);
       else if (k === 'exit') ctx.exit();
       else if (k === 'big') { big = true; rebuild(); }
       else if (k === 'unbig') { big = false; rebuild(); }

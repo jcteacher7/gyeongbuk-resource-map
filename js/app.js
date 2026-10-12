@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=38';
-import { store } from './store.js?v=38';
-import { createMapView, shortName } from './map-view.js?v=38';
-import { shrinkPhoto } from './photo.js?v=38';
-import { esc, safeLink, josa, timeText } from './util.js?v=38';
-import { MAX_LEN } from './config.js?v=38';
-import { LETTERS } from '../data/letters.js?v=38';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=38';
-import { createTagView } from './tag-view.js?v=38';
-import { createChatView } from './chat-view.js?v=38';
-import { createTeacher, hashCode } from './teacher.js?v=38';
+import mapData from '../data/gyeongbuk-map.js?v=40';
+import { store } from './store.js?v=40';
+import { createMapView, shortName } from './map-view.js?v=40';
+import { shrinkPhoto } from './photo.js?v=40';
+import { esc, safeLink, josa, timeText } from './util.js?v=40';
+import { MAX_LEN } from './config.js?v=40';
+import { LETTERS, ANSWER_CARDS } from '../data/letters.js?v=40';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=40';
+import { createTagView } from './tag-view.js?v=40';
+import { createChatView } from './chat-view.js?v=40';
+import { createTeacher, hashCode } from './teacher.js?v=40';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -96,7 +96,13 @@ const ENV = { nat: '자연환경', hum: '인문환경' };
 const AMT = { many: '많아요', few: '적어요' };
 
 // 예시 지역(문경)의 예시 카드는 앱에 들어 있고, 아이들이 올린 카드는 서버에서 옵니다.
+function answerCards() {
+  return Object.entries(ANSWER_CARDS).flatMap(([cid, list]) => list.map(([name, env, why, amt, era, eraWhy], i) => (
+    // 원래부터 적은 것은 '옛날과 비교' 딱지를 붙이지 않습니다(고를 말이 없어서)
+    { key: `ans-${cid}-${i}`, cid: +cid, name, env, why, amt, era: amt === 'few' && era === 'old' ? '' : era, eraWhy, example: true, answer: true })));
+}
 function resAll() {
+  if (S.answerMode) return EXAMPLE_RES.concat(answerCards());
   return EXAMPLE_RES.concat(store.list('res').filter((r) => r.cid !== EXAMPLE_CID).sort((a, b) => (a.at || 0) - (b.at || 0)));
 }
 const resGet = (key) => resAll().find((r) => r.key === key);
@@ -169,7 +175,7 @@ function renderTop() {
   $('#enter').hidden = true;
   $('#teacher').hidden = true;
   $('#main').hidden = false;
-  $('#who').innerHTML = isTeacher() ? `${ICON.key}선생님 화면으로` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
+  $('#who').innerHTML = isTeacher() ? `${ICON.key}${S.answerMode ? '정답 예시 보는 중 · ' : ''}선생님 화면으로` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
   const t = texts(), st = stages();
   const tab = (id, label, open) => `<button type="button" class="tab ${S.tab === id ? 'on' : ''} ${open ? '' : 'locked'}" data-tab="${id}">${open ? '' : ICON.lock}${esc(label)}</button>`;
   const html = isTeacher()
@@ -270,7 +276,7 @@ function resCard(r, pickMode) {
       <span class="rc-top"><b>${esc(r.name)}</b><span class="badge ${r.amt}">${AMT[r.amt] || ''}</span></span>
       <small><span class="env ${r.env}">${ENV[r.env] || ''}</span>${esc(r.why)}</small>
       ${r.era ? `<small><span class="era ${r.era}">${ERA[r.era]}</span>${esc(r.eraWhy || '')}</small>` : ''}
-      <small class="by">${r.example ? '예시 카드' : esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
+      <small class="by">${r.answer ? '정답 예시' : r.example ? '예시 카드' : esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
     </span>${pick}</button>`;
 }
 
@@ -351,7 +357,7 @@ function renderPanel() {
     html += list.length
       ? '<div class="cards">' + list.map((r) => resCard(r, !!S.arrowMode)).join('') + '</div>'
       : '<p class="hint">아직 올라온 자원이 없어요.</p>';
-    if (!S.arrowMode && id !== EXAMPLE_CID) {
+    if (!S.arrowMode && id !== EXAMPLE_CID && !S.answerMode) {
       const ok = canAdd(id);
       html += `<div class="add-row">
         <button type="button" class="btn primary ${ok ? '' : 'off'}" data-act="add">${ICON.plus}자원 올리기</button>
@@ -427,6 +433,7 @@ function photoBox(p, big) {
 }
 
 function editRow(item, kind) {
+  if (item.answer) return `<div class="pop-foot"><span class="by">${ICON.bulb}편지를 읽고 이렇게 쓸 수 있다는 본보기예요. 답이 하나뿐인 것은 아니에요.</span></div>`;
   if (item.example) return `<div class="pop-foot"><span class="by">${ICON.bulb}예시 카드예요. 이렇게 조사해서 올려요.</span></div>`;
   const canEdit = isTeacher() || (S.me && item.by && item.by.g === S.me.g);
   const canDel = isTeacher() || sameMe(item.by);
@@ -559,13 +566,16 @@ function openResForm(cid, key) {
   const draft = loadDraft(draftId);
   const f = { env: '', why: '', name: '', amt: '', era: '', eraWhy: '', link: '', ...(old ? { env: old.env, why: old.why, name: old.name, amt: old.amt, era: old.era || '', eraWhy: old.eraWhy || '', link: old.link || '' } : {}), ...(draft || {}) };
   const eraHint = () => (f.era ? EXAMPLE_HINT.era[f.era] : '위에서 하나를 고르면 예시가 나와요');
+  const withLetter = canReadLetter(cid); // 편지를 연 모둠은 편지를 옆에 두고 씁니다
   let photo = old && old.photo ? old.photo : null;
   let newPhoto = null;
   let busy = false;
   const html = `<div class="sheet form" role="dialog">
     <div class="sheet-head"><b>${esc(regionName(cid))}</b>&nbsp;${key ? '자원 고치기' : '자원 올리기'}
       ${draft ? '<span class="draft-note">쓰던 글을 불러왔어요</span>' : ''}
+      ${withLetter ? `<button type="button" class="btn small tip-btn on" data-act="form-letter">${ICON.mail}<span>편지 접기</span></button>` : ''}
       <button type="button" class="xbtn" data-act="form-cancel" aria-label="닫기">${ICON.x}</button></div>
+    <div class="form-body ${withLetter ? 'split' : ''}">
     <div class="form-cols">
       <div class="col">
         <div class="q"><span class="num">1</span>이 자원은 어떤 환경 때문에 있나요?</div>
@@ -593,6 +603,8 @@ function openResForm(cid, key) {
         </div>
         <p class="face-note">${ICON.face}얼굴이 나온 사진은 올리지 않아요.</p>
       </div>
+    </div>
+    ${withLetter ? `<aside class="form-letter" data-fletter>${letterPaper(cid, true)}</aside>` : ''}
     </div>
     <div class="sheet-foot"><span class="why-not"></span>
       <button type="button" class="btn ghost" data-act="form-cancel">그만두기</button>
@@ -797,6 +809,13 @@ document.addEventListener('click', (e) => {
     const fn = modal.onOk; closeModal(); fn();
   }
   else if (a === 'close') closeModal();
+  else if (a === 'form-letter') {
+    // 입력칸은 그대로 두고 옆의 편지만 접었다 폅니다
+    const body = $('#modal .form-body'), on = body.classList.toggle('split');
+    $('#modal [data-fletter]').hidden = !on;
+    act.classList.toggle('on', on);
+    act.querySelector('span').textContent = on ? '편지 접기' : '편지 보면서 쓰기';
+  }
   else if (a === 'letter') openLetter(S.selected);
   else if (a === 'letter-lock') openLetterLock(S.selected);
   else if (a === 'letter-ok') tryLetter();
@@ -895,6 +914,7 @@ async function teacherLogin() {
 }
 function openTeacher(fresh) {
   S.teacherScreen = true;
+  S.answerMode = false;
   S.me = null; S.arrowMode = null; S.selected = null; S.selArrow = null;
   if (modal) closeModal();
   $('#enter').hidden = true;
@@ -903,8 +923,9 @@ function openTeacher(fresh) {
   if (fresh) teacher.open(); else teacher.render(true);
   store.refresh();
 }
-function teacherMap() {
+function teacherMap(answers) {
   S.teacherScreen = false;
+  S.answerMode = !!answers;
   S.me = { ...TEACHER };
   S.tab = 'map'; S.selected = null; S.arrowMode = null; S.selArrow = null;
   lastPanel = ''; lastMapSig = '';
@@ -960,6 +981,12 @@ function letterText(t, notes) {
     .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
     .replace(/\{(.+?)\}/g, (m, w) => { const i = notes.findIndex((n) => n[0] === w); return `<span class="gl">${w}${i >= 0 ? `<sup>${i + 1}</sup>` : ''}</span>`; });
 }
+function letterPaper(cid, withNotes) {
+  const L = letterOf(cid), notes = L.notes || [];
+  return `<div class="paper">${L.paras.map((p) => `<p>${letterText(p, notes)}</p>`).join('')}
+    <p class="sign">${esc(shortName(regionName(cid)))}에서, ${esc(josa(L.name, '이가', '가'))}</p>
+    ${withNotes && notes.length ? `<ol class="paper-notes">${notes.map((n) => `<li><b>${esc(n[0])}</b> ${esc(n[1])}</li>`).join('')}</ol>` : ''}</div>`;
+}
 function openLetter(cid) {
   const L = letterOf(cid);
   if (!L) return;
@@ -968,8 +995,7 @@ function openLetter(cid) {
   openModal({ type: 'letter', cid }, `<div class="sheet letter" role="dialog">
     <div class="sheet-head">${ICON.mail}<span><b>${esc(place)}</b>에서 온 편지</span><button type="button" class="xbtn" data-act="close" aria-label="닫기">${ICON.x}</button></div>
     <div class="letter-body">
-      <div class="paper">${L.paras.map((p) => `<p>${letterText(p, notes)}</p>`).join('')}
-        <p class="sign">${esc(place)}에서, ${esc(josa(L.name, '이가', '가'))}</p></div>
+      ${letterPaper(cid, false)}
       <div class="letter-side">
         ${notes.length ? `<div class="lbox"><h4>낱말 풀이</h4><ol>${notes.map((n) => `<li><b>${esc(n[0])}</b> ${esc(n[1])}</li>`).join('')}</ol></div>` : ''}
         <div class="lbox find"><h4>편지를 읽고 찾아봐요</h4><ol>
