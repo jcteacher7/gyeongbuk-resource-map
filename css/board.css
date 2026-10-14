@@ -292,3 +292,10 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .seg3 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
 .form .seg3 .seg button { height: 44px; }
 .era.low { background: #E6EEF0; }
+
+/* 교류의 종류(화살표 팁)와 자원 확인 질문(자원 올리기 창) */
+.tip-box .kinds { margin: 6px 0 0; padding: 0 0 0 38px; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; font-size: 15.5px; line-height: 1.35; }
+.tip-box .kinds b { display: block; font-family: var(--body); font-size: 15.5px; color: var(--ink); }
+.res-check { margin: 2px 0 6px; padding: 6px 10px; border-radius: 10px; background: #EAF5F3; font-size: 14.5px; line-height: 1.4; color: var(--ink); }
+.res-check b { display: block; color: var(--teal-d, var(--teal)); }
+.res-check small { color: var(--mute); font-size: 14px; }

@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=42';
-import { store } from './store.js?v=42';
-import { createMapView, shortName } from './map-view.js?v=42';
-import { shrinkPhoto } from './photo.js?v=42';
-import { esc, safeLink, josa, timeText } from './util.js?v=42';
-import { MAX_LEN } from './config.js?v=42';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=42';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=42';
-import { createTagView } from './tag-view.js?v=42';
-import { createChatView } from './chat-view.js?v=42';
-import { createTeacher, hashCode } from './teacher.js?v=42';
+import mapData from '../data/gyeongbuk-map.js?v=43';
+import { store } from './store.js?v=43';
+import { createMapView, shortName } from './map-view.js?v=43';
+import { shrinkPhoto } from './photo.js?v=43';
+import { esc, safeLink, josa, timeText } from './util.js?v=43';
+import { MAX_LEN } from './config.js?v=43';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=43';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=43';
+import { createTagView } from './tag-view.js?v=43';
+import { createChatView } from './chat-view.js?v=43';
+import { createTeacher, hashCode } from './teacher.js?v=43';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -586,6 +586,7 @@ function openResForm(cid, key) {
         <div class="q"><span class="num">2</span>자원 이름을 쓰고, 많은지 적은지 골라요</div>
         ${field('name', f.name, '자원 이름')}
         <p class="ex">${esc(EXAMPLE_HINT.name)}</p>
+        <p class="res-check"><b>자원인지 확인해요</b>쓸모가 있나요? · 우리 지역에 많거나 부족한가요? · 보내거나 받을 수 있나요? <small>(찾아와서 누리는 것도 돼요. 길·건물·땅은 1번의 '왜'에 써요)</small></p>
         ${seg('amt', [['many', '이 시군에 많아요'], ['few', '이 시군에 적어요']], f.amt)}
       </div>
       <div class="col">
@@ -685,6 +686,7 @@ function openArrowForm(fromKey, toKey, key) {
     <div class="tip-box" data-tip hidden>
       <b>${ICON.bulb}선생님의 팁 <small>예시: ${esc(ARROW_TIP.pair)}</small></b>
       <p><span class="num">1</span>${esc(ARROW_TIP.how.tip)}<br><em>예: ${esc(ARROW_TIP.how.ex)}</em></p>
+      <ul class="kinds">${ARROW_TIP.kinds.map(([k, ex]) => `<li><b>${esc(k)}</b>${esc(ex)}</li>`).join('')}</ul>
       <p><span class="num">2</span>${esc(ARROW_TIP.change.tip)}<br><em>예: ${esc(ARROW_TIP.change.ex)}</em></p>
       <div class="ways" data-page="0">${ARROW_TIP.ways.map(([name], i) => `<button type="button" data-act="way" data-i="${i}" class="${i < 8 ? 'p0' : 'p1'}">${esc(name)}</button>`).join('')}
         <button type="button" class="more" data-act="way-more">다른 것 더 보기 <small>1/2</small></button></div>
