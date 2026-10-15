@@ -308,3 +308,6 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .ex-steps .step-name { width: auto; gap: 6px; align-items: center; font-size: 20px; }
 .ex-steps .ex-kind { display: inline-block; margin-right: 6px; padding: 0 7px; border-radius: 7px; background: var(--coral-d); color: #fff; font-size: 14px; line-height: 1.5; }
 .ex-steps .ex-way { display: inline-block; margin-right: 6px; padding: 0 7px; border: 2px dashed #7FB5BE; border-radius: 8px; background: #F3FBF9; font-size: 14px; line-height: 1.4; }
+/* 자원 올리기 1번: 환경은 둘 다 고를 수 있음 */
+.q .q-note { margin-left: 6px; font-family: var(--body); font-weight: 400; font-size: 14.5px; color: var(--teal); }
+.env + .env { margin-left: 3px; }

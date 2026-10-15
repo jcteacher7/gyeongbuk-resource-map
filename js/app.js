@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=49';
-import { store } from './store.js?v=49';
-import { createMapView, shortName } from './map-view.js?v=49';
-import { shrinkPhoto } from './photo.js?v=49';
-import { esc, safeLink, josa, timeText } from './util.js?v=49';
-import { MAX_LEN } from './config.js?v=49';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=49';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=49';
-import { createTagView } from './tag-view.js?v=49';
-import { createChatView } from './chat-view.js?v=49';
-import { createTeacher, hashCode } from './teacher.js?v=49';
+import mapData from '../data/gyeongbuk-map.js?v=50';
+import { store } from './store.js?v=50';
+import { createMapView, shortName } from './map-view.js?v=50';
+import { shrinkPhoto } from './photo.js?v=50';
+import { esc, safeLink, josa, timeText } from './util.js?v=50';
+import { MAX_LEN } from './config.js?v=50';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=50';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=50';
+import { createTagView } from './tag-view.js?v=50';
+import { createChatView } from './chat-view.js?v=50';
+import { createTeacher, hashCode } from './teacher.js?v=50';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -283,7 +283,7 @@ function resCard(r, pickMode) {
     <span class="thumb">${img}</span>
     <span class="rc-body">
       <span class="rc-top"><b>${esc(r.name)}</b><span class="badge ${r.amt}">${AMT[r.amt] || ''}</span></span>
-      <small><span class="env ${r.env}">${ENV[r.env] || ''}</span>${esc(r.why)}</small>
+      <small>${envChips(r.env)}${esc(r.why)}</small>
       ${r.era ? `<small><span class="era ${r.era}">${ERA[r.era]}</span>${esc(r.eraWhy || '')}</small>` : ''}
       <small class="by">${r.answer ? (r.extra ? '정답 예시 · 더 찾아본 것' : '정답 예시 · 편지에 있는 것') : r.example ? '예시 카드' : esc(byText(r.by))}${r._pending ? ' · <em>아직 못 보냄</em>' : ''}</small>
     </span>${pick}</button>`;
@@ -473,7 +473,7 @@ function showRes(key, refresh) {
       <button type="button" class="xbtn light" data-act="close" aria-label="닫기">${ICON.x}</button></div>
     <div class="pop-photo big">${photoBox(r.photo, true)}</div>
     <div class="pop-info">
-      <div class="info-row"><span class="num">1</span><span class="env ${r.env}">${ENV[r.env] || ''}</span><span>${esc(r.why)}</span></div>
+      <div class="info-row"><span class="num">1</span>${envChips(r.env)}<span>${esc(r.why)}</span></div>
       <div class="info-row"><span class="num">2</span><b>${esc(r.name)}</b><span class="badge ${r.amt}">이 시군에 ${AMT[r.amt] || ''}</span></div>
       <div class="info-row"><span class="num">3</span>${r.era ? `<span class="era ${r.era}">${ERA[r.era]}</span><span>${esc(r.eraWhy || '')}</span>` : '<span class="muted">옛날과 비교한 내용이 없어요</span>'}</div>
       <div class="info-row"><span class="num">4</span>${link ? `<a class="btn small" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${ICON.link}자료 보기</a>` : '<span class="muted">링크가 없어요</span>'}</div>
@@ -526,7 +526,7 @@ function showArrow(key, refresh) {
     </div>
     <ol class="steps3">
       <li><span class="step-name"><span class="num">1</span>환경</span>
-        <span class="step-text"><span class="env ${f.env}">${ENV[f.env] || ''}</span>${esc(f.why)}${f.era ? ` <span class="era ${f.era}">${ERA[f.era]}</span>` : ''}<br><span class="env ${t.env}">${ENV[t.env] || ''}</span>${esc(t.why)}${t.era ? ` <span class="era ${t.era}">${ERA[t.era]}</span>` : ''}</span></li>
+        <span class="step-text">${envChips(f.env)}${esc(f.why)}${f.era ? ` <span class="era ${f.era}">${ERA[f.era]}</span>` : ''}<br>${envChips(t.env)}${esc(t.why)}${t.era ? ` <span class="era ${t.era}">${ERA[t.era]}</span>` : ''}</span></li>
       <li><span class="step-name"><span class="num">2</span>교류</span><span class="step-text">${esc(a.how)}</span></li>
       <li><span class="step-name"><span class="num">3</span>생활 변화</span><span class="step-text">${esc(a.change)}</span></li>
     </ol>
@@ -555,6 +555,11 @@ function dropDraft(id) { try { localStorage.removeItem(draftKey(id)); } catch (e
 const field = (name, value, ph, extra = '') =>
   `<span class="field"><input name="${name}" value="${esc(value)}" maxlength="${MAX_LEN}" placeholder="${esc(ph)}" autocomplete="off" ${extra}><span class="count" data-count="${name}">${String(value || '').length}/${MAX_LEN}</span></span>`;
 const seg = (name, opts, v) => `<div class="seg" data-seg="${name}">${opts.map(([k, label]) => `<button type="button" data-v="${k}" class="${v === k ? 'on' : ''}">${label}</button>`).join('')}</div>`;
+// 환경은 둘 다 고를 수 있습니다(예: 복숭아는 날씨와 땅 덕분이면서 사람이 과수원을 만들어 길러요).
+// 저장 값: 'nat' | 'hum' | 'both'
+const envKeys = (env) => (env === 'both' ? ['nat', 'hum'] : env ? [env] : []);
+const envSeg = (v) => `<div class="seg" data-seg="env" data-multi="1">${[['nat', '자연환경'], ['hum', '인문환경']].map(([k, label]) => `<button type="button" data-v="${k}" class="${envKeys(v).includes(k) ? 'on' : ''}" aria-pressed="${envKeys(v).includes(k)}">${label}</button>`).join('')}</div>`;
+const envChips = (env) => envKeys(env).map((k) => `<span class="env ${k}">${ENV[k]}</span>`).join('');
 
 // 폼 공통: 입력할 때마다 글자 수·저장 단추 상태만 고치고, 입력칸 자체는 다시 그리지 않습니다.
 function bindForm(f, draftId, validate, onSave) {
@@ -577,8 +582,16 @@ function bindForm(f, draftId, validate, onSave) {
     const b = e.target.closest('[data-seg] button');
     if (b) {
       const box = b.closest('[data-seg]');
-      f[box.dataset.seg] = b.dataset.v;
-      box.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+      if (box.dataset.multi) {
+        // 여러 개 고르기(환경): 누를 때마다 켜고 끕니다.
+        b.classList.toggle('on');
+        b.setAttribute('aria-pressed', b.classList.contains('on'));
+        const on = [...box.querySelectorAll('button.on')].map((x) => x.dataset.v);
+        f[box.dataset.seg] = on.length === 2 ? 'both' : on[0] || '';
+      } else {
+        f[box.dataset.seg] = b.dataset.v;
+        box.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+      }
       saveDraft(draftId, f);
       update();
     }
@@ -618,8 +631,8 @@ function openResForm(cid, key) {
     <div class="form-body ${withLetter ? 'split' : ''}">
     <div class="form-cols">
       <div class="col">
-        <div class="q"><span class="num">1</span>이 자원은 어떤 환경 때문에 있나요?</div>
-        ${seg('env', [['nat', '자연환경'], ['hum', '인문환경']], f.env)}
+        <div class="q"><span class="num">1</span>이 자원은 어떤 환경 때문에 있나요? <small class="q-note">둘 다 골라도 돼요</small></div>
+        ${envSeg(f.env)}
         ${field('why', f.why, '왜 그런지 한 줄로 써요')}
         <p class="ex">${esc(EXAMPLE_HINT.why)}</p>
         <div class="q"><span class="num">2</span>자원 이름을 쓰고, 많은지 적은지 골라요</div>
@@ -676,7 +689,7 @@ function openResForm(cid, key) {
     const eh = root.querySelector('[data-erahint]');
     if (eh && eh.textContent !== eraHint()) eh.textContent = eraHint();
     if (busy) return '사진을 줄이는 중이에요. 잠깐만요!';
-    if (!f.env) return '1번: 자연환경인지 인문환경인지 골라 주세요';
+    if (!f.env) return '1번: 자연환경, 인문환경 가운데 골라 주세요(둘 다 돼요)';
     if (!f.why.trim()) return '1번: 왜 그런지 써 주세요';
     if (!f.name.trim()) return '2번: 자원 이름을 써 주세요';
     if (!f.amt) return '2번: 많아요 / 적어요를 골라 주세요';
