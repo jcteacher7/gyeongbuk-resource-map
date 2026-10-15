@@ -198,8 +198,8 @@
   @page port { size: A3 portrait; margin: 0; }
   html.pr body { padding: 0; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html.pr .printbar { display: none; }
-  html.pr .sheet { box-sizing: border-box; width: 420mm; height: 297mm; padding: 9mm; overflow: hidden; break-after: page; break-inside: avoid; page: land; display: flex; align-items: center; justify-content: center; }
-  html.pr .sheet.p3 { width: 297mm; height: 420mm; page: port; break-after: auto; }
+  html.pr .sheet { box-sizing: border-box; width: 420mm; height: 296mm; padding: 9mm; overflow: hidden; break-after: page; break-inside: avoid; page: land; display: flex; align-items: center; justify-content: center; }
+  html.pr .sheet.p3 { width: 297mm; height: 419mm; page: port; break-after: auto; }
   html.pr .fit { flex: none; }
   html.pr .pad { box-shadow: none; }
   html.pr .kid, html.pr .ideas, html.pr .pick { max-width: none; }
@@ -226,9 +226,9 @@
   html.pr .p3 .fit { width: 720px; }
   html.pr .p3 > .fit > .kid { display: none; } /* 그림 위에 같은 제목이 있어서 */
   html.pr .p3 .wrap { display: block; }
-  html.pr.preview { background: #888; }
+  @media screen { html.pr.preview { background: #888; }
   html.pr.preview body { background: #888; }
-  html.pr.preview .sheet { background: #fff; margin: 12px auto; }
+  html.pr.preview .sheet { background: #fff; margin: 12px auto; } }
 
   /* 줄인 안내(4학년용): 그림 옆에 번호 설명, 네 걸음, 짧은 확인표 */
   .side { max-width: 470px; display: grid; gap: 10px; }
