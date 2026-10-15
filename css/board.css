@@ -302,3 +302,9 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .tip-box p.nonum { padding-left: 38px; text-indent: 0; }
 /* 팁이 길어도 창이 화면 밖으로 넘치지 않게: 팁 안에서만 위아래로 넘김 */
 .af-body .tip-box { max-height: 580px; overflow-y: auto; overscroll-behavior: contain; }
+/* 교류 제안서 [예시: 문경] */
+.plan-groups .ex-chip { border-style: dashed; }
+.ex-steps li { flex-direction: column; gap: 4px; }
+.ex-steps .step-name { width: auto; gap: 6px; align-items: center; font-size: 20px; }
+.ex-steps .ex-kind { display: inline-block; margin-right: 6px; padding: 0 7px; border-radius: 7px; background: var(--coral-d); color: #fff; font-size: 14px; line-height: 1.5; }
+.ex-steps .ex-way { display: inline-block; margin-right: 6px; padding: 0 7px; border: 2px dashed #7FB5BE; border-radius: 8px; background: #F3FBF9; font-size: 14px; line-height: 1.4; }

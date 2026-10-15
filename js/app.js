@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=48';
-import { store } from './store.js?v=48';
-import { createMapView, shortName } from './map-view.js?v=48';
-import { shrinkPhoto } from './photo.js?v=48';
-import { esc, safeLink, josa, timeText } from './util.js?v=48';
-import { MAX_LEN } from './config.js?v=48';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=48';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=48';
-import { createTagView } from './tag-view.js?v=48';
-import { createChatView } from './chat-view.js?v=48';
-import { createTeacher, hashCode } from './teacher.js?v=48';
+import mapData from '../data/gyeongbuk-map.js?v=49';
+import { store } from './store.js?v=49';
+import { createMapView, shortName } from './map-view.js?v=49';
+import { shrinkPhoto } from './photo.js?v=49';
+import { esc, safeLink, josa, timeText } from './util.js?v=49';
+import { MAX_LEN } from './config.js?v=49';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=49';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=49';
+import { createTagView } from './tag-view.js?v=49';
+import { createChatView } from './chat-view.js?v=49';
+import { createTeacher, hashCode } from './teacher.js?v=49';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -82,14 +82,21 @@ const regionName = (id) => (mapData.regions.find((r) => r.id === id) || {}).name
 const isPlan = () => S.tab === 'plan';
 const onMapView = () => S.tab === 'map' || S.tab === 'plan';
 const planOf = (g) => (store.get('plan', 'g' + g) || {}).cid ?? null;
+// [예시: 문경]을 보고 있으면 planView() 가 EX 입니다.
+const EX = 'ex';
 const planView = () => {
+  if (S.planGroup === EX) return EX;
   const ids = roster().groups.map((g) => g.id);
   if (ids.includes(S.planGroup)) return S.planGroup;
   return !isTeacher() && ids.includes(S.me.g) ? S.me.g : ids[0];
 };
 const groupColor = (g) => GROUP_COLORS[Math.max(0, roster().groups.findIndex((x) => x.id === g)) % GROUP_COLORS.length];
 const planMine = () => !isTeacher() && planView() === S.me.g;
-const planArrows = () => arrowsAll().filter((a) => a.by && a.by.g === planView());
+const EX_COLOR = '#F9B97A';
+function exampleArrows() {
+  return EXAMPLE_ARROWS.map((a) => ({ ...a, example: true, fromRes: EXAMPLE_RES.find((r) => r.key === a.from), toRes: { ...a.to, key: '' } }));
+}
+const planArrows = () => (planView() === EX ? exampleArrows() : arrowsAll().filter((a) => a.by && a.by.g === planView()));
 const sameMe = (by) => !!by && !!S.me && by.g === S.me.g && by.n === S.me.n;
 const byText = (by) => (by ? (by.g === 0 ? '선생님' : `${groupName(by.g)} · ${by.n}`) : '');
 const ENV = { nat: '자연환경', hum: '인문환경' };
@@ -239,7 +246,8 @@ function renderMap() {
     selected: S.selected,
     mine: new Set(isPlan() ? [] : myCounties()),
     // 교류 제안서: 모둠마다 고른 제안 지역을 그 모둠의 색으로 칠합니다.
-    tint: isPlan() ? Object.fromEntries(roster().groups.map((g) => [planOf(g.id), groupColor(g.id)]).filter(([c]) => c != null)) : {},
+    tint: !isPlan() ? {} : planView() === EX ? { [EXAMPLE_CID]: EX_COLOR }
+      : Object.fromEntries(roster().groups.map((g) => [planOf(g.id), groupColor(g.id)]).filter(([c]) => c != null)),
     arrows,
     pick: pickRes ? pickRes.cid : null,
     selArrow: S.selArrow,
@@ -284,10 +292,19 @@ function resCard(r, pickMode) {
 function planPanel(all) {
   const gid = planView();
   const mine = planMine();
-  const focus = planOf(gid);
+  const ex = gid === EX;
+  const focus = ex ? EXAMPLE_CID : planOf(gid);
   const arrows = planArrows();
   const aitem = (a) => `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.arrowSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`;
-  let html = `<div class="plan-groups">${roster().groups.map((g) => `<button type="button" class="chip ${g.id === gid ? 'on' : ''}" data-plang="${g.id}"><i class="gdot" style="background:${groupColor(g.id)}"></i>${esc(g.name)}${!isTeacher() && g.id === S.me.g ? ' (우리)' : ''}</button>`).join('')}</div>`;
+  let html = `<div class="plan-groups">${roster().groups.map((g) => `<button type="button" class="chip ${g.id === gid ? 'on' : ''}" data-plang="${g.id}"><i class="gdot" style="background:${groupColor(g.id)}"></i>${esc(g.name)}${!isTeacher() && g.id === S.me.g ? ' (우리)' : ''}</button>`).join('')}
+    <button type="button" class="chip ex-chip ${ex ? 'on' : ''}" data-plang="${EX}"><i class="gdot" style="background:${EX_COLOR}"></i>예시: 문경</button></div>`;
+  if (S.selected == null && ex) {
+    html += `<div class="p-head"><h2>예시: 문경시 교류 제안서</h2></div>
+      <div class="p-sub ex-note">${ICON.bulb}이젤패드 견본과 같은 예시예요. 화살표를 눌러 1·2·3 순서로 살펴봐요.</div>
+      <button type="button" class="mycounty" data-county="${EXAMPLE_CID}" style="background:${EX_COLOR}"><b>${esc(regionName(EXAMPLE_CID))}</b><span>제안 지역</span></button>
+      <h3 class="p-h3">${ICON.arrowSmall}화살표 ${arrows.length}개</h3><div class="alist">${arrows.map(aitem).join('')}</div>`;
+    return html;
+  }
   if (S.selected == null) {
     html += `<div class="p-head"><h2>${esc(groupName(gid))} 교류 제안서</h2></div>`;
     html += focus != null
@@ -295,7 +312,7 @@ function planPanel(all) {
       : `<p class="hint">${mine ? '먼저 지도에서 우리 모둠이 제안할 시군을 누르고, [제안 지역으로 정하기]를 눌러요.' : '아직 제안 지역을 정하지 않았어요.'}</p>`;
     html += `<h3 class="p-h3">${ICON.arrowSmall}화살표 ${arrows.length}개</h3>`;
     html += arrows.length ? `<div class="alist">${arrows.map(aitem).join('')}</div>`
-      : `<p class="hint">${mine && focus != null ? '[화살표 잇기]를 눌러 제안 지역의 자원과 다른 시군의 자원을 이어요.' : '아직 이은 화살표가 없어요.'}</p>`;
+      : `<p class="hint">${mine && focus != null ? '[화살표 잇기]를 눌러 제안 지역의 자원과 다른 시군의 자원을 이어요.' : '아직 이은 화살표가 없어요.'}<br><small>어떻게 잇는지 궁금하면 위의 [예시: 문경]을 눌러 봐요.</small></p>`;
   } else {
     const id = S.selected;
     const list = all.filter((r) => r.cid === id);
@@ -423,7 +440,7 @@ function refreshModal() {
     if (!resGet(modal.key)) { closeModal(); toast('이 자원은 지워졌어요.'); return; }
     showRes(modal.key, true);
   } else if (modal.type === 'arrow') {
-    if (!arrowsAll().some((a) => a.key === modal.key)) { closeModal(); toast('이 화살표는 지워졌어요.'); return; }
+    if (!arrowsAll().some((a) => a.key === modal.key) && !exampleArrows().some((a) => a.key === modal.key)) { closeModal(); toast('이 화살표는 지워졌어요.'); return; }
     showArrow(modal.key, true);
   }
 }
@@ -473,7 +490,29 @@ function showRes(key, refresh) {
   }
 }
 
+// 예시 화살표: 이젤패드 지역 칸과 같은 1 어떻게 교류 · 2 생활 모습 · 3 함께 만드는 것
+function showExampleArrow(a, refresh) {
+  const f = a.fromRes, t = a.toRes;
+  const html = `<div class="sheet pop arrow-pop" role="dialog" aria-label="예시 화살표">
+    <div class="pop-head coral"><span>${esc(shortName(regionName(f.cid)))} ${esc(f.name)}</span>${ICON.arrowWhite}<span>${esc(shortName(regionName(t.cid)))} ${esc(t.name)}</span>
+      <button type="button" class="xbtn light" data-act="close" aria-label="닫기">${ICON.x}</button></div>
+    <ol class="steps3 ex-steps">
+      <li><span class="step-name"><span class="num">1</span>어떻게 교류하나요?</span><span class="step-text"><span class="ex-kind">${esc(a.kind)}</span>${esc(a.how)}</span></li>
+      <li><span class="step-name"><span class="num">2</span>생활 모습이 어떻게 달라지나요?</span><span class="step-text"><span class="ex-way">${esc(a.way)}</span>${esc(a.change)}</span></li>
+      <li><span class="step-name"><span class="num">3</span>함께 만드는 것</span><span class="step-text">${esc(a.together)}</span></li>
+    </ol>
+    <div class="pop-foot"><span class="by">${ICON.bulb}예시 제안서예요. 받은 것 + 우리 것 = 새로운 생활! 이젤패드 견본과 같은 순서예요.</span></div>
+  </div>`;
+  if (refresh) {
+    const el = $('#modal');
+    if (el.innerHTML !== html) el.innerHTML = html;
+    modal = { type: 'arrow', key: a.key };
+  } else openModal({ type: 'arrow', key: a.key }, html, true);
+}
+
 function showArrow(key, refresh) {
+  const ex = exampleArrows().find((x) => x.key === key);
+  if (ex) { showExampleArrow(ex, refresh); return; }
   const a = arrowsAll().find((x) => x.key === key);
   if (!a) return;
   const f = a.fromRes, t = a.toRes;
@@ -773,7 +812,7 @@ document.addEventListener('click', (e) => {
   if (ak) { S.selArrow = ak.dataset.arrowkey; showArrow(ak.dataset.arrowkey); requestRender(); return; }
   const pg = t.closest('[data-plang]');
   if (pg) {
-    S.planGroup = +pg.dataset.plang; S.arrowMode = null; S.selArrow = null;
+    S.planGroup = pg.dataset.plang === EX ? EX : +pg.dataset.plang; S.arrowMode = null; S.selArrow = null;
     if (modal && (modal.type === 'res' || modal.type === 'arrow')) closeModal();
     requestRender();
     return;

@@ -47,6 +47,20 @@ export const EXAMPLE_HINT = {
   },
 };
 
+// 교류 제안서 화면의 [예시: 문경]: 이젤패드 견본(docs/easel-sample.html)과 같은 세 화살표.
+// 문경 쪽은 예시 카드(EXAMPLE_RES)에서 출발하고, 다른 지역 쪽은 이름만 둡니다(아이들이 조사한 지도에 카드를 더하지 않음).
+export const EXAMPLE_ARROWS = [
+  { key: 'ex-arrow-yd', from: 'ex-omija', to: { cid: 37350, name: '대게' }, kind: '물건 교류',
+    how: '문경은 오미자를 보내고, 영덕은 대게를 보내요', way: '먹는 것',
+    change: '대게 식당에 빨간 오미자 소스가 생겨서, "문경 맛 대게"에 손님들이 줄을 서요', together: '오미자 대게 요리 대회' },
+  { key: 'ex-arrow-sj', from: 'ex-bowl', to: { cid: 37080, name: '곶감' }, kind: '물건 교류',
+    how: '문경은 찻사발을 보내고, 상주는 곶감을 보내요', way: '사고파는 것',
+    change: '곶감을 찻사발에 담은 선물 꾸러미가 설날마다 전국으로 날아가요', together: '찻사발 곶감 선물 상자' },
+  { key: 'ex-arrow-ph', from: 'ex-bowl', to: { cid: 37010, name: '쇠' }, kind: '기술 교류',
+    how: '문경 도예가는 흙 빚는 솜씨를, 포항 장인은 쇠 다루는 솜씨를 나눠요', way: '만드는 물건',
+    change: '포항 쇠 장인과 문경 도예가가 함께 "쇠 손잡이 찻사발"을 만들어요', together: '흙과 쇠 공방' },
+];
+
 // 화살표(교류 제안) 입력 창의 [선생님의 팁]에 나오는 예시
 export const ARROW_TIP = {
   pair: '문경 오미자 → 영덕 대게',
