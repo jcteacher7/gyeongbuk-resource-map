@@ -367,7 +367,7 @@
   .formula small b { color: inherit; }
 
 /* ---------- 우리 지역의 답: 원인 → 결과 사슬 네 줄(2026-10-16) ----------
-   ① 왜 부족할까요?(곳·때에 따라 많은 것과 부족한 것) → 그래서 ② 서로 채워요 → 그러면 ③ 함께 만들어요 → 그 결과 ④ 살아가는 방식이 달라져요 */
+   ① 왜 부족할까요?(공간·시간에 따라 많은 것과 부족한 것) → 그래서 ② 서로 채워요 → 그러면 ③ 함께 만들어요 → 그 결과 ④ 살아가는 방식이 달라져요 */
 .pad .claim ol.chain { gap: 3px; }
 .pad .claim ol.chain li { grid-template-columns: 168px 1fr; align-items: start; }
 .pad .claim ol.chain li b { position: relative; }
