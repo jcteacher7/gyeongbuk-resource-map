@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
-<link rel="stylesheet" href="css/app.css?v=53">
-<link rel="stylesheet" href="css/screens.css?v=53">
-<link rel="stylesheet" href="css/board.css?v=53">
+<link rel="stylesheet" href="css/app.css?v=54">
+<link rel="stylesheet" href="css/screens.css?v=54">
+<link rel="stylesheet" href="css/board.css?v=54">
 </head>
 <body>
 <div id="stage" class="stage">
@@ -40,9 +40,13 @@
   <section id="teacher" class="screen" hidden></section>
 
   <div id="modal" class="modal" hidden></div>
+  <div id="viewbadge" class="viewbadge">👀 보기 모드 · 둘러보기만 할 수 있어요</div>
+  <div id="viewexit" class="viewexit" hidden><div class="sheet confirm"><p>보기 모드 끄기<br><small>선생님 암호 4자리</small></p>
+    <div class="code-row"><input type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="암호"></div>
+    <div class="confirm-acts"><button type="button" class="btn" data-vcancel>취소</button><button type="button" class="btn primary" data-voff>끄기</button></div></div></div>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </div>
 <noscript>이 앱은 자바스크립트가 켜져 있어야 써요.</noscript>
-<script type="module" src="js/app.js?v=53"></script>
+<script type="module" src="js/app.js?v=54"></script>
 </body>
 </html>

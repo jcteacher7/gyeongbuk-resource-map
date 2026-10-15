@@ -4,7 +4,7 @@
 //   그래서 인터넷이 끊겨도, 새로고침해도 글이 사라지지 않고 연결이 돌아오면 다시 보냅니다.
 // - 읽기는 몇 초마다 "마지막으로 본 뒤 바뀐 줄"만 가져오고, 가끔 전체를 다시 읽습니다.
 // - 지우기는 줄을 없애지 않고 deleted 표시를 붙입니다(다른 기기에도 지운 것이 전해지도록).
-import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=53';
+import { SUPABASE_URL, SUPABASE_KEY, TABLE, PHOTO_BUCKET, POLL_MS } from './config.js?v=54';
 
 const CACHE_KEY = 'gb-cache-v1';
 const OUTBOX_KEY = 'gb-outbox-v1';
@@ -23,6 +23,8 @@ let timer = null;
 const listeners = new Set();
 
 const rk = (kind, key) => kind + '/' + key;
+// 전시용 보기 모드(이 기기에서만): 켜져 있으면 아무것도 서버에 쓰지 않습니다.
+const viewOn = () => { try { return localStorage.getItem('gb-view') === '1'; } catch (e) { return false; } };
 
 function emit() {
   listeners.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
@@ -209,6 +211,7 @@ export const store = {
   },
   // photo: 새 사진이 있을 때 { full, thumb } (dataURL). 서버로 보낼 때 올리고 주소로 바꿉니다.
   put(kind, key, value, photo = null) {
+    if (viewOn()) return true;
     const prev = outbox.findIndex((o) => o.kind === kind && o.key === key);
     const v = { ...value };
     if (v.photo && v.photo.local) {
@@ -254,6 +257,7 @@ export const store = {
   // 선생님 화면: 한 종류의 기록을 서버에서 완전히 지웁니다.
   // key 를 주면 그 한 줄만 지웁니다.
   async wipe(kinds, key) {
+    if (viewOn()) throw new Error('보기 모드에서는 지울 수 없어요');
     const hit = (o) => kinds.includes(o.kind) && (key == null || o.key === key);
     outbox = outbox.filter((o) => !hit(o));
     saveOutbox();
@@ -285,6 +289,7 @@ export const store = {
   },
   // 챗봇 중계 함수 부르기
   async callFunction(name, body, ms = 40000) {
+    if (viewOn()) throw Object.assign(new Error('call'), { status: 0, code: 'closed' });
     const res = await api(`/functions/v1/${name}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     }, ms);

@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=53';
-import { store } from './store.js?v=53';
-import { createMapView, shortName } from './map-view.js?v=53';
-import { shrinkPhoto } from './photo.js?v=53';
-import { esc, safeLink, josa, timeText } from './util.js?v=53';
-import { MAX_LEN } from './config.js?v=53';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=53';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=53';
-import { createTagView } from './tag-view.js?v=53';
-import { createChatView } from './chat-view.js?v=53';
-import { createTeacher, hashCode } from './teacher.js?v=53';
+import mapData from '../data/gyeongbuk-map.js?v=54';
+import { store } from './store.js?v=54';
+import { createMapView, shortName } from './map-view.js?v=54';
+import { shrinkPhoto } from './photo.js?v=54';
+import { esc, safeLink, josa, timeText } from './util.js?v=54';
+import { MAX_LEN } from './config.js?v=54';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=54';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=54';
+import { createTagView } from './tag-view.js?v=54';
+import { createChatView } from './chat-view.js?v=54';
+import { createTeacher, hashCode } from './teacher.js?v=54';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -57,6 +57,12 @@ const S = {
 let modal = null;
 
 const TEACHER = { g: 0, n: '선생님', teacher: true };
+// 전시용 보기 모드(이 기기에서만): 손님이 지도와 교류 제안서를 둘러보기만 합니다. 이름은 가운데 글자를 가립니다.
+let VIEW = false;
+try { VIEW = localStorage.getItem('gb-view') === '1'; } catch (e) { /* 무시 */ }
+const GUEST = { g: -1, n: '손님', guest: true };
+const maskName = (n) => { n = String(n || ''); return n.length < 2 ? n : n.length === 2 ? n[0] + '○' : n[0] + '○'.repeat(n.length - 2) + n[n.length - 1]; };
+const VIEW_ACTS = ['close', 'focus', 'unselect', 'letter', 'form-letter', 'tip', 'way-more', 'way', 'secret'];
 
 // 시군 배정: 선생님이 정한 것 + 모둠이 쪽지의 친구 이름으로 편지를 연 시군(letter/c<시군>).
 function roster() {
@@ -98,7 +104,7 @@ function exampleArrows() {
 }
 const planArrows = () => (planView() === EX ? exampleArrows() : arrowsAll().filter((a) => a.by && a.by.g === planView()));
 const sameMe = (by) => !!by && !!S.me && by.g === S.me.g && by.n === S.me.n;
-const byText = (by) => (by ? (by.g === 0 ? '선생님' : `${groupName(by.g)} · ${by.n}`) : '');
+const byText = (by) => (by ? (by.g === 0 ? '선생님' : `${groupName(by.g)} · ${VIEW ? maskName(by.n) : by.n}`) : '');
 const ENV = { nat: '자연환경', hum: '인문환경' };
 const AMT = { many: '많아요', few: '적어요' };
 
@@ -131,11 +137,12 @@ let lastPanel = '';
 let lastMapSig = '';
 
 function renderAll() {
+  document.body.classList.toggle('viewmode', VIEW);
   if (S.teacherScreen) { teacher.render(); refreshModal(); return; }
   if (!S.me) { renderEnter(); return; }
   renderTop();
   renderTabs();
-  if (onMapView() && (S.tab === 'map' || stages().plan || isTeacher())) {
+  if (onMapView() && (S.tab === 'map' || stages().plan || isTeacher() || VIEW)) {
     renderMap();
     renderPanel();
   }
@@ -146,6 +153,17 @@ function renderEnter() {
   $('#enter').hidden = false;
   $('#main').hidden = true;
   $('#teacher').hidden = true;
+  document.body.classList.toggle('viewmode', VIEW);
+  if (VIEW) {
+    $('#enter').innerHTML = `
+    <div class="enter">
+      <div class="enter-title">${ICON.pin}<span>경상북도 자원 지도</span></div>
+      <p class="enter-sub">4학년 아이들이 경북 시군의 자원을 조사해 만든 지도예요.</p>
+      <div class="enter-go"><button type="button" class="btn primary big" data-act="view-enter">지도 둘러보기</button></div>
+      <p class="hint">보기 모드예요. 둘러보기만 할 수 있고 고칠 수는 없어요.</p>
+    </div>`;
+    return;
+  }
   const r = roster();
   const g = r.groups.find((x) => x.id === S.enterGroup);
   const names = g ? g.members : [];
@@ -183,10 +201,10 @@ function renderTop() {
   $('#enter').hidden = true;
   $('#teacher').hidden = true;
   $('#main').hidden = false;
-  $('#who').innerHTML = isTeacher() ? `${ICON.key}${S.answerMode ? '정답 예시 닫기' : '선생님 화면으로'}` : esc(`${groupName(S.me.g)} · ${S.me.n}`);
+  $('#who').innerHTML = isTeacher() ? `${ICON.key}${S.answerMode ? '정답 예시 닫기' : '선생님 화면으로'}` : VIEW ? '처음으로' : esc(`${groupName(S.me.g)} · ${S.me.n}`);
   const t = texts(), st = stages();
   const tab = (id, label, open) => `<button type="button" class="tab ${S.tab === id ? 'on' : ''} ${open ? '' : 'locked'}" data-tab="${id}">${open ? '' : ICON.lock}${esc(label)}</button>`;
-  const html = isTeacher()
+  const html = (isTeacher() || VIEW)
     ? tab('map', t.tabMap, true) + tab('plan', t.tabPlan, true)
     : tab('map', t.tabMap, true) + tab('plan', t.tabPlan, !!st.plan) + tab('tag', t.tabTag, !!st.tag) + tab('chat', t.tabChat, !!st.chat);
   if ($('#tabs').innerHTML !== html) $('#tabs').innerHTML = html;
@@ -206,7 +224,7 @@ function fitTop() {
 }
 
 function renderTabs() {
-  const planOpen = !!stages().plan || isTeacher();
+  const planOpen = !!stages().plan || isTeacher() || VIEW;
   $('#view-map').hidden = !(S.tab === 'map' || (S.tab === 'plan' && planOpen));
   const pv = $('#view-plan');
   pv.hidden = !(S.tab === 'plan' && !planOpen);
@@ -825,6 +843,20 @@ document.addEventListener('click', (e) => {
     if ((id === 'map' || id === 'plan') && mapView) setTimeout(() => mapView.resize(), 0);
     return;
   }
+  if (VIEW) {
+    if (t.closest('#arrowBtn')) return;
+    if (act && act.dataset.act === 'view-enter') {
+      S.me = { ...GUEST }; S.tab = 'map'; S.selected = null; S.arrowMode = null; S.selArrow = null;
+      lastPanel = ''; lastMapSig = '';
+      renderAll(); mapView.resize(); mapView.home(true);
+      return;
+    }
+    if (act && act.dataset.act === 'who') { S.me = null; S.selected = null; S.selArrow = null; renderEnter(); return; }
+    if (act && !t.closest('[data-tab],[data-res],[data-arrowkey],[data-plang],[data-county]') && !VIEW_ACTS.includes(act.dataset.act)) {
+      toast('보기 모드예요. 둘러보기만 할 수 있어요.');
+      return;
+    }
+  }
   if (t.closest('#arrowBtn')) {
     if (S.arrowMode) { S.arrowMode = null; toast('화살표 잇기를 그만두었어요.'); }
     else if (planOf(S.me.g) == null) { toast('먼저 우리 모둠의 제안 지역을 정해요. 지도에서 시군을 누르고 [제안 지역으로 정하기]를 눌러요.', 3600); return; }
@@ -961,6 +993,7 @@ function secretTap() {
   if (secretTaps.length < 5) return;
   secretTaps = [];
   if (!store.ready()) { toast('서버와 연결된 뒤에 다시 눌러 주세요.'); return; }
+  if (VIEW) return;
   const has = !!store.get('cfg', 'teacher');
   openModal({ type: 'tlogin', setup: !has }, `<div class="sheet confirm" role="dialog">
     <p>${has ? '선생님 암호' : '선생님 암호 정하기'}<br><small>${has ? '숫자 4자리' : '처음이에요. 숫자 4자리를 두 번 써 주세요.'}</small></p>
@@ -1115,6 +1148,14 @@ function start() {
     confirmTyped,
     openMap: teacherMap,
     exit: teacherExit,
+    viewOn: () => {
+      try { localStorage.setItem('gb-view', '1'); } catch (e) { /* 무시 */ }
+      VIEW = true;
+      try { sessionStorage.removeItem('gb-teacher'); } catch (e) { /* 무시 */ }
+      S.teacherScreen = false; S.me = null; S.answerMode = false;
+      renderEnter();
+      toast('보기 모드를 켰어요. 이 태블릿에서는 둘러보기만 할 수 있어요.', 3200);
+    },
   };
   tagView = createTagView($('#view-tag'), ctx);
   chatView = createChatView($('#view-chat'), ctx);
@@ -1123,7 +1164,32 @@ function start() {
   store.start();
   let wasTeacher = false;
   try { wasTeacher = sessionStorage.getItem('gb-teacher') === '1'; } catch (e) { /* 무시 */ }
-  if (wasTeacher) openTeacher(true); else renderEnter();
+  if (wasTeacher && !VIEW) openTeacher(true); else renderEnter();
+  // 보기 모드 끄기: 왼쪽 아래 '보기 모드' 딱지를 2초 꾹 누르고 선생님 암호
+  const vb = document.getElementById('viewbadge');
+  let lt = null;
+  vb.addEventListener('pointerdown', () => { if (!VIEW) return; clearTimeout(lt); lt = setTimeout(viewOffAsk, 2000); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((n) => vb.addEventListener(n, () => clearTimeout(lt)));
+  vb.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+function viewOffAsk() {
+  const box = document.getElementById('viewexit');
+  box.hidden = false;
+  const inp = box.querySelector('input');
+  inp.value = '';
+  setTimeout(() => inp.focus(), 50);
+  const off = async () => {
+    const saved = store.get('cfg', 'teacher');
+    const a = inp.value.trim();
+    if (!saved || (await hashCode(saved.salt, a)) !== saved.hash) { toast('암호가 맞지 않아요.'); inp.value = ''; return; }
+    try { localStorage.removeItem('gb-view'); } catch (e) { /* 무시 */ }
+    VIEW = false; box.hidden = true; S.me = null;
+    renderEnter();
+    toast('보기 모드를 껐어요.');
+  };
+  box.querySelector('[data-voff]').onclick = off;
+  box.querySelector('[data-vcancel]').onclick = () => { box.hidden = true; };
+  inp.onkeydown = (e) => { if (e.key === 'Enter') off(); };
 }
 
 const sv = (d, w = 24, extra = '') => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" ${extra} aria-hidden="true">${d}</svg>`;

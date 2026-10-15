@@ -327,3 +327,10 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .field.long textarea:focus { border-color: var(--teal); background: #fff; }
 .field.long .count { position: static; display: block; translate: none; margin-top: 1px; text-align: right; line-height: 1.2; }
 .af-main > .field.long { display: block; }
+
+/* 전시용 보기 모드(이 기기에서만) */
+.viewbadge{display:none}
+body.viewmode .viewbadge{display:block;position:fixed;left:12px;bottom:12px;z-index:60;background:#2B2A27;color:#fff;font-size:15px;font-weight:700;padding:10px 16px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.25);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.viewexit[hidden]{display:none}
+.viewexit{position:fixed;inset:0;z-index:70;background:rgba(20,30,30,.45);display:flex;align-items:center;justify-content:center}
+body.viewmode #arrowBtn, body.viewmode [data-act="add"], body.viewmode [data-act="plan-set"], body.viewmode [data-act="edit-res"], body.viewmode [data-act="edit-arrow"], body.viewmode [data-act="del-res"], body.viewmode [data-act="del-arrow"], body.viewmode [data-act="letter-lock"], body.viewmode [data-act="retry"]{display:none!important}
