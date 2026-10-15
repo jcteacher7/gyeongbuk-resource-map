@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모둠별 교류 제안서 예시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<link rel="stylesheet" href="easel.css">
+<style>
+  /* 모둠별 예시: 견본(easel-sample.html)과 같은 종이·배치. 한 지역과 두 가지를 주고받으면 그 칸에 두 줄로 씁니다. */
+  .groups { display: flex; flex-wrap: wrap; gap: 34px; align-items: flex-start; }
+  .gx .node:not(.hub) { grid-template-rows: auto auto auto 1fr auto; }
+  .gx .node:not(.hub) .swaps { grid-column: 1 / 3; display: grid; gap: 3px; justify-items: start; }
+  .gx .node:not(.hub) .swap { font-size: 14px; }
+  .gx .node:not(.hub) .swap i { font-size: 11.5px; }
+  .gx .node:not(.hub) .pic { grid-column: 1; grid-row: 3; font-size: 13px; line-height: 1.25; padding: 4px; color: var(--mute); }
+  .gx .node:not(.hub) .pic b { display: block; font-size: 14px; color: var(--teal); }
+  /* ② 달라지는 것: 그림 옆에 여러 개 */
+  .gx .ways { grid-column: 2; grid-row: 3; align-self: stretch; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 3px; padding: 3px 4px; border: 2px dashed #7FB5BE; border-radius: 9px; background: #F3FBF9; }
+  .gx .ways::before { content: "2"; display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; border-radius: 50%; background: var(--ink); color: #fff; font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 12.5px; }
+  .gx .ways span { font-size: 13.5px; line-height: 1.15; }
+  /* 생활 모습: 두 가지면 두 줄 */
+  .gx .lines { grid-column: 1 / 3; grid-row: 4; margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; align-content: start; }
+  .gx .lines li { position: relative; padding-left: 12px; font-size: 14.5px; line-height: 1.25; text-wrap: pretty; }
+  .gx .lines li::before { content: "▸"; position: absolute; left: 0; color: var(--coral-d); }
+  .gx .node:not(.hub) .plus { grid-row: 5; font-size: 13.5px; }
+  .gx .hub .pic { font-size: 14px; color: #A9781A; padding: 6px; text-align: center; }
+  .gx .chg li { font-size: 16px; }
+  .gx .claim li { font-size: 15.5px; }
+  .gx .papersize { text-align: left; }
+  /* 촘촘하게: 주고받는 줄은 첫 줄에만 번호, ② 상자는 그림 높이 안에 */
+  .gx .node:not(.hub) h3 { font-size: 18.5px; }
+  .gx .node:not(.hub) .swap { padding: 0 6px; font-size: 13.5px; line-height: 1.3; }
+  .gx .node:not(.hub) .swap + .swap::before { visibility: hidden; }
+  .gx .ways { flex-direction: row; flex-wrap: wrap; align-content: center; justify-content: flex-start; gap: 2px 5px; padding: 3px 4px; max-height: 100%; overflow: hidden; }
+  .gx .ways::before { width: 16px; height: 16px; font-size: 11px; flex-basis: 100%; max-width: 16px; margin-bottom: 1px; }
+  .gx .ways span { font-size: 12.5px; line-height: 1.15; }
+  .gx .lines li { font-size: 14px; }
+  /* 두 가지를 주고받는 모둠도 종이 안에 들어가게 간격을 조금씩 좁힘 */
+  .gx .pad .tl { gap: 9px; }
+  .gx .pad .web { grid-template-rows: auto 9px auto; }
+  .gx .pad .node:not(.hub) { row-gap: 3px; padding: 5px 6px; }
+  .gx .node:not(.hub) h3 { line-height: 1.05; }
+  .gx .node:not(.hub) .swap { line-height: 1.2; }
+  .gx .node:not(.hub) .swaps { gap: 2px; }
+  .gx .lines li { line-height: 1.2; }
+  .gx .pad .claim { margin-top: 5px; }
+  /* 달라진 우리 지역: 제목을 그림 옆 글 위로 올려 한 줄 아낌 */
+  .gx .pad .hub { grid-template-rows: auto 1fr; row-gap: 3px; }
+  .gx .pad .hub h3 { grid-column: 2; grid-row: 1; }
+  .gx .pad .hub .pic { grid-column: 1; grid-row: 1 / 3; }
+  .gx .pad .hub .chg { grid-column: 2; grid-row: 2; }
+  .gx .pad .title b { font-size: 27px; }
+  .gx .pad .keyq { font-size: 16px; padding: 3px 10px; }
+  .gx .pad .trow .tk, .gx .pad .tc { min-height: 28px; font-size: 17px; }
+  /* ② 상자: 한 줄에 하나씩, 낱말 중간에서 꺾이지 않게 */
+  .gx .ways { flex-direction: column; flex-wrap: nowrap; align-items: flex-start; justify-content: center; gap: 1px; padding: 3px 2px 3px 4px; }
+  .gx .ways::before { flex: none; flex-basis: auto; height: 16px; margin-bottom: 2px; }
+  .gx .ways span { font-size: 12px; line-height: 1.15; word-break: keep-all; letter-spacing: -0.2px; }
+  .gx .ways span::before { content: none; }
+  .gx .ways span { white-space: nowrap; } /* 짧은 것은 한 줄로, 긴 것(이웃 지역과의 사이 등)만 줄바꿈 */
+  .gx .ways span.long { white-space: normal; }
+  /* 달라진 우리 지역: 이름표 칸을 넉넉히(가장 긴 '이웃 지역과의 사이'에 맞춤) */
+  .gx .chg li { grid-template-columns: 130px 1fr; }
+  .gnote { max-width: 980px; margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--mute); }
+  /* 인쇄: 모둠마다 A3 세로 한 장 */
+  html.pr .gx-sheet { box-sizing: border-box; width: 297mm; height: 419mm; padding: 9mm; overflow: hidden; break-after: page; break-inside: avoid; page: port; display: flex; align-items: center; justify-content: center; }
+  html.pr .gx-sheet:last-child { break-after: auto; }
+  html.pr .gx-sheet .fit { width: 720px; }
+  html.pr .groups { display: block; }
+  html.pr .gnote, html.pr h1 { display: none; }
+  @media screen { html.pr.preview, html.pr.preview body { background: #888; } html.pr.preview .gx-sheet { background: #fff; margin: 12px auto; } }
+</style>
+</head>
+<body>
+<div class="printbar"><button type="button" id="printBtn">A3 네 장으로 인쇄하기</button><span>모둠마다 한 장씩, 세로로 나와요. 인쇄 창에서 <b>배율 100%</b>, <b>배경 그래픽 켜기</b>, 머리글·바닥글 끄기를 골라 주세요.</span></div>
+<h1>모둠별 교류 제안서 예시</h1>
+<p class="gnote">아이들이 앱의 <b>교류 제안서</b>에 올린 화살표(교류 종류, 주고받는 것, 달라지는 것, 생활 모습)를 견본과 같은 모양으로 정리했어요. 아이들이 지은 이름은 그대로 살리고 맞춤법과 띄어쓰기만 다듬었어요. 한 지역과 두 가지를 주고받은 곳은 그 칸에 두 줄로 썼어요. 그림 칸에는 AI로 만들 그림의 예를 적었어요.</p>
+<div class="groups" id="groups"></div>
+<script>
+  const KQ = '가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?';
+  // 지역 칸: swaps [교류 종류, 우리 것 ⇄ 받는 것], ways 달라지는 것, lines 생활 모습(주고받는 것마다 한 줄), pic AI 그림 예, plus 함께 만드는 것
+  const GROUPS = [
+    { g: '1모둠', place: '포항시', short: '포항',
+      past: '오징어와 꽁치가 많이 잡혀 과메기를 많이 만들었어요.',
+      many: '오징어, 방어', few: '과메기, 한우, 토마토, 잡곡',
+      nodes: [
+        { name: '울릉', swaps: [['물건 교류', '오징어 ⇄ 호박엿'], ['물건 교류', '과메기 ⇄ 오징어']], ways: ['먹는 것', '사고파는 것', '축제와 행사'],
+          lines: ['오징어를 호박엿에 담가 구운 "오징엿"을 팔아요.', '과메기·오징어 꼬치로 "동해오과축제"를 열어요.'],
+          pic: '오징엿 굽는 축제', plus: '동해오과축제' },
+        { name: '경주', swaps: [['물건 교류', '오징어 ⇄ 한우'], ['물건 교류', '오징어 ⇄ 토마토']], ways: ['먹는 것', '사고파는 것', '만드는 물건'],
+          lines: ['한우에 오징어를 넣어 구운 요리를 팔아요.', '"오징어 먹물 토마토 스파게티"를 만들어요.'],
+          pic: '오징어 한우 구이와 스파게티', plus: '바다·들 요리 장터' },
+        { name: '안동', swaps: [['물건 교류', '방어 ⇄ 잡곡']], ways: ['먹는 것', '쓰는 물건', '사고파는 것'],
+          lines: ['방어 데리야끼 잡곡 솥밥을 무료로 나눠요.'],
+          pic: '방어 잡곡 솥밥 나눔', plus: '잡곡 솥밥 나눔 캠페인' },
+      ],
+      chg: [['먹는 것', '오징엿, 오징어 스파게티 같은 새 음식이 생겨요.'], ['축제와 행사', '동해오과축제에서 꼬치를 팔고 맛봐요.'], ['이웃 지역과의 사이', '솥밥을 나누며 안동과 가까워져요.']],
+      claim: ['울릉·경주·안동', '오징어·과메기·방어를 보내고, 호박엿·한우·토마토·잡곡을 받아요.', '동해오과축제, 바다·들 요리 장터, 솥밥 나눔 캠페인', '새 음식이 생기고, 축제와 나눔으로 사람들이 모여요.'] },
+    { g: '2모둠', place: '울릉군', short: '울릉',
+      past: '오징어가 정말 많이 잡혔어요.',
+      many: '마가목, 호박엿', few: '오징어, 한우, 마늘, 곶감',
+      nodes: [
+        { name: '경주', swaps: [['물건 교류', '오징어 ⇄ 한우'], ['물건 교류', '호박엿 ⇄ 한우']], ways: ['먹는 것', '축제와 행사'],
+          lines: ['한우·오징어 구이 "한오"로 축제를 열어요.', '호박엿으로 맛을 낸 "울릉호박 한우"를 먹어요.'],
+          pic: '한오 축제', plus: '한오 축제' },
+        { name: '의성', swaps: [['물건 교류', '오징어 ⇄ 마늘']], ways: ['먹는 것'],
+          lines: ['의성 마늘을 듬뿍 올린 "마늘 오징어구이"를 만들어 먹어요.'],
+          pic: '마늘 오징어구이', plus: '마늘 오징어구이' },
+        { name: '상주', swaps: [['물건 교류', '마가목 ⇄ 곶감'], ['물건 교류', '호박엿 ⇄ 곶감']], ways: ['먹는 것'],
+          lines: ['새콤달콤한 음료 "마감목"을 즐겨 마셔요.', '"울상 호박곶감엿"을 만들어요.'],
+          pic: '마감목 음료와 호박곶감엿', plus: '마감목·호박곶감엿' },
+      ],
+      chg: [['먹는 것', '한오, 마늘 오징어구이, 마감목이 생겨요.'], ['축제와 행사', '한오 축제에서 배지·스티커를 나눠요.'], ['사고파는 것', '호박곶감엿과 마감목을 새 특산품으로 팔아요.']],
+      claim: ['경주·의성·상주', '오징어·호박엿·마가목을 보내고, 한우·마늘·곶감을 받아요.', '한오 축제, 마늘 오징어구이, 마감목·호박곶감엿', '섬의 밥상과 간식이 다양해지고, 축제로 사람들이 모여요.'] },
+    { g: '3모둠', place: '영주시', short: '영주',
+      past: '단단한 화강암을 많이 캤어요. 지금은 캐지 않아요.',
+      many: '인견, 인삼', few: '화강암, 삼베, 목화, 작약',
+      nodes: [
+        { name: '안동', swaps: [['물건 교류', '인견 ⇄ 삼베']], ways: ['입는 것', '만드는 물건', '이웃 지역과의 사이'],
+          lines: ['삼베와 인견으로 바람 잘 통하는 옷과 장신구를 만들어요.'],
+          pic: '삼베·인견 옷 가게', plus: '삼베·인견 옷' },
+        { name: '상주', swaps: [['물건 교류', '화강암 ⇄ 목화']], ways: ['만드는 물건', '축제와 행사', '자연을 쓰는 방법'],
+          lines: ['화강암 그릇과 목화 꽃차를 파는 "자연 축제"를 열어요.'],
+          pic: '자연 축제', plus: '자연(천연) 축제' },
+        { name: '의성', swaps: [['물건 교류', '인삼 ⇄ 작약']], ways: ['먹는 것', '축제와 행사', '배우는 것'],
+          lines: ['작약과 인삼으로 건강한 차와 음식을 만들어 축제를 열어요.'],
+          pic: '작약·인삼 차 축제', plus: '건강 약초 축제' },
+      ],
+      chg: [['입는 것', '바람이 잘 통하는 삼베·인견 옷을 즐겨 입어요.'], ['먹는 것', '작약·인삼 차와 건강한 음식이 생겨요.'], ['축제와 행사', '자연 축제와 약초 축제가 열려 사람들이 찾아와요.']],
+      claim: ['안동·상주·의성', '인견·화강암·인삼을 보내고, 삼베·목화·작약을 받아요.', '삼베·인견 옷, 자연 축제, 건강 약초 축제', '옷과 먹을거리가 건강해지고, 축제로 이웃과 가까워져요.'] },
+    { g: '4모둠', place: '안동시', short: '안동',
+      past: '옛날부터 삼베로 옷을 지어 입었어요.',
+      many: '삼베, 잡곡, 마', few: '방어, 포도, 한우',
+      nodes: [
+        { name: '포항', swaps: [['물건 교류', '잡곡 ⇄ 방어']], ways: ['먹는 것', '축제와 행사'],
+          lines: ['잡곡밥에 방어를 올린 "잡곡 방어덮밥"이 유명해져 덮밥 축제를 열어요.'],
+          pic: '잡곡 방어덮밥 축제', plus: '잡곡 방어덮밥 축제' },
+        { name: '칠곡', swaps: [['물건 교류', '마 ⇄ 포도']], ways: ['먹는 것'],
+          lines: ['마와 포도로 샐러드·라떼·젤리·샌드위치 같은 새 간식을 만들어요.'],
+          pic: '마·포도 간식', plus: '마·포도 간식 가게' },
+        { name: '경주', swaps: [['물건 교류', '삼베 ⇄ 한우']], ways: ['먹는 것', '입는 것'],
+          lines: ['한우를 사면 삼베 천으로 싸 주고, 삼베를 사면 한우를 덤으로 주며 서로 공평하게 나눠요.'],
+          pic: '삼베로 싼 한우 선물', plus: '삼베 한우 꾸러미' },
+      ],
+      chg: [['먹는 것', '잡곡 방어덮밥, 마·포도 간식이 밥상에 올라와요.'], ['쓰는 물건', '삼베 천이 선물을 싸는 보자기로 널리 쓰여요.'], ['축제와 행사', '잡곡 방어덮밥 축제가 열려요.']],
+      claim: ['포항·칠곡·경주', '잡곡·마·삼베를 보내고, 방어·포도·한우를 받아요.', '덮밥 축제, 마·포도 간식, 삼베 한우 꾸러미', '새 음식이 생기고, 삼베가 생활 곳곳에 쓰여요.'] },
+  ];
+  // 받침이 있으면 앞의 말, 없으면 뒤의 말(은/는, 과/와)
+  const jo = (w, a, b) => { const c = w.charCodeAt(w.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 ? a : b; };
+  const e = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const node = (n, cls, first) => `<div class="node ${cls}">
+      <h3><span class="cn">3</span>달라진 ${e(n.name)}</h3>
+      <div class="swaps">${n.swaps.map(([k, s]) => `<span class="swap"><i>${e(k)}</i>${e(s)}</span>`).join('')}</div>
+      <div class="pic"><b>교류 후 그림</b>${e(n.pic)}</div>
+      <div class="ways">${n.ways.map((w) => `<span${w.length > 6 ? ' class="long"' : ''}>${e(w)}</span>`).join('')}</div>
+      <ul class="lines">${n.lines.map((l) => `<li>${e(l)}</li>`).join('')}</ul>
+      <span class="plus">${e(n.plus)}</span>
+    </div>`;
+  const pad = (d) => `<div class="pad">
+      <div class="title"><b><span class="cn">1</span>${e(d.place)} 교류 제안서</b><span class="who2"><b>${e(d.g)}</b>이름, 이름, 이름, 이름</span></div>
+      <div class="keyq"><span>탐구 질문</span><p>${KQ}</p></div>
+      <div class="tl">
+        <div class="trow"><span class="cn">2</span><span class="tk past">과거</span><div class="tc">${e(d.past)}</div></div>
+        <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: ${e(d.many)}</span><span class="few">부족한 것: ${e(d.few)}</span></div></div>
+        <div class="fut"><span class="tk future">미래 <small>교류하면 이렇게 달라져요</small></span>
+          <div class="web">
+            ${node(d.nodes[0], 'a')}${node(d.nodes[1], 'c')}${node(d.nodes[2], 'b')}
+            <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
+            <div class="node hub">
+              <h3><span class="cn">4</span>달라진 ${e(d.short)}</h3>
+              <div class="pic">교류 후 ${e(d.short)} 그림<small>AI와 함께 상상해서 그린 그림</small></div>
+              <ul class="chg">${d.chg.map(([k, s]) => `<li><b>${e(k)}</b><span>${e(s)}</span></li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="claim"><span class="ans">탐구 질문에 대한 우리 지역의 답</span><span class="cn">5</span>${e(d.short)}${jo(d.short, '은', '는')} <u>${e(d.claim[0])}</u>${jo(d.claim[0], '과', '와')} 교류해야 합니다. 왜냐하면
+        <ol>
+          <li><b>서로 채워요</b><span>${e(d.claim[1])}</span></li>
+          <li><b>함께 만들어요</b><span>${e(d.claim[2])}</span></li>
+          <li><b>살아가는 방식이 달라져요</b><span>${e(d.claim[3])}</span></li>
+        </ol></div>
+    </div>`;
+  document.getElementById('groups').innerHTML = GROUPS.map((d) => `<div class="gx-sheet gx"><div class="fit"><figure>
+      <figcaption>${e(d.g)} · ${e(d.place)}</figcaption>${pad(d)}
+      <div class="papersize">실제 종이: 가로 63.5cm × 세로 76.2cm · 세 지역 그림 A7 가로(10.5 × 7.4cm) · 우리 지역 그림 A6 가로(14.8 × 10.5cm)</div>
+    </figure></div></div>`).join('');
+</script>
+<script>
+  // 인쇄 직전에 틀을 켜고, 장마다 내용이 종이에 꼭 차도록 크기를 맞춥니다(easel-sample.html 과 같은 방식).
+  (function () {
+    const root = document.documentElement;
+    function fit() {
+      document.querySelectorAll('.gx-sheet').forEach((sh) => {
+        const box = sh.querySelector('.fit');
+        box.style.zoom = 1;
+        const cs = getComputedStyle(sh);
+        const W = sh.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const H = sh.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        box.style.zoom = Math.min(W / box.offsetWidth, H / box.offsetHeight);
+      });
+    }
+    function on() { root.classList.add('pr'); fit(); }
+    function off() { if (!root.classList.contains('preview')) { root.classList.remove('pr'); document.querySelectorAll('.fit').forEach((b) => { b.style.zoom = ''; }); } }
+    window.addEventListener('beforeprint', on);
+    window.addEventListener('afterprint', off);
+    document.getElementById('printBtn').addEventListener('click', () => { on(); window.print(); });
+    if (/[?&]pr=1/.test(location.search)) {
+      root.classList.add('preview');
+      window.addEventListener('load', () => { (document.fonts ? document.fonts.ready : Promise.resolve()).then(on); });
+    }
+  })();
+</script>
+</body>
+</html>
