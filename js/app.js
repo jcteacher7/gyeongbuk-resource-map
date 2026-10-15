@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=45';
-import { store } from './store.js?v=45';
-import { createMapView, shortName } from './map-view.js?v=45';
-import { shrinkPhoto } from './photo.js?v=45';
-import { esc, safeLink, josa, timeText } from './util.js?v=45';
-import { MAX_LEN } from './config.js?v=45';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=45';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=45';
-import { createTagView } from './tag-view.js?v=45';
-import { createChatView } from './chat-view.js?v=45';
-import { createTeacher, hashCode } from './teacher.js?v=45';
+import mapData from '../data/gyeongbuk-map.js?v=47';
+import { store } from './store.js?v=47';
+import { createMapView, shortName } from './map-view.js?v=47';
+import { shrinkPhoto } from './photo.js?v=47';
+import { esc, safeLink, josa, timeText } from './util.js?v=47';
+import { MAX_LEN } from './config.js?v=47';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=47';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, withDefaults } from './defaults.js?v=47';
+import { createTagView } from './tag-view.js?v=47';
+import { createChatView } from './chat-view.js?v=47';
+import { createTeacher, hashCode } from './teacher.js?v=47';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -687,11 +687,13 @@ function openArrowForm(fromKey, toKey, key) {
       <b>${ICON.bulb}선생님의 팁 <small>예시: ${esc(ARROW_TIP.pair)}</small></b>
       <p><span class="num">1</span>${esc(ARROW_TIP.how.tip)}<br><em>예: ${esc(ARROW_TIP.how.ex)}</em></p>
       <ul class="kinds">${ARROW_TIP.kinds.map(([k, ex]) => `<li><b>${esc(k)}</b>${esc(ex)}</li>`).join('')}</ul>
-      <p><span class="num">2</span>${esc(ARROW_TIP.change.tip)}<br><em>예: ${esc(ARROW_TIP.change.ex)}</em></p>
+      <p><span class="num">2</span>${esc(ARROW_TIP.change.pick)}</p>
       <div class="ways" data-page="0">${ARROW_TIP.ways.map(([name], i) => `<button type="button" data-act="way" data-i="${i}" class="${i < 8 ? 'p0' : 'p1'}">${esc(name)}</button>`).join('')}
         <button type="button" class="more" data-act="way-more">다른 것 더 보기 <small>1/2</small></button></div>
       <div class="way-q" data-wayq hidden></div>
-      <small>예시를 그대로 쓰지 말고, 우리 모둠이 조사한 자원으로 써요.</small>
+      <p class="nonum">${esc(ARROW_TIP.change.tip)}<br><em>예: ${esc(ARROW_TIP.change.ex)}</em></p>
+      <p><span class="num">3</span>${esc(ARROW_TIP.together.tip)}<br><em>예: ${esc(ARROW_TIP.together.ex)}</em></p>
+      <small>예시를 그대로 쓰지 말고, 우리 모둠이 조사한 자원으로 써요. 이젤패드의 지역 칸도 이 1·2·3 순서와 같아요.</small>
     </div>
     </div>
     <div class="sheet-foot"><span class="why-not"></span>

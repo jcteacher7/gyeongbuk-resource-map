@@ -249,6 +249,32 @@
   .talk b { font-family: 'Gaegu', sans-serif; font-size: 22px; margin-right: 6px; }
   .talk small { color: var(--mute); }
   .idea span { font-size: 14px; }
+  /* ---------- 지역 칸: 태블릿 화살표와 같은 순서 ① 어떻게 교류 ② 무엇이 달라지나 ③ 생활 모습(그림·한 문장) ④ 함께 만드는 것 ---------- */
+  .swap i { font-style: normal; margin-right: 6px; padding: 0 6px; border-radius: 8px; background: var(--coral-d); color: #fff; font-size: 15px; }
+  .way { justify-self: start; align-self: start; padding: 0 8px; border-radius: 9px; border: 2px dashed #7FB5BE; background: #F3FBF9; font-size: 17px; line-height: 1.45; white-space: nowrap; }
+  .node:not(.hub) .pic { grid-row: 3 / 6; }
+  .node:not(.hub) .way, .node:not(.hub) p, .node:not(.hub) .plus { grid-column: 2; }
+  .node:not(.hub) .swap::before, .node:not(.hub) .way::before, .node:not(.hub) .plus::after {
+    display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; margin-right: 5px; border-radius: 50%;
+    background: var(--ink); color: #fff; font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 12.5px; vertical-align: 2px; }
+  .node:not(.hub) .swap::before { content: "1"; }
+  .node:not(.hub) .way::before { content: "2"; }
+  .node:not(.hub) .plus { position: relative; }
+  .node:not(.hub) .plus::after { content: "3"; position: absolute; left: -25px; top: 3px; }
+  .blank .way { color: #9AB3B9; }
+  /* 그림 칸(예시 그림) */
+  .pic.art { position: relative; padding: 0; overflow: hidden; background: #fff; border-color: var(--teal-l); }
+  .pic.art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .node:not(.hub) .pic.art { height: auto; min-height: 0; aspect-ratio: 120 / 150; align-self: start; }
+  .hub .pic.art { height: auto; aspect-ratio: 236 / 150; }
+  .pic.art small { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 1px 0; background: rgba(255,255,255,.82); text-align: center; }
+  /* 그림 옆 안내: 같은 순서, 받은 것 + 우리 것 = 새로운 생활 */
+  .flow { display: grid; gap: 2px; margin-top: 3px; }
+  .flow > span { font-size: 15.5px; }
+  .formula { background: #fff; border: 3px solid var(--coral-d); border-radius: 14px; padding: 8px 14px; font-family: 'Gaegu', sans-serif; font-weight: 700; font-size: 25px; color: var(--ink); text-align: center; }
+  .formula b { color: var(--coral-d); }
+  .formula small { display: block; font-family: 'Gowun Dodum', sans-serif; font-weight: 400; font-size: 15px; color: var(--mute); }
+  .formula small b { color: inherit; }
 </style>
 </head>
 <body>
@@ -267,38 +293,41 @@
       <div class="keyq"><span>탐구 질문</span><p>가진 것이 서로 다른 지역이 교류하면, 사람들이 살아가는 방식은 어떻게 달라질까?</p></div>
       <div class="tl">
         <div class="trow"><span class="cn">2</span><span class="tk past">과거</span><div class="tc">석탄을 많이 캤어요.</div></div>
-        <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: 오미자, 찻사발</span><span class="few">부족한 것: 바다 먹거리, 곶감</span></div></div>
+        <div class="trow"><span class="tk now">현재</span><div class="tc"><span class="many">많은 것: 오미자, 찻사발</span><span class="few">부족한 것: 바다 먹거리, 곶감, 쇠</span></div></div>
         <div class="fut"><span class="tk future">미래 <small>교류하면 이렇게 달라져요</small></span>
       <div class="web">
         <div class="node a">
           <h3><span class="cn">3</span>달라진 영덕</h3>
-          <span class="swap">오미자 ⇄ 대게</span>
-          <div class="pic">교류 후 그림</div>
-          <p>바닷가에서도 오미자차를 마셔요.</p>
-          <span class="plus">대게·오미자 맛 축제</span>
+          <span class="swap"><i>물건 교류</i>오미자 ⇄ 대게</span>
+          <div class="pic art" data-pic="yd"></div>
+          <span class="way">먹는 것</span>
+          <p>대게 식당에 빨간 오미자 소스가 생겨서, "문경 맛 대게"를 먹으러 손님들이 줄을 서요.</p>
+          <span class="plus">오미자 대게 요리 대회</span>
         </div>
         <div class="node b">
           <h3>달라진 상주</h3>
-          <span class="swap">찻사발 ⇄ 곶감</span>
-          <div class="pic">교류 후 그림</div>
-          <p>곶감을 예쁜 그릇에 담아 더 많이 팔아요.</p>
-          <span class="plus">찻사발 곶감 선물</span>
+          <span class="swap"><i>물건 교류</i>찻사발 ⇄ 곶감</span>
+          <div class="pic art" data-pic="sj"></div>
+          <span class="way">사고파는 것</span>
+          <p>곶감을 찻사발에 담은 선물 꾸러미가 나와서, 설날마다 전국으로 택배가 날아가요.</p>
+          <span class="plus">찻사발 곶감 선물 상자</span>
         </div>
         <div class="node c">
           <h3>달라진 포항</h3>
-          <span class="swap">석탄 박물관 ⇄ 제철소</span>
-          <div class="pic">교류 후 그림</div>
-          <p>석탄과 철을 배우러 아이들이 찾아와요.</p>
-          <span class="plus">석탄·철 배움 여행길</span>
+          <span class="swap"><i>기술 교류</i>찻사발 ⇄ 쇠</span>
+          <div class="pic art" data-pic="ph"></div>
+          <span class="way">만드는 물건</span>
+          <p>포항 쇠 장인과 문경 도예가가 함께 "쇠 손잡이 찻사발"을 만들어요.</p>
+          <span class="plus">흙과 쇠 공방</span>
         </div>
         <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
         <div class="node hub">
           <h3><span class="cn">4</span>달라진 문경</h3>
-          <div class="pic">교류 후 문경 그림<small>AI와 함께 상상해서 그린 그림</small></div>
+          <div class="pic art" data-pic="mg"><small>AI와 함께 상상해서 그린 그림</small></div>
           <ul class="chg">
-            <li><b>먹는 것</b><span>산골 밥상에 대게와 곶감이 올라와요.</span></li>
-            <li><b>하는 일</b><span>오미자 농사를 짓고 찻사발을 빚는 사람이 늘어요.</span></li>
-            <li><b>마을 모습</b><span>축제와 배움 여행으로 찾아오는 사람이 많아져요.</span></li>
+            <li><b>먹는 것</b><span>산골 밥상에 오미자 대게찜이 올라와요.</span></li>
+            <li><b>하는 일</b><span>찻사발에 쇠 장식을 다는 새 일이 생겨요.</span></li>
+            <li><b>축제와 행사</b><span>봄 찻사발 축제에 대게·곶감 장터가 함께 열려요.</span></li>
           </ul>
         </div>
       </div>
@@ -306,9 +335,9 @@
       </div>
       <div class="claim"><span class="ans">탐구 질문에 대한 우리 지역의 답</span><span class="cn">5</span>문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 왜냐하면
         <ol>
-          <li><b>서로 채워요</b><span>오미자와 찻사발을 보내고, 대게와 곶감을 받아요.</span></li>
-          <li><b>함께 만들어요</b><span>맛 축제, 곶감 선물, 배움 여행길을 함께 만들어요.</span></li>
-          <li><b>살아가는 방식이 달라져요</b><span>먹을 것이 많아지고, 놀러 오는 사람이 늘어나요.</span></li>
+          <li><b>서로 채워요</b><span>오미자와 찻사발을 보내고, 대게와 곶감과 쇠를 받아요.</span></li>
+          <li><b>함께 만들어요</b><span>요리 대회, 곶감 선물 상자, 흙과 쇠 공방을 함께 만들어요.</span></li>
+          <li><b>살아가는 방식이 달라져요</b><span>산골 밥상이 바뀌고, 새 일이 생기고, 축제가 더 커져요.</span></li>
         </ol></div>
     </div>
   </figure>
@@ -317,10 +346,11 @@
     <ol class="num5">
       <li><span class="cn">1</span><span><b>제목과 탐구 질문</b><br>모둠 이름, 친구들 이름도 써요.</span></li>
       <li><span class="cn">2</span><span><b>과거 ↓ 현재 ↓ 미래</b><br>위에서 아래로 시간이 흘러요. 현재 칸에 <span style="color:#C93A27">많은 것은 빨강</span>, <span style="color:#2F63B0">부족한 것은 파랑</span>.</span></li>
-      <li><span class="cn">3</span><span><b>미래: 함께 달라지는 지역 세 곳</b><br>주고받는 것 · 그림 · 한 문장 · <span class="plus" style="font-family:'Gaegu';font-weight:700">만드는 것</span></span></li>
+      <li><span class="cn">3</span><span><b>미래: 함께 달라지는 지역 세 곳</b><br>태블릿 화살표와 같은 순서로 써요.<br><span class="flow"><span>① 어떻게 교류하나요?</span><span>② 생활 모습이 어떻게 달라지나요? <small>(달라지는 것 고르기 → 그림과 한 문장)</small></span><span>③ 함께 만드는 것</span></span></span></li>
       <li><span class="cn">4</span><span><b>미래: 달라진 우리 지역</b><br>가장 크게! 그림과 <b style="font-family:inherit;font-size:inherit">달라지는 것 세 가지</b> <small>(무엇이 달라지는지는 우리가 골라요)</small></span></li>
       <li><span class="cn">5</span><span><b>우리 지역의 답</b><br>서로 채워요 · 함께 만들어요 · 살아가는 방식이 달라져요</span></li>
     </ol>
+    <div class="formula"><b>받은 것</b> + <b>우리 것</b> = <b>새로운 생활!</b><small>"주고받았어요"에서 멈추지 말고, 둘이 만나서 <b>무엇이 새로 생길까?</b> 상상해요.</small></div>
     <div class="remember"><b>꼭 기억해요</b><br>· 예시를 베끼지 말고 <b>우리가 조사한 것</b>으로 써요.<br>· 지역과 지역을 <b>선이나 길로 이어요.</b><br>· 글씨는 <b>세 걸음 떨어져도 읽히게</b> 크게, 짧게 써요.</div>
   </div>
 </div>
@@ -335,11 +365,12 @@
       <li><b>자원 지도</b>에서 우리 지역 카드를 보고 과거와 현재를 살펴봐요. <small>(카드의 "옛날과 비교"를 봐요)</small></li></ul></li>
     <li><b>연습 종이에 적기</b>
       <ul><li><b>과거</b> 한 줄, <b>현재</b> 많은 것과 부족한 것</li>
-      <li><b>미래</b> 세 지역마다: 주고받는 것, 함께 만드는 것, 어떻게 달라지는지</li>
+      <li><b>미래</b> 세 지역마다 태블릿 화살표와 같은 순서로: <b>①</b> 어떻게 교류하나요? <small>(물건·기술·관광·문화 교류, 주고받는 것)</small> <b>②</b> 생활 모습이 어떻게 달라지나요? <small>(아래 고르기에서 하나 고르고 한 문장)</small> <b>③</b> 함께 만드는 것</li>
+      <li>②는 <b>받은 것 + 우리 것 = 새로운 생활!</b> 둘이 만나서 새로 생기는 음식, 물건, 일, 축제를 상상해요.</li>
       <li><b>미래</b> 우리 지역은 어떻게 달라질까요? 아래 <b>"달라지는 것 고르기"</b>에서 <b>세 가지</b>를 골라 써요.</li></ul></li>
     <li><b>그림 네 장 만들기</b>
       <ul><li>우리 지역 한 장, 세 지역 한 장씩. 모두 <b>교류한 뒤</b>의 모습이에요.</li></ul>
-      <div class="say">AI에게 이렇게 부탁해요.<br>( 어디 )에 사는 ( 누가 ) ( 무엇을 받아서 ) ( 어떻게 하고 있는 ) 모습</div></li>
+      <div class="say">AI에게 이렇게 부탁해요.<br>( 어디 )에 사는 ( 누가 ) ( 받은 것 )과 ( 우리 것 )으로 ( 새롭게 무엇을 하는 ) 모습, 귀여운 동화책 그림<br><small>예: 영덕에 사는 식당 아저씨가 문경 오미자와 영덕 대게로 빨간 소스 대게 요리를 만드는 모습, 귀여운 동화책 그림</small></div></li>
     <li><b>큰 종이에 옮기기</b>
       <ul><li>아래에서 <b>모양</b>을 골라 연필로 자리를 잡아요.</li>
       <li>위에서부터 <b>과거 → 현재 → 미래</b> 순서로 쓰고, 그림을 붙이고, 선으로 이어요.</li>
@@ -347,7 +378,7 @@
   </ol>
   <div class="pick">
     <h3>달라지는 것 고르기</h3>
-    <p>사람들이 살아가는 방식에는 여러 가지가 있어요. 우리 지역에서 <b>가장 많이 달라질 것 세 가지</b>를 골라요. 여기에 없는 것을 새로 생각해도 좋아요.</p>
+    <p>사람들이 살아가는 방식에는 여러 가지가 있어요. 세 지역 칸에는 <b>하나씩</b>(②번), 우리 지역에는 <b>가장 많이 달라질 것 세 가지</b>를 골라요. 태블릿 화살표의 [선생님의 팁]에 있는 딱지와 같아요. 여기에 없는 것을 새로 생각해도 좋아요.</p>
     <ul><li><b>먹는 것</b><span>밥상에 무엇이 올라오나요?</span></li><li><b>입는 것</b><span>옷이나 신발이 달라지나요?</span></li><li><b>사는 집</b><span>집이나 건물이 달라지나요?</span></li><li><b>하는 일</b><span>새로 생기는 일, 늘어나는 일은?</span></li><li><b>돈을 버는 방법</b><span>무엇을 팔고 무엇으로 벌이를 하나요?</span></li><li><b>사고파는 것</b><span>시장과 가게에 무엇이 나오나요?</span></li><li><b>만드는 물건</b><span>새로 만들게 되는 것은?</span></li><li><b>쓰는 물건</b><span>생활에 쓰는 물건이 달라지나요?</span></li><li><b>노는 것</b><span>쉬는 날에 무엇을 하나요?</span></li><li><b>축제와 행사</b><span>어떤 축제가 열리나요?</span></li><li><b>배우는 것</b><span>학교나 체험에서 무엇을 배우나요?</span></li><li><b>다니는 길</b><span>길, 버스, 기차가 달라지나요?</span></li><li><b>찾아오는 사람</b><span>누가, 왜 우리 지역에 오나요?</span></li><li><b>마을 모습</b><span>거리와 마을 풍경이 어떻게 바뀌나요?</span></li><li><b>자연을 쓰는 방법</b><span>산, 들, 바다, 강을 어떻게 쓰나요?</span></li><li><b>이웃 지역과의 사이</b><span>다른 지역 사람들과 어떻게 지내나요?</span></li></ul>
   </div>
 </section>
@@ -363,7 +394,8 @@
   <ul class="check">
     <li>①~⑤ 다섯 가지가 모두 있어요.</li>
     <li><b>과거, 현재, 미래</b>가 위에서 아래로 차례로 보여요.</li>
-    <li>세 지역마다 <b>주고받는 것, 그림, 한 문장, 함께 만드는 것</b>이 있어요.</li>
+    <li>세 지역마다 <b>① 교류 ② 달라지는 것·그림·한 문장 ③ 함께 만드는 것</b>이 있어요.</li>
+    <li>②에 주고받은 것이 만나서 <b>새로 생기는 생활 모습</b>이 들어 있어요.</li>
     <li>지역들이 선이나 길로 이어져 있어요.</li>
     <li>그림 아래에 "AI와 함께 상상해서 그린 그림"이라고 썼어요.</li>
     <li>세 걸음 떨어져도 글씨가 읽혀요.</li>
@@ -372,7 +404,7 @@
   <h2><span class="cn">5</span>발표는 이렇게 해요 (5분)</h2>
   <ol class="talk">
     <li><b>① 우리 지역</b><span>"우리 ○○은 과거에는 ~. 현재는 ~이 많고 ~이 부족합니다." <small>태블릿으로 화살표도 보여 줘요.</small></span></li>
-    <li><b>② 미래의 세 지역</b><span>"○○와는 ~을 주고받습니다. 함께 ~을 만들 수 있습니다. 그래서 ○○ 사람들은 ~."</span></li>
+    <li><b>② 미래의 세 지역</b><span>"○○와는 (○○ 교류로) ~을 주고받습니다. 그러면 ~이 달라집니다. ○○ 사람들은 ~. 함께 ~을 만들 수 있습니다."</span></li>
     <li><b>③ 미래의 우리 지역</b><span>"이렇게 교류하면 미래의 우리 ○○은 ~." <small>가운데 그림을 짚어요.</small></span></li>
     <li><b>④ 우리 지역의 답</b><span>탐구 질문을 읽고, 맨 아래 세 줄을 또박또박 읽어요.</span></li>
   </ol>
@@ -394,23 +426,26 @@
       <div class="web">
         <div class="node a">
           <h3>달라진 <span class="fill">○○</span></h3>
-          <span class="swap"><span class="fill">보낼 것 ⇄ 받을 것</span></span>
+          <span class="swap"><i>○○ 교류</i><span class="fill">보낼 것 ⇄ 받을 것</span></span>
           <div class="pic">교류 후 그림</div>
-          <p class="fill">어떻게 달라지나요?</p>
+          <span class="way fill">달라지는 것</span>
+          <p class="fill">받은 것 + 우리 것 = 새로운 생활 모습은?</p>
           <span class="plus">함께 만드는 것</span>
         </div>
         <div class="node b">
           <h3>달라진 <span class="fill">○○</span></h3>
-          <span class="swap"><span class="fill">보낼 것 ⇄ 받을 것</span></span>
+          <span class="swap"><i>○○ 교류</i><span class="fill">보낼 것 ⇄ 받을 것</span></span>
           <div class="pic">교류 후 그림</div>
-          <p class="fill">어떻게 달라지나요?</p>
+          <span class="way fill">달라지는 것</span>
+          <p class="fill">받은 것 + 우리 것 = 새로운 생활 모습은?</p>
           <span class="plus">함께 만드는 것</span>
         </div>
         <div class="node c">
           <h3>달라진 <span class="fill">○○</span></h3>
-          <span class="swap"><span class="fill">보낼 것 ⇄ 받을 것</span></span>
+          <span class="swap"><i>○○ 교류</i><span class="fill">보낼 것 ⇄ 받을 것</span></span>
           <div class="pic">교류 후 그림</div>
-          <p class="fill">어떻게 달라지나요?</p>
+          <span class="way fill">달라지는 것</span>
+          <p class="fill">받은 것 + 우리 것 = 새로운 생활 모습은?</p>
           <span class="plus">함께 만드는 것</span>
         </div>
         <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
@@ -482,6 +517,118 @@
   ];
   document.getElementById('ideas').innerHTML = IDEAS.map((d) =>
     `<div class="idea"><svg viewBox="0 0 200 240" role="img" aria-label="${d.name} 배치">${head}<g transform="translate(8 22) scale(.92 .88)">${d.svg}</g></svg><b>${d.name}</b><span>${d.say}</span></div>`).join('');
+</script>
+<script>
+  // 예시 그림(교류한 뒤의 모습): 동화책처럼 둥글고 귀여운 그림. 그림마다 "받은 것 + 우리 것 = 새로운 생활"을 보여 줍니다.
+  (function () {
+    const L = '#6B4E3D';
+    const o = `stroke="${L}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"`;
+    const g = (x, y, s, body) => `<g transform="translate(${x} ${y}) scale(${s})">${body}</g>`;
+    // 아이(또는 어른) 한 사람: 둥근 얼굴, 볼터치, 웃는 입
+    const kid = (x, y, s, { hair = '#6B4A35', shirt = '#8ED1C2', hat = '', look = 0, arm = '' } = {}) => g(x, y, s, `
+      <path d="M-13 33 Q-13 14 0 14 Q13 14 13 33 Z" fill="${shirt}" ${o}/>${arm}
+      <circle cx="0" cy="0" r="12.5" fill="#FFE2C8" ${o}/>
+      <path d="M-12.5 -1 Q-12 -15 0 -14 Q12 -15 12.5 -1 Q7 -8 0 -7 Q-7 -9 -12.5 -1 Z" fill="${hair}" ${o}/>
+      ${hat === 'chef' ? `<path d="M-10 -10 Q-15 -22 -6 -23 Q0 -31 6 -23 Q15 -22 10 -10 Z" fill="#fff" ${o}/>` : ''}
+      ${hat === 'helmet' ? `<path d="M-13 -4 Q-13 -17 0 -17 Q13 -17 13 -4 Z" fill="#FFD35C" ${o}/><path d="M-15 -4 H15" ${o}/>` : ''}
+      <circle cx="${-4.5 + look}" cy="1.5" r="1.7" fill="#3B2A20"/><circle cx="${4.5 + look}" cy="1.5" r="1.7" fill="#3B2A20"/>
+      <circle cx="-8" cy="6" r="2.6" fill="#F7A6A0" opacity=".85"/><circle cx="8" cy="6" r="2.6" fill="#F7A6A0" opacity=".85"/>
+      <path d="M${-3 + look} 6.5 Q${look} 10 ${3 + look} 6.5" fill="none" stroke="#3B2A20" stroke-width="1.6" stroke-linecap="round"/>`);
+    // 대게: 대나무처럼 긴 다리, 웃는 얼굴
+    const crab = (x, y, s, color = '#E8584A') => g(x, y, s, `
+      ${[-1, 1].map((d) => [0, 1, 2].map((i) => `<path d="M${d * 12} ${2 + i * 3} q${d * 10} ${-6 + i * 2} ${d * 20} ${2 + i * 3}" fill="none" stroke="${L}" stroke-width="4.5" stroke-linecap="round"/><path d="M${d * 12} ${2 + i * 3} q${d * 10} ${-6 + i * 2} ${d * 20} ${2 + i * 3}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round"/>`).join('')).join('')}
+      <path d="M-9 -6 L-14 -15 M9 -6 L14 -15" ${o}/>
+      <circle cx="-15" cy="-17" r="5" fill="${color}" ${o}/><circle cx="15" cy="-17" r="5" fill="${color}" ${o}/>
+      <ellipse cx="0" cy="2" rx="15" ry="10.5" fill="${color}" ${o}/>
+      <path d="M-4 -8 V-12 M4 -8 V-12" ${o}/><circle cx="-4" cy="-13.5" r="2.4" fill="#fff" ${o}/><circle cx="4" cy="-13.5" r="2.4" fill="#fff" ${o}/>
+      <circle cx="-4" cy="-13.3" r="1" fill="#3B2A20"/><circle cx="4" cy="-13.3" r="1" fill="#3B2A20"/>
+      <path d="M-3 3 Q0 6 3 3" fill="none" stroke="#3B2A20" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="-8" cy="3" r="2" fill="#FFB3A8"/><circle cx="8" cy="3" r="2" fill="#FFB3A8"/>`);
+    // 찻사발: 흙빛 그릇에 연둣빛 유약
+    const bowl = (x, y, s, handle = false) => g(x, y, s, `
+      ${handle ? `<path d="M15 -3 Q27 -3 26 6 Q25 13 13 10" fill="none" stroke="${L}" stroke-width="6" stroke-linecap="round"/><path d="M15 -3 Q27 -3 26 6 Q25 13 13 10" fill="none" stroke="#B9C4CE" stroke-width="3.4" stroke-linecap="round"/>` : ''}
+      <path d="M-17 -6 H17 Q16 11 0 13 Q-16 11 -17 -6 Z" fill="#D7AE84" ${o}/>
+      <path d="M-17 -6 H17 Q15 2 0 3 Q-15 2 -17 -6 Z" fill="#A9D3C0" ${o}/>
+      <path d="M-6 13 H6 V16 H-6 Z" fill="#C79A70" ${o}/>
+      <path d="M-11 6 Q-6 9 -2 7" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>`);
+    // 곶감: 하얀 분이 핀 주황 감
+    const gam = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * .82}" fill="#EE8E3C" ${o}/>
+      <path d="M${x - r * .45} ${y - r * .7} Q${x} ${y - r * 1.15} ${x + r * .45} ${y - r * .7}" fill="#6E8B3D" ${o}/>
+      <circle cx="${x - r * .35}" cy="${y}" r="${r * .14}" fill="#fff" opacity=".85"/><circle cx="${x + r * .3}" cy="${y + r * .25}" r="${r * .12}" fill="#fff" opacity=".85"/>`;
+    // 오미자 송이
+    const omija = (x, y, s) => g(x, y, s, `<path d="M0 -10 Q6 -16 12 -12 Q6 -8 0 -10 Z" fill="#7DBB6A" ${o}/>
+      ${[[0, 0], [-4, 4], [4, 4], [0, 8], [-2, 12], [3, 12]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="3.4" fill="#D8323C" stroke="${L}" stroke-width="1.2"/>`).join('')}`);
+    const star = (x, y, r, c = '#FFD35C') => `<path d="M${x} ${y - r} L${x + r * .3} ${y - r * .3} L${x + r} ${y} L${x + r * .3} ${y + r * .3} L${x} ${y + r} L${x - r * .3} ${y + r * .3} L${x - r} ${y} L${x - r * .3} ${y - r * .3} Z" fill="${c}"/>`;
+    const heart = (x, y, s, c = '#F48A99') => g(x, y, s, `<path d="M0 4 C-7 -2 -5 -8 0 -4 C5 -8 7 -2 0 4 Z" fill="${c}"/>`);
+    const gift = (x, y, s) => g(x, y, s, `<rect x="-14" y="-10" width="28" height="22" rx="3" fill="#F9C6D2" ${o}/>
+      <path d="M0 -10 V12 M-14 1 H14" stroke="#C93A27" stroke-width="3.5"/>
+      <path d="M0 -10 Q-9 -20 -10 -12 Q-9 -8 0 -10 Q9 -20 10 -12 Q9 -8 0 -10 Z" fill="#E8584A" ${o}/>`);
+    const T = (x, y, t, size = 10, c = L) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Gaegu, sans-serif" font-weight="700" font-size="${size}" fill="${c}">${t}</text>`;
+
+    const PICS = {
+      // 영덕: 대게 식당에 빨간 오미자 소스가 생겨서 손님들이 줄을 서요
+      yd: { vb: '0 0 120 150', svg: `
+        <rect width="120" height="150" fill="#E2F4F8"/>
+        <circle cx="18" cy="18" r="10" fill="#FFE07A"/>
+        <path d="M0 52 Q15 46 30 52 T60 52 T90 52 T120 52 V82 H0 Z" fill="#9AD7E6"/>
+        <path d="M6 62 q6 -4 12 0 M40 68 q6 -4 12 0 M80 61 q6 -4 12 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <rect x="44" y="4" width="54" height="17" rx="5" fill="#fff" ${o}/>${T(71, 16.5, '문경 맛 대게', 10.5, '#C93A27')}
+        ${kid(96, 70, .9, { shirt: '#fff', hat: 'chef', look: -1.5 })}
+        <path d="M0 102 H120 V150 H0 Z" fill="#F0D3A6"/><path d="M0 102 H120" ${o}/>
+        <ellipse cx="46" cy="110" rx="36" ry="10" fill="#fff" ${o}/>
+        ${crab(46, 100, .95)}
+        <path d="M86 112 h22 q0 12 -11 12 q-11 0 -11 -12 Z" fill="#E04A4F" ${o}/>${omija(97, 99, .7)}
+        ${T(94, 140, '오미자 소스', 9.5)}
+        ${heart(14, 92, 1.1)}${heart(78, 84, .9)}${star(30, 40, 4, '#fff')}` },
+      // 상주: 곶감을 찻사발에 담은 선물 꾸러미가 전국으로 날아가요
+      sj: { vb: '0 0 120 150', svg: `
+        <rect width="120" height="150" fill="#FFF2DA"/>
+        <path d="M2 14 Q60 32 118 14" fill="none" stroke="#B88B5A" stroke-width="2.5"/>
+        ${[16, 38, 60, 82, 104].map((x, i) => { const y = 14 + Math.sin(Math.PI * x / 120) * 16; return `<path d="M${x} ${y} V${y + 7}" stroke="#B88B5A" stroke-width="1.5"/>${gam(x, y + 14, 6.5)}`; }).join('')}
+        ${bowl(56, 92, 1.55)}
+        ${gam(46, 80, 7)}${gam(60, 77, 7.5)}${gam(70, 82, 6.5)}
+        ${gift(22, 128, .95)}
+        <g transform="translate(98 58) rotate(-12)"><rect x="-11" y="-8" width="22" height="16" rx="2" fill="#E9C58F" ${o}/><path d="M-11 -2 H11" stroke="#C93A27" stroke-width="2.5"/>
+          <path d="M-11 -4 Q-20 -14 -24 -4 Q-18 -2 -11 0" fill="#fff" ${o}/><path d="M11 -4 Q20 -14 24 -4 Q18 -2 11 0" fill="#fff" ${o}/></g>
+        <path d="M74 70 h-8 M76 76 h-12" stroke="${L}" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>
+        ${kid(96, 112, .78, { shirt: '#F9B4C2', hair: '#3E2C22', look: -2 })}
+        ${star(110, 92, 4)}${star(36, 56, 3.5)}` },
+      // 포항: 포항 쇠 장인과 문경 도예가가 함께 쇠 손잡이 찻사발을 만들어요
+      ph: { vb: '0 0 120 150', svg: `
+        <rect width="120" height="150" fill="#E7EFF7"/>
+        <rect x="22" y="10" width="76" height="20" rx="6" fill="#fff" ${o}/>${T(60, 24.5, '흙과 쇠 공방', 11.5, '#C93A27')}
+        <path d="M0 116 H120 V150 H0 Z" fill="#E3D2B8"/><path d="M0 116 H120" ${o}/>
+        ${kid(26, 66, .85, { shirt: '#D7AE84', hair: '#3E2C22', look: 1.5 })}
+        ${kid(94, 66, .85, { shirt: '#9FB7CC', hat: 'helmet', look: -1.5 })}
+        <g transform="translate(106 92) rotate(30)"><rect x="-2" y="-14" width="4" height="20" rx="2" fill="#B88B5A" ${o}/><rect x="-7" y="-19" width="14" height="7" rx="2" fill="#A9B4BF" ${o}/></g>
+        ${bowl(56, 108, 1.5, true)}
+        ${star(44, 82, 5)}${star(80, 78, 4)}${star(62, 70, 3.5, '#fff')}
+        ${T(60, 142, '흙 + 쇠', 13, '#C93A27')}` },
+      // 문경: 오미자 대게찜, 찻사발에 쇠 장식, 축제에 대게·곶감 장터
+      mg: { vb: '0 0 236 150', svg: `
+        <rect width="236" height="150" fill="#DDF1F6"/>
+        <circle cx="212" cy="24" r="12" fill="#FFE07A"/>
+        <path d="M0 74 Q30 30 64 62 Q96 26 136 60 Q172 28 206 58 Q222 46 236 52 V110 H0 Z" fill="#A9DA9C" ${o}/>
+        <path d="M0 92 Q50 70 100 90 Q160 66 236 88 V110 H0 Z" fill="#8CCB86"/>
+        ${omija(40, 64, .8)}${omija(120, 58, .8)}${omija(190, 60, .8)}
+        <path d="M0 10 Q118 34 236 10" fill="none" stroke="${L}" stroke-width="1.5"/>
+        ${[14, 38, 62, 86, 110, 134, 158, 182, 206, 228].map((x, i) => { const y = 10 + Math.sin(Math.PI * x / 236) * 12; return `<path d="M${x - 7} ${y} L${x + 7} ${y} L${x} ${y + 12} Z" fill="${['#F48A99', '#FFD35C', '#8ED1C2', '#9FC3F0'][i % 4]}" stroke="${L}" stroke-width="1"/>`; }).join('')}
+        <rect x="76" y="38" width="84" height="18" rx="6" fill="#fff" ${o}/>${T(118, 51, '봄 찻사발 축제', 11, '#C93A27')}
+        <path d="M0 108 H236 V150 H0 Z" fill="#F4E3B8"/><path d="M0 108 H236" ${o}/>
+        <path d="M14 78 L52 64 L90 78 Z" fill="#E8584A" ${o}/><rect x="20" y="78" width="64" height="30" fill="#fff" ${o}/>${crab(52, 96, .55)}
+        <path d="M146 78 L184 64 L222 78 Z" fill="#EE8E3C" ${o}/><rect x="152" y="78" width="64" height="30" fill="#fff" ${o}/>${gam(172, 96, 6)}${gam(186, 94, 6)}${gam(200, 97, 6)}
+        <rect x="88" y="118" width="62" height="10" rx="3" fill="#C79A70" ${o}/>
+        <ellipse cx="104" cy="116" rx="15" ry="4.5" fill="#fff" ${o}/>${crab(104, 110, .42, '#D9333E')}${omija(112, 104, .4)}
+        ${bowl(136, 110, .65, true)}
+        ${kid(72, 112, .7, { shirt: '#F9B4C2', hair: '#3E2C22', look: 1.5 })}
+        ${kid(166, 112, .7, { shirt: '#9FC3F0', look: -1.5 })}
+        ${heart(92, 96, 1)}${heart(148, 92, 1)}${star(20, 40, 4, '#fff')}` },
+    };
+    document.querySelectorAll('[data-pic]').forEach((el) => {
+      const p = PICS[el.dataset.pic];
+      if (p) el.insertAdjacentHTML('afterbegin', `<svg viewBox="${p.vb}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="교류한 뒤의 모습 예시 그림">${p.svg}</svg>`);
+    });
+  })();
 </script>
 <script>
   // 인쇄 직전에 세 장의 틀을 켜고, 장마다 내용이 종이에 꼭 차도록 크기를 맞춥니다(글은 바꾸지 않음).

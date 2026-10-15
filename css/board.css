@@ -299,3 +299,6 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .res-check { margin: 2px 0 6px; padding: 6px 10px; border-radius: 10px; background: #EAF5F3; font-size: 14.5px; line-height: 1.4; color: var(--ink); }
 .res-check b { display: block; color: var(--teal-d, var(--teal)); }
 .res-check small { color: var(--mute); font-size: 14px; }
+.tip-box p.nonum { padding-left: 38px; text-indent: 0; }
+/* 팁이 길어도 창이 화면 밖으로 넘치지 않게: 팁 안에서만 위아래로 넘김 */
+.af-body .tip-box { max-height: 580px; overflow-y: auto; overscroll-behavior: contain; }
