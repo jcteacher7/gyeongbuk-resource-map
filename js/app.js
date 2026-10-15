@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=52';
-import { store } from './store.js?v=52';
-import { createMapView, shortName } from './map-view.js?v=52';
-import { shrinkPhoto } from './photo.js?v=52';
-import { esc, safeLink, josa, timeText } from './util.js?v=52';
-import { MAX_LEN } from './config.js?v=52';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=52';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=52';
-import { createTagView } from './tag-view.js?v=52';
-import { createChatView } from './chat-view.js?v=52';
-import { createTeacher, hashCode } from './teacher.js?v=52';
+import mapData from '../data/gyeongbuk-map.js?v=53';
+import { store } from './store.js?v=53';
+import { createMapView, shortName } from './map-view.js?v=53';
+import { shrinkPhoto } from './photo.js?v=53';
+import { esc, safeLink, josa, timeText } from './util.js?v=53';
+import { MAX_LEN } from './config.js?v=53';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=53';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=53';
+import { createTagView } from './tag-view.js?v=53';
+import { createChatView } from './chat-view.js?v=53';
+import { createTeacher, hashCode } from './teacher.js?v=53';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -498,7 +498,7 @@ function showExampleArrow(a, refresh) {
       <button type="button" class="xbtn light" data-act="close" aria-label="닫기">${ICON.x}</button></div>
     <ol class="steps3 ex-steps">
       <li><span class="step-name"><span class="num">1</span>어떻게 교류하나요?</span><span class="step-text"><span class="ex-kind">${esc(a.kind)}</span>${esc(a.how)}</span></li>
-      <li><span class="step-name"><span class="num">2</span>생활 모습이 어떻게 달라지나요?</span><span class="step-text"><span class="ex-way">${esc(a.way)}</span>${esc(a.change)}</span></li>
+      <li><span class="step-name"><span class="num">2</span>생활 모습이 어떻게 달라지나요?</span><span class="step-text">${wayList(a.way).map((w) => `<span class="ex-way">${esc(w)}</span>`).join('')}${esc(a.change)}</span></li>
       <li><span class="step-name"><span class="num">3</span>함께 만드는 것</span><span class="step-text">${esc(a.together)}</span></li>
     </ol>
     <div class="pop-foot"><span class="by">${ICON.bulb}예시 제안서예요. 받은 것 + 우리 것 = 새로운 생활! 이젤패드 견본과 같은 순서예요.</span></div>
@@ -552,6 +552,10 @@ function dropDraft(id) { try { localStorage.removeItem(draftKey(id)); } catch (e
 
 const field = (name, value, ph, extra = '') =>
   `<span class="field"><input name="${name}" value="${esc(value)}" maxlength="${MAX_LEN}" placeholder="${esc(ph)}" autocomplete="off" ${extra}><span class="count" data-count="${name}">${String(value || '').length}/${MAX_LEN}</span></span>`;
+// 여러 줄로 길게 쓰는 칸(화살표 2번 생활 모습: 200자)
+const LONG_MAX = 200;
+const fieldLong = (name, value, ph) =>
+  `<span class="field long"><textarea name="${name}" rows="3" maxlength="${LONG_MAX}" placeholder="${esc(ph)}" autocomplete="off">${esc(value)}</textarea><span class="count" data-count="${name}" data-max="${LONG_MAX}">${String(value || '').length}/${LONG_MAX}</span></span>`;
 const seg = (name, opts, v) => `<div class="seg" data-seg="${name}">${opts.map(([k, label]) => `<button type="button" data-v="${k}" class="${v === k ? 'on' : ''}">${label}</button>`).join('')}</div>`;
 // 환경은 둘 다 고를 수 있습니다(예: 복숭아는 날씨와 땅 덕분이면서 사람이 과수원을 만들어 길러요).
 // 저장 값: 'nat' | 'hum' | 'both'
@@ -570,8 +574,8 @@ function bindForm(f, draftId, validate, onSave) {
     btn.classList.toggle('off', !!why);
     root.querySelector('.why-not').textContent = why || '';
     root.querySelectorAll('[data-count]').forEach((c) => {
-      const inp = root.querySelector(`input[name="${c.dataset.count}"]`);
-      c.textContent = `${inp.value.length}/${MAX_LEN}`;
+      const inp = root.querySelector(`[name="${c.dataset.count}"]`);
+      c.textContent = `${inp.value.length}/${c.dataset.max || MAX_LEN}`;
     });
   };
   root.addEventListener('input', (e) => {
@@ -742,7 +746,7 @@ function openArrowForm(fromKey, toKey, key) {
     <div class="q"><span class="num">2</span>그러면 생활 모습이 어떻게 달라지나요? <small class="q-note">달라지는 것을 골라요(여러 개 골라도 돼요)</small></div>
     <div class="seg-way"><div class="seg" data-seg="way" data-multi="list">${ARROW_TIP.ways.map(([n]) => `<button type="button" data-v="${esc(n)}" class="${f.way.includes(n) ? 'on' : ''}" aria-pressed="${f.way.includes(n)}">${esc(n)}</button>`).join('')}</div></div>
     <p class="ex" data-wayhint>${esc(wayQ(f.way))}</p>
-    ${field('change', f.change, '받은 것 + 우리 것 = 새로운 생활!')}
+    ${fieldLong('change', f.change, '받은 것 + 우리 것 = 새로운 생활! 여러 줄로 자세히 써도 돼요')}
       </div>
     <div class="tip-box" data-tip hidden>
       <b>${ICON.bulb}선생님의 팁 <small>예시: ${esc(ARROW_TIP.pair)}</small></b>

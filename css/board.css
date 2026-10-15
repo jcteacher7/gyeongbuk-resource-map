@@ -184,7 +184,7 @@ input, textarea { caret-color: var(--coral-d); }
 
 /* 챗봇 입력칸: 엔터로 줄을 바꿀 수 있는 두 줄짜리 칸 */
 .cv-input { align-items: flex-end; }
-.cv-input textarea { flex: 1; min-width: 0; height: 76px; padding: 10px 16px; border: 3px solid var(--teal-l); border-radius: 16px; background: #fff; font-family: var(--body); font-size: 20px; line-height: 1.4; color: var(--ink); outline: none; resize: none; }
+.cv-input textarea { flex: 1; min-width: 0; height: 76px; padding: 10px 16px; border: 3px solid var(--teal-l); border-radius: 16px; background: #fff; font-family: var(--body); font-size: 19px; line-height: 1.35; color: var(--ink); outline: none; resize: none; }
 .cv-input textarea:focus { border-color: var(--teal); }
 .cv-input textarea::placeholder { font-size: 17px; }
 .cv-input .btn { height: 56px; }
@@ -322,3 +322,8 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 .seg-kind .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .seg-kind .seg button { height: 44px; }
 .af-main > .ex[data-wayhint] { margin-top: 4px; margin-bottom: 2px; font-size: 15px; }
+/* 여러 줄 칸(화살표 2번 생활 모습, 200자) */
+.field.long textarea { display: block; width: 100%; height: 80px; min-height: 0; padding: 8px 14px; border: 3px solid var(--teal-l); border-radius: 14px; background: var(--card); font-family: var(--body); font-size: 19px; line-height: 1.35; color: var(--ink); outline: none; resize: none; }
+.field.long textarea:focus { border-color: var(--teal); background: #fff; }
+.field.long .count { position: static; display: block; translate: none; margin-top: 1px; text-align: right; line-height: 1.2; }
+.af-main > .field.long { display: block; }
