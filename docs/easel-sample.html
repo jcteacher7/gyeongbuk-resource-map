@@ -205,12 +205,12 @@
   html.pr .kid, html.pr .ideas, html.pr .pick { max-width: none; }
   html.pr .kid h2 { margin-top: 0; }
   /* 1장: 왼쪽에 다 만든 모습, 오른쪽에 질문과 다섯 가지 */
-  html.pr .p1 .fit { width: 1530px; display: grid; grid-template-columns: 720px 1fr; column-gap: 44px; align-items: start; }
+  html.pr .p1 .fit { width: 1750px; display: grid; grid-template-columns: 950px 1fr; column-gap: 44px; align-items: start; }
   html.pr .p1 h1 { grid-column: 2; grid-row: 1; font-size: 62px; line-height: 1.1; margin: 0 0 16px; }
   html.pr .p1 .lead { grid-column: 2; max-width: none; zoom: 1.5; margin: 0 0 12px !important; }
   html.pr .p1 > .fit > .kid { display: none; }
   html.pr .p1 .wrap { display: contents; }
-  html.pr .p1 figure { grid-column: 1; grid-row: 1 / span 6; }
+  html.pr .p1 figure { grid-column: 1; grid-row: 1 / span 6; zoom: 1.3; }
   html.pr .p1 .side { grid-column: 2; max-width: none; zoom: 1.5; margin-top: 8px; gap: 12px; }
   /* 2장: 위에 네 걸음과 고르기, 아래 왼쪽에 모양, 오른쪽에 확인과 발표 */
   html.pr .p2 .fit { width: 1980px; display: grid; grid-template-columns: 1.18fr 1fr; gap: 26px 44px; align-items: start; }
@@ -268,6 +268,72 @@
   .node:not(.hub) .pic.art { height: auto; min-height: 0; aspect-ratio: 120 / 150; align-self: start; }
   .hub .pic.art { height: auto; aspect-ratio: 236 / 150; }
   .pic.art small { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 1px 0; background: rgba(255,255,255,.82); text-align: center; }
+  /* ---------- 실제 이젤패드 크기(포스트잇 559, 가로 63.5cm × 세로 76.2cm)에 맞춘 배치 ----------
+     종이 가로 720px = 63.5cm 로 보고(1px ≈ 0.88mm) 세로를 864px 로 고정합니다.
+     세 지역은 위에 나란히, 달라진 우리 지역은 그 아래에 넓게, 맨 아래에 우리 지역의 답.
+     그림 칸 크기: 세 지역 = A6 가로(14.8 × 10.5cm), 우리 지역 = A5 가로(21 × 14.8cm). */
+  .pad { height: 864px; display: flex; flex-direction: column; padding: 10px 16px 10px; }
+  .pad .title b { font-size: 34px; }
+  .pad .title { padding-bottom: 4px; }
+  .pad .keyq { margin-top: 6px; padding: 4px 10px; font-size: 19px; }
+  .pad .tl { gap: 12px; margin-top: 8px; flex: 1; grid-template-rows: auto auto 1fr; }
+  .pad .trow .tk, .pad .tc { height: auto; min-height: 32px; font-size: 19px; }
+  .pad .fut { padding: 24px 8px 8px; }
+  .pad .web { grid-template-columns: 1fr 1fr 1fr; column-gap: 8px; grid-template-rows: auto 16px auto; }
+  .pad .a { grid-column: 1; grid-row: 1; }
+  .pad .c { grid-column: 2; grid-row: 1; justify-self: stretch; width: auto; }
+  .pad .b { grid-column: 3; grid-row: 1; }
+  .pad .lk.l { grid-column: 1; grid-row: 2; }
+  .pad .lk.v { grid-column: 2; grid-row: 2; }
+  .pad .lk.r { grid-column: 3; grid-row: 2; }
+  .pad .hub { grid-column: 1 / 4; grid-row: 3; grid-template-columns: 238px 1fr; padding: 8px 12px; }
+  .pad .hub h3 { font-size: 25px; }
+  .pad .node:not(.hub) { display: flex; flex-direction: column; gap: 4px; padding: 7px; }
+  .pad .node:not(.hub) h3 { font-size: 21px; }
+  .pad .node:not(.hub) .swap { font-size: 15.5px; padding: 1px 7px; }
+  .pad .swap i { font-size: 13.5px; padding: 0 5px; margin-right: 4px; }
+  .pad .node:not(.hub) .pic { width: 100%; height: auto; min-height: 0; aspect-ratio: 148 / 105; }
+  .pad .node:not(.hub) .pic:not(.art) { font-size: 16px; }
+  .pad .way { font-size: 15px; }
+  .pad .node:not(.hub) p { font-size: 16px; line-height: 1.22; }
+  .pad .node:not(.hub) .plus { margin-left: 24px; font-size: 15.5px; }
+  .pad .hub .pic { width: 238px; height: auto; aspect-ratio: 210 / 148; }
+  .pad .chg li { font-size: 18px; line-height: 1.22; }
+  .pad .chg b { font-size: 15px; }
+  .pad .claim { margin-top: 8px; padding: 6px 12px; font-size: 20px; line-height: 1.25; }
+  .pad .claim .ans { font-size: 14.5px; }
+  .pad .claim li { font-size: 17px; line-height: 1.25; }
+  .pad .claim li b { font-size: 15px; }
+  /* 종이 안에 다 들어가도록 줄이기(그림 칸: 세 지역 A7 가로 10.5 × 7.4cm, 우리 지역 A6 가로 14.8 × 10.5cm) */
+  .pad .title b { font-size: 30px; }
+  .pad .title .who2 { font-size: 15px; } .pad .title .who2 b { font-size: 20px; }
+  .pad .keyq { font-size: 17.5px; margin-top: 4px; }
+  .pad .tl { gap: 8px; margin-top: 5px; }
+  .pad .trow .tk, .pad .tc { min-height: 30px; font-size: 18px; padding-top: 1px; padding-bottom: 1px; }
+  .pad .fut { padding: 20px 7px 7px; }
+  .pad .web { grid-template-rows: auto 12px auto; }
+  .pad .swap { white-space: normal; }
+  .pad .node:not(.hub) .pic { width: 119px; align-self: center; aspect-ratio: 105 / 74; }
+  .pad .node:not(.hub) p { font-size: 15px; }
+  .pad .node:not(.hub) { gap: 3px; padding: 6px; }
+  .pad .node:not(.hub) .swap { font-size: 14.5px; white-space: nowrap; padding: 1px 6px; }
+  .pad .node:not(.hub) .swap i { font-size: 12px; padding: 0 4px; margin-right: 3px; }
+  .pad .node:not(.hub) .swap::before { margin-right: 3px; }
+  .pad .node:not(.hub) .plus { font-size: 14px; }
+  .pad .way { line-height: 1.3; }
+  .pad.blank .node:not(.hub) .swap { white-space: normal; }
+  .pad .node:not(.hub) h3 { font-size: 20px; }
+  .pad .hub { grid-template-columns: 168px 1fr; column-gap: 12px; padding: 6px 12px 8px; row-gap: 4px; }
+  .pad .hub h3 { font-size: 23px; }
+  .pad .hub .pic { width: 168px; aspect-ratio: 148 / 105; }
+  .pad .chg { gap: 5px; }
+  .pad .chg li { font-size: 17px; }
+  .pad .claim { margin-top: 6px; padding: 5px 12px; font-size: 18px; }
+  .pad .claim ol { margin-top: 3px; gap: 2px; }
+  .pad .claim li { font-size: 16px; }
+  .pad .claim li b { font-size: 14px; }
+  /* 크기 눈금: 종이 오른쪽과 아래에 실제 길이 */
+  .papersize { margin-top: 6px; font-family: 'Gowun Dodum', sans-serif; font-size: 14px; color: var(--mute); text-align: center; }
   /* 그림 옆 안내: 같은 순서, 받은 것 + 우리 것 = 새로운 생활 */
   .flow { display: grid; gap: 2px; margin-top: 3px; }
   .flow > span { font-size: 15.5px; }
@@ -301,7 +367,7 @@
           <span class="swap"><i>물건 교류</i>오미자 ⇄ 대게</span>
           <div class="pic art" data-pic="yd"></div>
           <span class="way">먹는 것</span>
-          <p>대게 식당에 빨간 오미자 소스가 생겨서, "문경 맛 대게"를 먹으러 손님들이 줄을 서요.</p>
+          <p>대게 식당에 빨간 오미자 소스가 생겨서, "문경 맛 대게"에 손님들이 줄을 서요.</p>
           <span class="plus">오미자 대게 요리 대회</span>
         </div>
         <div class="node b">
@@ -309,7 +375,7 @@
           <span class="swap"><i>물건 교류</i>찻사발 ⇄ 곶감</span>
           <div class="pic art" data-pic="sj"></div>
           <span class="way">사고파는 것</span>
-          <p>곶감을 찻사발에 담은 선물 꾸러미가 나와서, 설날마다 전국으로 택배가 날아가요.</p>
+          <p>곶감을 찻사발에 담은 선물 꾸러미가 설날마다 전국으로 날아가요.</p>
           <span class="plus">찻사발 곶감 선물 상자</span>
         </div>
         <div class="node c">
@@ -335,11 +401,12 @@
       </div>
       <div class="claim"><span class="ans">탐구 질문에 대한 우리 지역의 답</span><span class="cn">5</span>문경은 <u>영덕·상주·포항</u>과 교류해야 합니다. 왜냐하면
         <ol>
-          <li><b>서로 채워요</b><span>오미자와 찻사발을 보내고, 대게와 곶감과 쇠를 받아요.</span></li>
-          <li><b>함께 만들어요</b><span>요리 대회, 곶감 선물 상자, 흙과 쇠 공방을 함께 만들어요.</span></li>
-          <li><b>살아가는 방식이 달라져요</b><span>산골 밥상이 바뀌고, 새 일이 생기고, 축제가 더 커져요.</span></li>
+          <li><b>서로 채워요</b><span>오미자·찻사발을 보내고, 대게·곶감·쇠를 받아요.</span></li>
+          <li><b>함께 만들어요</b><span>요리 대회, 곶감 선물 상자, 흙과 쇠 공방</span></li>
+          <li><b>살아가는 방식이 달라져요</b><span>밥상이 바뀌고, 새 일이 생기고, 축제가 커져요.</span></li>
         </ol></div>
     </div>
+    <div class="papersize">실제 종이: 가로 63.5cm × 세로 76.2cm (포스트잇 559 이젤패드) · 세 지역 그림 A7 가로(10.5 × 7.4cm) · 우리 지역 그림 A6 가로(14.8 × 10.5cm)</div>
   </figure>
   <div class="side">
     <h2>종이에 넣는 것 다섯 가지</h2>
@@ -369,7 +436,8 @@
       <li>②는 <b>받은 것 + 우리 것 = 새로운 생활!</b> 둘이 만나서 새로 생기는 음식, 물건, 일, 축제를 상상해요.</li>
       <li><b>미래</b> 우리 지역은 어떻게 달라질까요? 아래 <b>"달라지는 것 고르기"</b>에서 <b>세 가지</b>를 골라 써요.</li></ul></li>
     <li><b>그림 네 장 만들기</b>
-      <ul><li>우리 지역 한 장, 세 지역 한 장씩. 모두 <b>교류한 뒤</b>의 모습이에요.</li></ul>
+      <ul><li>우리 지역 한 장, 세 지역 한 장씩. 모두 <b>교류한 뒤</b>의 모습이에요.</li>
+      <li>가로 그림으로 인쇄해요. 세 지역은 <b>A7 (10.5 × 7.4cm)</b>, 우리 지역은 <b>A6 (14.8 × 10.5cm)</b>. <small>(A4 한 장에 A7은 8장, A6은 4장이 들어가요)</small></li></ul>
       <div class="say">AI에게 이렇게 부탁해요.<br>( 어디 )에 사는 ( 누가 ) ( 받은 것 )과 ( 우리 것 )으로 ( 새롭게 무엇을 하는 ) 모습, 귀여운 동화책 그림<br><small>예: 영덕에 사는 식당 아저씨가 문경 오미자와 영덕 대게로 빨간 소스 대게 요리를 만드는 모습, 귀여운 동화책 그림</small></div></li>
     <li><b>큰 종이에 옮기기</b>
       <ul><li>아래에서 <b>모양</b>을 골라 연필로 자리를 잡아요.</li>
@@ -430,7 +498,7 @@
           <div class="pic">교류 후 그림</div>
           <span class="way fill">달라지는 것</span>
           <p class="fill">받은 것 + 우리 것 = 새로운 생활 모습은?</p>
-          <span class="plus">함께 만드는 것</span>
+          <span class="plus">무엇을 만들까?</span>
         </div>
         <div class="node b">
           <h3>달라진 <span class="fill">○○</span></h3>
@@ -438,7 +506,7 @@
           <div class="pic">교류 후 그림</div>
           <span class="way fill">달라지는 것</span>
           <p class="fill">받은 것 + 우리 것 = 새로운 생활 모습은?</p>
-          <span class="plus">함께 만드는 것</span>
+          <span class="plus">무엇을 만들까?</span>
         </div>
         <div class="node c">
           <h3>달라진 <span class="fill">○○</span></h3>
@@ -446,7 +514,7 @@
           <div class="pic">교류 후 그림</div>
           <span class="way fill">달라지는 것</span>
           <p class="fill">받은 것 + 우리 것 = 새로운 생활 모습은?</p>
-          <span class="plus">함께 만드는 것</span>
+          <span class="plus">무엇을 만들까?</span>
         </div>
         <div class="lk l"></div><div class="lk r"></div><div class="lk v"></div>
         <div class="node hub">
@@ -468,6 +536,7 @@
           <li><b>살아가는 방식이 달라져요</b><span class="fill">사람들이 살아가는 방식이 어떻게 달라지나요?</span></li>
         </ol></div>
     </div>
+    <div class="papersize">실제 종이: 가로 63.5cm × 세로 76.2cm (포스트잇 559 이젤패드) · 세 지역 그림 A7 가로(10.5 × 7.4cm) · 우리 지역 그림 A6 가로(14.8 × 10.5cm)</div>
   </figure>
 </div>
 </div></div>
@@ -567,47 +636,46 @@
 
     const PICS = {
       // 영덕: 대게 식당에 빨간 오미자 소스가 생겨서 손님들이 줄을 서요
-      yd: { vb: '0 0 120 150', svg: `
-        <rect width="120" height="150" fill="#E2F4F8"/>
-        <circle cx="18" cy="18" r="10" fill="#FFE07A"/>
-        <path d="M0 52 Q15 46 30 52 T60 52 T90 52 T120 52 V82 H0 Z" fill="#9AD7E6"/>
-        <path d="M6 62 q6 -4 12 0 M40 68 q6 -4 12 0 M80 61 q6 -4 12 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-        <rect x="44" y="4" width="54" height="17" rx="5" fill="#fff" ${o}/>${T(71, 16.5, '문경 맛 대게', 10.5, '#C93A27')}
-        ${kid(96, 70, .9, { shirt: '#fff', hat: 'chef', look: -1.5 })}
-        <path d="M0 102 H120 V150 H0 Z" fill="#F0D3A6"/><path d="M0 102 H120" ${o}/>
-        <ellipse cx="46" cy="110" rx="36" ry="10" fill="#fff" ${o}/>
-        ${crab(46, 100, .95)}
-        <path d="M86 112 h22 q0 12 -11 12 q-11 0 -11 -12 Z" fill="#E04A4F" ${o}/>${omija(97, 99, .7)}
-        ${T(94, 140, '오미자 소스', 9.5)}
-        ${heart(14, 92, 1.1)}${heart(78, 84, .9)}${star(30, 40, 4, '#fff')}` },
+      yd: { vb: '0 0 148 105', svg: `
+        <rect width="148" height="105" fill="#E2F4F8"/>
+        <circle cx="16" cy="14" r="9" fill="#FFE07A"/>
+        <path d="M0 34 Q18 28 37 34 T74 34 T111 34 T148 34 V62 H0 Z" fill="#9AD7E6"/>
+        <path d="M8 44 q6 -4 12 0 M50 50 q6 -4 12 0 M92 42 q6 -4 12 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <rect x="46" y="4" width="58" height="17" rx="5" fill="#fff" ${o}/>${T(75, 16.5, '문경 맛 대게', 10.5, '#C93A27')}
+        ${kid(126, 46, .82, { shirt: '#fff', hat: 'chef', look: -1.5 })}
+        <path d="M0 72 H148 V105 H0 Z" fill="#F0D3A6"/><path d="M0 72 H148" ${o}/>
+        <ellipse cx="46" cy="80" rx="34" ry="9" fill="#fff" ${o}/>
+        ${crab(46, 71, .9)}
+        <path d="M90 80 h22 q0 12 -11 12 q-11 0 -11 -12 Z" fill="#E04A4F" ${o}/>${omija(101, 67, .7)}
+        ${T(101, 101, '오미자 소스', 9.5)}
+        ${heart(14, 56, 1.1)}${heart(82, 56, .9)}${star(30, 30, 3.5, '#fff')}` },
       // 상주: 곶감을 찻사발에 담은 선물 꾸러미가 전국으로 날아가요
-      sj: { vb: '0 0 120 150', svg: `
-        <rect width="120" height="150" fill="#FFF2DA"/>
-        <path d="M2 14 Q60 32 118 14" fill="none" stroke="#B88B5A" stroke-width="2.5"/>
-        ${[16, 38, 60, 82, 104].map((x, i) => { const y = 14 + Math.sin(Math.PI * x / 120) * 16; return `<path d="M${x} ${y} V${y + 7}" stroke="#B88B5A" stroke-width="1.5"/>${gam(x, y + 14, 6.5)}`; }).join('')}
-        ${bowl(56, 92, 1.55)}
-        ${gam(46, 80, 7)}${gam(60, 77, 7.5)}${gam(70, 82, 6.5)}
-        ${gift(22, 128, .95)}
-        <g transform="translate(98 58) rotate(-12)"><rect x="-11" y="-8" width="22" height="16" rx="2" fill="#E9C58F" ${o}/><path d="M-11 -2 H11" stroke="#C93A27" stroke-width="2.5"/>
-          <path d="M-11 -4 Q-20 -14 -24 -4 Q-18 -2 -11 0" fill="#fff" ${o}/><path d="M11 -4 Q20 -14 24 -4 Q18 -2 11 0" fill="#fff" ${o}/></g>
-        <path d="M74 70 h-8 M76 76 h-12" stroke="${L}" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>
-        ${kid(96, 112, .78, { shirt: '#F9B4C2', hair: '#3E2C22', look: -2 })}
-        ${star(110, 92, 4)}${star(36, 56, 3.5)}` },
+      sj: { vb: '0 0 148 105', svg: `
+        <rect width="148" height="105" fill="#FFF2DA"/>
+        <path d="M2 8 Q74 24 146 8" fill="none" stroke="#B88B5A" stroke-width="2.5"/>
+        ${[14, 38, 62, 86, 110, 134].map((x) => { const y = 8 + Math.sin(Math.PI * x / 148) * 9; return `<path d="M${x} ${y} V${y + 5}" stroke="#B88B5A" stroke-width="1.5"/>${gam(x, y + 11, 5.5)}`; }).join('')}
+        ${bowl(62, 74, 1.4)}
+        ${gam(52, 63, 6.5)}${gam(64, 60, 7)}${gam(74, 65, 6)}
+        ${gift(20, 84, .85)}
+        <g transform="translate(104 46) rotate(-12)"><rect x="-10" y="-7" width="20" height="14" rx="2" fill="#E9C58F" ${o}/><path d="M-10 -1 H10" stroke="#C93A27" stroke-width="2.5"/>
+          <path d="M-10 -3 Q-18 -12 -22 -3 Q-16 -1 -10 1" fill="#fff" ${o}/><path d="M10 -3 Q18 -12 22 -3 Q16 -1 10 1" fill="#fff" ${o}/></g>
+        <path d="M84 56 h-8 M86 61 h-12" stroke="${L}" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>
+        ${kid(128, 76, .72, { shirt: '#F9B4C2', hair: '#3E2C22', look: -2 })}
+        ${star(140, 40, 3.5)}${star(28, 46, 3)}` },
       // 포항: 포항 쇠 장인과 문경 도예가가 함께 쇠 손잡이 찻사발을 만들어요
-      ph: { vb: '0 0 120 150', svg: `
-        <rect width="120" height="150" fill="#E7EFF7"/>
-        <rect x="22" y="10" width="76" height="20" rx="6" fill="#fff" ${o}/>${T(60, 24.5, '흙과 쇠 공방', 11.5, '#C93A27')}
-        <path d="M0 116 H120 V150 H0 Z" fill="#E3D2B8"/><path d="M0 116 H120" ${o}/>
-        ${kid(26, 66, .85, { shirt: '#D7AE84', hair: '#3E2C22', look: 1.5 })}
-        ${kid(94, 66, .85, { shirt: '#9FB7CC', hat: 'helmet', look: -1.5 })}
-        <g transform="translate(106 92) rotate(30)"><rect x="-2" y="-14" width="4" height="20" rx="2" fill="#B88B5A" ${o}/><rect x="-7" y="-19" width="14" height="7" rx="2" fill="#A9B4BF" ${o}/></g>
-        ${bowl(56, 108, 1.5, true)}
-        ${star(44, 82, 5)}${star(80, 78, 4)}${star(62, 70, 3.5, '#fff')}
-        ${T(60, 142, '흙 + 쇠', 13, '#C93A27')}` },
+      ph: { vb: '0 0 148 105', svg: `
+        <rect width="148" height="105" fill="#E7EFF7"/>
+        <rect x="40" y="5" width="68" height="18" rx="6" fill="#fff" ${o}/>${T(74, 18.5, '흙과 쇠 공방', 11, '#C93A27')}
+        <path d="M0 80 H148 V105 H0 Z" fill="#E3D2B8"/><path d="M0 80 H148" ${o}/>
+        ${kid(24, 52, .8, { shirt: '#D7AE84', hair: '#3E2C22', look: 1.5 })}
+        ${kid(122, 52, .8, { shirt: '#9FB7CC', hat: 'helmet', look: -1.5 })}
+        <g transform="translate(140 74) rotate(30)"><rect x="-2" y="-13" width="4" height="18" rx="2" fill="#B88B5A" ${o}/><rect x="-6.5" y="-17" width="13" height="6.5" rx="2" fill="#A9B4BF" ${o}/></g>
+        ${bowl(70, 80, 1.3, true)}
+        ${star(52, 50, 4.5)}${star(96, 46, 4)}${star(74, 36, 3.2, '#fff')}` },
       // 문경: 오미자 대게찜, 찻사발에 쇠 장식, 축제에 대게·곶감 장터
-      mg: { vb: '0 0 236 150', svg: `
+      mg: { vb: '12 0 212 150', svg: `
         <rect width="236" height="150" fill="#DDF1F6"/>
-        <circle cx="212" cy="24" r="12" fill="#FFE07A"/>
+        <circle cx="200" cy="26" r="11" fill="#FFE07A"/>
         <path d="M0 74 Q30 30 64 62 Q96 26 136 60 Q172 28 206 58 Q222 46 236 52 V110 H0 Z" fill="#A9DA9C" ${o}/>
         <path d="M0 92 Q50 70 100 90 Q160 66 236 88 V110 H0 Z" fill="#8CCB86"/>
         ${omija(40, 64, .8)}${omija(120, 58, .8)}${omija(190, 60, .8)}
