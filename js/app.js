@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=51';
-import { store } from './store.js?v=51';
-import { createMapView, shortName } from './map-view.js?v=51';
-import { shrinkPhoto } from './photo.js?v=51';
-import { esc, safeLink, josa, timeText } from './util.js?v=51';
-import { MAX_LEN } from './config.js?v=51';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=51';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=51';
-import { createTagView } from './tag-view.js?v=51';
-import { createChatView } from './chat-view.js?v=51';
-import { createTeacher, hashCode } from './teacher.js?v=51';
+import mapData from '../data/gyeongbuk-map.js?v=52';
+import { store } from './store.js?v=52';
+import { createMapView, shortName } from './map-view.js?v=52';
+import { shrinkPhoto } from './photo.js?v=52';
+import { esc, safeLink, josa, timeText } from './util.js?v=52';
+import { MAX_LEN } from './config.js?v=52';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=52';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=52';
+import { createTagView } from './tag-view.js?v=52';
+import { createChatView } from './chat-view.js?v=52';
+import { createTeacher, hashCode } from './teacher.js?v=52';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -526,7 +526,7 @@ function showArrow(key, refresh) {
     </div>
     <ol class="steps3 ex-steps">
       <li><span class="step-name"><span class="num">1</span>어떻게 교류하나요?</span><span class="step-text">${a.kind ? `<span class="ex-kind">${esc(a.kind)}</span>` : ''}${esc(a.how)}</span></li>
-      <li><span class="step-name"><span class="num">2</span>생활 모습이 어떻게 달라지나요?</span><span class="step-text">${a.way ? `<span class="ex-way">${esc(a.way)}</span>` : ''}${esc(a.change)}</span></li>
+      <li><span class="step-name"><span class="num">2</span>생활 모습이 어떻게 달라지나요?</span><span class="step-text">${wayList(a.way).map((w) => `<span class="ex-way">${esc(w)}</span>`).join('')}${esc(a.change)}</span></li>
     </ol>
     ${editRow(a, 'arrow')}
   </div>`;
@@ -557,6 +557,8 @@ const seg = (name, opts, v) => `<div class="seg" data-seg="${name}">${opts.map((
 // 저장 값: 'nat' | 'hum' | 'both'
 const envKeys = (env) => (env === 'both' ? ['nat', 'hum'] : env ? [env] : []);
 const envSeg = (v) => `<div class="seg" data-seg="env" data-multi="1">${[['nat', '자연환경'], ['hum', '인문환경']].map(([k, label]) => `<button type="button" data-v="${k}" class="${envKeys(v).includes(k) ? 'on' : ''}" aria-pressed="${envKeys(v).includes(k)}">${label}</button>`).join('')}</div>`;
+// 화살표의 '달라지는 것': 여러 개를 배열로 저장합니다. 예전에 하나만 고른 것(문자열)도 배열로 읽습니다.
+const wayList = (w) => (Array.isArray(w) ? w : w ? [w] : []);
 const envChips = (env) => envKeys(env).map((k) => `<span class="env ${k}">${ENV[k]}</span>`).join('');
 
 // 폼 공통: 입력할 때마다 글자 수·저장 단추 상태만 고치고, 입력칸 자체는 다시 그리지 않습니다.
@@ -585,7 +587,8 @@ function bindForm(f, draftId, validate, onSave) {
         b.classList.toggle('on');
         b.setAttribute('aria-pressed', b.classList.contains('on'));
         const on = [...box.querySelectorAll('button.on')].map((x) => x.dataset.v);
-        f[box.dataset.seg] = on.length === 2 ? 'both' : on[0] || '';
+        // list: 고른 것을 모두 배열로(달라지는 것). 그 밖(환경): 둘 다면 'both'
+        f[box.dataset.seg] = box.dataset.multi === 'list' ? on : on.length === 2 ? 'both' : on[0] || '';
       } else {
         f[box.dataset.seg] = b.dataset.v;
         box.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
@@ -718,9 +721,12 @@ function openArrowForm(fromKey, toKey, key) {
   if (!fr || !tr) return;
   const draftId = key ? 'arrow-' + key : `arrow-new-${fromKey}-${toKey}`;
   const draft = loadDraft(draftId);
-  // kind: 교류 종류(물건·기술·관광·문화), way: 달라지는 것(16가지 가운데 하나). 예시 화살표와 같은 모양으로 보입니다.
-  const f = { kind: old ? old.kind || '' : '', how: old ? old.how : '', way: old ? old.way || '' : '', change: old ? old.change : '', ...(draft || {}) };
-  const wayQ = (w) => ((ARROW_TIP.ways.find(([n]) => n === w) || [])[1] || '위에서 하나를 고르면 떠올릴 물음이 나와요');
+  // kind: 교류 종류(물건·기술·관광·문화), way: 달라지는 것(16가지 가운데 여러 개, 배열). 예시 화살표와 같은 모양으로 보입니다.
+  const f = { kind: old ? old.kind || '' : '', how: old ? old.how : '', way: wayList(old && old.way), change: old ? old.change : '', ...(draft || {}) };
+  f.way = wayList(f.way); // 예전에 하나만 고른 글(문자열)도 배열로
+  const wayQ = (list) => (list.length
+    ? list.map((w) => `${w}: ${(ARROW_TIP.ways.find(([n]) => n === w) || [])[1] || ''}`).join('  ·  ')
+    : '위에서 고르면 떠올릴 물음이 나와요(여러 개 골라도 돼요)');
   const side = (r) => `<div class="af-res">${photoBox(r.photo)}<span><small>${esc(regionName(r.cid))}</small><b>${esc(r.name)}</b></span></div>`;
   const html = `<div class="sheet form arrow-form" role="dialog">
     <div class="sheet-head">${key ? '화살표 고치기' : '화살표 잇기'}
@@ -733,8 +739,8 @@ function openArrowForm(fromKey, toKey, key) {
     <div class="q"><span class="num">1</span>어떻게 교류하나요? <small class="q-note">교류 종류를 고르고, 무엇을 주고받는지 써요</small></div>
     <div class="seg-kind">${seg('kind', ARROW_TIP.kinds.map(([k]) => [k, k]), f.kind)}</div>
     ${field('how', f.how, '무엇을 보내고 무엇을 받나요?')}
-    <div class="q"><span class="num">2</span>그러면 생활 모습이 어떻게 달라지나요? <small class="q-note">달라지는 것을 하나 골라요</small></div>
-    <div class="seg-way">${seg('way', ARROW_TIP.ways.map(([n]) => [n, n]), f.way)}</div>
+    <div class="q"><span class="num">2</span>그러면 생활 모습이 어떻게 달라지나요? <small class="q-note">달라지는 것을 골라요(여러 개 골라도 돼요)</small></div>
+    <div class="seg-way"><div class="seg" data-seg="way" data-multi="list">${ARROW_TIP.ways.map(([n]) => `<button type="button" data-v="${esc(n)}" class="${f.way.includes(n) ? 'on' : ''}" aria-pressed="${f.way.includes(n)}">${esc(n)}</button>`).join('')}</div></div>
     <p class="ex" data-wayhint>${esc(wayQ(f.way))}</p>
     ${field('change', f.change, '받은 것 + 우리 것 = 새로운 생활!')}
       </div>
@@ -756,7 +762,7 @@ function openArrowForm(fromKey, toKey, key) {
   bindForm(f, draftId, () => {
     if (!f.kind) return '1번: 교류 종류를 골라 주세요';
     if (!f.how.trim()) return '1번: 어떻게 교류하는지 써 주세요';
-    if (!f.way) return '2번: 달라지는 것을 하나 골라 주세요';
+    if (!f.way.length) return '2번: 달라지는 것을 하나 이상 골라 주세요';
     if (!f.change.trim()) return '2번: 생활 모습이 어떻게 달라지는지 써 주세요';
     return '';
   }, () => {
