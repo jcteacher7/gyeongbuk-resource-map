@@ -1,6 +1,6 @@
 // 지도 그리기: 시군 모양(확대되는 층) 위에 이름·핀·화살표(글자 크기가 그대로인 층)를 얹습니다.
 // 확대는 [+] [−] [처음 크기] 단추와 "이 시군 크게 보기"로만 합니다. 한 손가락으로 밀면 지도가 움직입니다.
-import { esc } from './util.js?v=50';
+import { esc } from './util.js?v=51';
 
 const NS = 'http://www.w3.org/2000/svg';
 const PAD = 22;
@@ -26,8 +26,8 @@ export function createMapView(el, data, h) {
     </svg>
     <svg class="arrows-svg">
       <defs>
-        <marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2A6F7D"></path></marker>
-        <marker id="ahs" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#FF6B57"></path></marker>
+        <marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#2A6F7D"></path></marker>
+        <marker id="ahs" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#FF6B57"></path></marker>
       </defs>
       <g class="arrows"></g>
     </svg>
@@ -51,6 +51,7 @@ export function createMapView(el, data, h) {
   let homeS = 1;
   let model = { counts: {}, selected: null, mine: new Set(), arrows: [], pick: null, selArrow: null, tint: {} };
   let labelEls = [];
+  let shownAt = new Map(); // 시군 id → 화면에 실제로 놓인 이름표의 가운데와 크기(겹침을 풀며 밀린 자리)
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const W = () => el.clientWidth;
@@ -116,6 +117,7 @@ export function createMapView(el, data, h) {
     labelEls.forEach(({ node }, i) => {
       node.style.transform = `translate(${pos[i][0].toFixed(1)}px, ${pos[i][1].toFixed(1)}px)`;
     });
+    shownAt = new Map(labelEls.map((l, i) => [l.id, { x: pos[i][0], y: pos[i][1], w: l.w, h: l.h }]).filter(([id]) => id != null));
     paintArrows();
   }
 
@@ -161,25 +163,33 @@ export function createMapView(el, data, h) {
     groups.forEach((list) => {
       list.forEach((a, i) => {
         const lo = Math.min(a.from, a.to), hi = Math.max(a.from, a.to);
-        const [ax, ay] = toScreen(pinPoint(lo));
-        const [bx, by] = toScreen(pinPoint(hi));
+        // 이름표가 겹침을 풀며 밀렸으면 밀린 자리에서 출발·도착합니다.
+        const at = (id) => { const s = shownAt.get(id); return s ? [s.x, s.y] : toScreen(pinPoint(id)); };
+        const box = (id) => { const s = shownAt.get(id); return s && s.w ? [s.w / 2, s.h / 2] : [42, 18]; };
+        const [ax, ay] = at(lo);
+        const [bx, by] = at(hi);
         const dx = bx - ax, dy = by - ay;
         const len = Math.hypot(dx, dy) || 1;
         const bend = (i % 2 ? -1 : 1) * (0.2 + Math.floor(i / 2) * 0.18) * len;
         const cx = (ax + bx) / 2 - (dy / len) * bend;
         const cy = (ay + by) / 2 + (dx / len) * bend;
         let [sx, sy, ex, ey] = a.from === lo ? [ax, ay, bx, by] : [bx, by, ax, ay];
-        const trim = (px, py, d) => {
+        // 교류는 서로 주고받으므로 양쪽 끝에 화살촉. 화살촉이 시군 이름표(가로로 넓은 네모) 밑에 숨지 않게
+        // 그 이름표 밖으로 나오는 거리만큼 줄입니다.
+        // 이름표가 맞닿은 이웃 시군은 비키다 화살표가 사라지지 않게, 줄이는 길이를 둘 사이 거리의 30%까지만 씁니다.
+        const trim = (px, py, [hw, hh]) => {
           const l = Math.hypot(cx - px, cy - py) || 1;
-          return [px + ((cx - px) / l) * d, py + ((cy - py) / l) * d];
+          const ux = (cx - px) / l, uy = (cy - py) / l;
+          const d = Math.min(Math.min(hw / (Math.abs(ux) || 1e-6), hh / (Math.abs(uy) || 1e-6)) + 7, len * 0.3);
+          return [px + ux * d, py + uy * d];
         };
-        [sx, sy] = trim(sx, sy, 20);
-        [ex, ey] = trim(ex, ey, 26);
+        [sx, sy] = trim(sx, sy, box(a.from));
+        [ex, ey] = trim(ex, ey, box(a.to));
         const d = `M${sx.toFixed(1)} ${sy.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
         const sel = a.key === model.selArrow;
         const part = sel
-          ? `<path class="arw-under" d="${d}"></path><path class="arw sel" d="${d}" marker-end="url(#ahs)"></path>`
-          : `<path class="arw flow" d="${d}" marker-end="url(#ah)"></path>`;
+          ? `<path class="arw-under" d="${d}"></path><path class="arw sel" d="${d}" marker-start="url(#ahs)" marker-end="url(#ahs)"></path>`
+          : `<path class="arw flow" d="${d}" marker-start="url(#ah)" marker-end="url(#ah)"></path>`;
         const hit = `<path class="arw-hit" data-arrow="${esc(a.key)}" d="${d}"></path>`;
         if (sel) {
           // 곡선의 한가운데(Q 곡선에서 t=0.5)에 이유 딱지를 얹습니다.
@@ -219,7 +229,7 @@ export function createMapView(el, data, h) {
     labelEls = out.map((o, i) => {
       const node = nodes[i];
       const region = node.matches('.pin, .rname');
-      return { node, pt: o.pt, pin: node.matches('.pin'), w: region ? node.offsetWidth : 0, h: region ? (node.matches('.pin') ? node.offsetHeight : 30) : 0 };
+      return { node, pt: o.pt, id: region ? +node.dataset.id : null, pin: node.matches('.pin'), w: region ? node.offsetWidth : 0, h: region ? (node.matches('.pin') ? node.offsetHeight : 30) : 0 };
     });
   }
 

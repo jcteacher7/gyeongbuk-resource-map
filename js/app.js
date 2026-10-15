@@ -1,14 +1,14 @@
-import mapData from '../data/gyeongbuk-map.js?v=50';
-import { store } from './store.js?v=50';
-import { createMapView, shortName } from './map-view.js?v=50';
-import { shrinkPhoto } from './photo.js?v=50';
-import { esc, safeLink, josa, timeText } from './util.js?v=50';
-import { MAX_LEN } from './config.js?v=50';
-import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=50';
-import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=50';
-import { createTagView } from './tag-view.js?v=50';
-import { createChatView } from './chat-view.js?v=50';
-import { createTeacher, hashCode } from './teacher.js?v=50';
+import mapData from '../data/gyeongbuk-map.js?v=51';
+import { store } from './store.js?v=51';
+import { createMapView, shortName } from './map-view.js?v=51';
+import { shrinkPhoto } from './photo.js?v=51';
+import { esc, safeLink, josa, timeText } from './util.js?v=51';
+import { MAX_LEN } from './config.js?v=51';
+import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=51';
+import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=51';
+import { createTagView } from './tag-view.js?v=51';
+import { createChatView } from './chat-view.js?v=51';
+import { createTeacher, hashCode } from './teacher.js?v=51';
 
 const $ = (s, r = document) => r.querySelector(s);
 const stage = $('#stage');
@@ -295,7 +295,7 @@ function planPanel(all) {
   const ex = gid === EX;
   const focus = ex ? EXAMPLE_CID : planOf(gid);
   const arrows = planArrows();
-  const aitem = (a) => `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.arrowSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`;
+  const aitem = (a) => `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.bothSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`;
   let html = `<div class="plan-groups">${roster().groups.map((g) => `<button type="button" class="chip ${g.id === gid ? 'on' : ''}" data-plang="${g.id}"><i class="gdot" style="background:${groupColor(g.id)}"></i>${esc(g.name)}${!isTeacher() && g.id === S.me.g ? ' (우리)' : ''}</button>`).join('')}
     <button type="button" class="chip ex-chip ${ex ? 'on' : ''}" data-plang="${EX}"><i class="gdot" style="background:${EX_COLOR}"></i>예시: 문경</button></div>`;
   if (S.selected == null && ex) {
@@ -383,7 +383,7 @@ function renderPanel() {
       const mine = arrows.filter((a) => a.fromRes.cid === id || a.toRes.cid === id);
       if (mine.length) {
         html += `<h3 class="p-h3">${ICON.arrowSmall}이어진 화살표 ${mine.length}개</h3><div class="alist">` + mine.map((a) =>
-          `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.arrowSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`).join('') + '</div>';
+          `<button type="button" class="aitem" data-arrowkey="${esc(a.key)}"><span>${esc(shortName(regionName(a.fromRes.cid)))} ${esc(a.fromRes.name)}</span>${ICON.bothSmall}<span>${esc(shortName(regionName(a.toRes.cid)))} ${esc(a.toRes.name)}</span></button>`).join('') + '</div>';
       }
     }
   }
@@ -494,7 +494,7 @@ function showRes(key, refresh) {
 function showExampleArrow(a, refresh) {
   const f = a.fromRes, t = a.toRes;
   const html = `<div class="sheet pop arrow-pop" role="dialog" aria-label="예시 화살표">
-    <div class="pop-head coral"><span>${esc(shortName(regionName(f.cid)))} ${esc(f.name)}</span>${ICON.arrowWhite}<span>${esc(shortName(regionName(t.cid)))} ${esc(t.name)}</span>
+    <div class="pop-head coral"><span>${esc(shortName(regionName(f.cid)))} ${esc(f.name)}</span>${ICON.bothWhite}<span>${esc(shortName(regionName(t.cid)))} ${esc(t.name)}</span>
       <button type="button" class="xbtn light" data-act="close" aria-label="닫기">${ICON.x}</button></div>
     <ol class="steps3 ex-steps">
       <li><span class="step-name"><span class="num">1</span>어떻게 교류하나요?</span><span class="step-text"><span class="ex-kind">${esc(a.kind)}</span>${esc(a.how)}</span></li>
@@ -517,18 +517,16 @@ function showArrow(key, refresh) {
   if (!a) return;
   const f = a.fromRes, t = a.toRes;
   const html = `<div class="sheet pop arrow-pop" role="dialog" aria-label="화살표">
-    <div class="pop-head coral"><span>${esc(shortName(regionName(f.cid)))} ${esc(f.name)}</span>${ICON.arrowWhite}<span>${esc(shortName(regionName(t.cid)))} ${esc(t.name)}</span>
+    <div class="pop-head coral"><span>${esc(shortName(regionName(f.cid)))} ${esc(f.name)}</span>${ICON.bothWhite}<span>${esc(shortName(regionName(t.cid)))} ${esc(t.name)}</span>
       <button type="button" class="xbtn light" data-act="close" aria-label="닫기">${ICON.x}</button></div>
     <div class="two-photos">
       <button type="button" class="ph" data-res="${esc(f.key)}">${photoBox(f.photo)}<span>${esc(shortName(regionName(f.cid)))} · ${esc(f.name)} <em class="badge ${f.amt}">${AMT[f.amt] || ''}</em></span></button>
-      <span class="ph-arrow">${ICON.arrow}</span>
+      <span class="ph-arrow">${ICON.both}</span>
       <button type="button" class="ph" data-res="${esc(t.key)}">${photoBox(t.photo)}<span>${esc(shortName(regionName(t.cid)))} · ${esc(t.name)} <em class="badge ${t.amt}">${AMT[t.amt] || ''}</em></span></button>
     </div>
-    <ol class="steps3">
-      <li><span class="step-name"><span class="num">1</span>환경</span>
-        <span class="step-text">${envChips(f.env)}${esc(f.why)}${f.era ? ` <span class="era ${f.era}">${ERA[f.era]}</span>` : ''}<br>${envChips(t.env)}${esc(t.why)}${t.era ? ` <span class="era ${t.era}">${ERA[t.era]}</span>` : ''}</span></li>
-      <li><span class="step-name"><span class="num">2</span>교류</span><span class="step-text">${esc(a.how)}</span></li>
-      <li><span class="step-name"><span class="num">3</span>생활 변화</span><span class="step-text">${esc(a.change)}</span></li>
+    <ol class="steps3 ex-steps">
+      <li><span class="step-name"><span class="num">1</span>어떻게 교류하나요?</span><span class="step-text">${a.kind ? `<span class="ex-kind">${esc(a.kind)}</span>` : ''}${esc(a.how)}</span></li>
+      <li><span class="step-name"><span class="num">2</span>생활 모습이 어떻게 달라지나요?</span><span class="step-text">${a.way ? `<span class="ex-way">${esc(a.way)}</span>` : ''}${esc(a.change)}</span></li>
     </ol>
     ${editRow(a, 'arrow')}
   </div>`;
@@ -720,7 +718,9 @@ function openArrowForm(fromKey, toKey, key) {
   if (!fr || !tr) return;
   const draftId = key ? 'arrow-' + key : `arrow-new-${fromKey}-${toKey}`;
   const draft = loadDraft(draftId);
-  const f = { how: old ? old.how : '', change: old ? old.change : '', ...(draft || {}) };
+  // kind: 교류 종류(물건·기술·관광·문화), way: 달라지는 것(16가지 가운데 하나). 예시 화살표와 같은 모양으로 보입니다.
+  const f = { kind: old ? old.kind || '' : '', how: old ? old.how : '', way: old ? old.way || '' : '', change: old ? old.change : '', ...(draft || {}) };
+  const wayQ = (w) => ((ARROW_TIP.ways.find(([n]) => n === w) || [])[1] || '위에서 하나를 고르면 떠올릴 물음이 나와요');
   const side = (r) => `<div class="af-res">${photoBox(r.photo)}<span><small>${esc(regionName(r.cid))}</small><b>${esc(r.name)}</b></span></div>`;
   const html = `<div class="sheet form arrow-form" role="dialog">
     <div class="sheet-head">${key ? '화살표 고치기' : '화살표 잇기'}
@@ -729,20 +729,20 @@ function openArrowForm(fromKey, toKey, key) {
       <button type="button" class="xbtn" data-act="form-cancel" aria-label="닫기">${ICON.x}</button></div>
     <div class="af-body">
       <div class="af-main">
-    <div class="af-top">${side(fr)}<span class="af-arrow">${ICON.arrow}</span>${side(tr)}</div>
-    <div class="q"><span class="num">1</span>어떻게 교류하나요?</div>
-    ${field('how', f.how, '한 줄로 써요')}
-    <div class="q"><span class="num">2</span>그러면 생활 모습이 어떻게 달라지나요?</div>
-    ${field('change', f.change, '한 줄로 써요')}
+    <div class="af-top">${side(fr)}<span class="af-arrow">${ICON.both}</span>${side(tr)}</div>
+    <div class="q"><span class="num">1</span>어떻게 교류하나요? <small class="q-note">교류 종류를 고르고, 무엇을 주고받는지 써요</small></div>
+    <div class="seg-kind">${seg('kind', ARROW_TIP.kinds.map(([k]) => [k, k]), f.kind)}</div>
+    ${field('how', f.how, '무엇을 보내고 무엇을 받나요?')}
+    <div class="q"><span class="num">2</span>그러면 생활 모습이 어떻게 달라지나요? <small class="q-note">달라지는 것을 하나 골라요</small></div>
+    <div class="seg-way">${seg('way', ARROW_TIP.ways.map(([n]) => [n, n]), f.way)}</div>
+    <p class="ex" data-wayhint>${esc(wayQ(f.way))}</p>
+    ${field('change', f.change, '받은 것 + 우리 것 = 새로운 생활!')}
       </div>
     <div class="tip-box" data-tip hidden>
       <b>${ICON.bulb}선생님의 팁 <small>예시: ${esc(ARROW_TIP.pair)}</small></b>
       <p><span class="num">1</span>${esc(ARROW_TIP.how.tip)}<br><em>예: ${esc(ARROW_TIP.how.ex)}</em></p>
       <ul class="kinds">${ARROW_TIP.kinds.map(([k, ex]) => `<li><b>${esc(k)}</b>${esc(ex)}</li>`).join('')}</ul>
       <p><span class="num">2</span>${esc(ARROW_TIP.change.pick)}</p>
-      <div class="ways" data-page="0">${ARROW_TIP.ways.map(([name], i) => `<button type="button" data-act="way" data-i="${i}" class="${i < 8 ? 'p0' : 'p1'}">${esc(name)}</button>`).join('')}
-        <button type="button" class="more" data-act="way-more">다른 것 더 보기 <small>1/2</small></button></div>
-      <div class="way-q" data-wayq hidden></div>
       <p class="nonum">${esc(ARROW_TIP.change.tip)}<br><em>예: ${esc(ARROW_TIP.change.ex)}</em></p>
       <p><span class="num">3</span>${esc(ARROW_TIP.together.tip)}<br><em>예: ${esc(ARROW_TIP.together.ex)}</em></p>
       <small>예시를 그대로 쓰지 말고, 우리 모둠이 조사한 자원으로 써요. 이젤패드의 지역 칸도 이 1·2·3 순서와 같아요.</small>
@@ -754,16 +754,23 @@ function openArrowForm(fromKey, toKey, key) {
   </div>`;
   openModal({ type: 'arrowForm' }, html);
   bindForm(f, draftId, () => {
+    if (!f.kind) return '1번: 교류 종류를 골라 주세요';
     if (!f.how.trim()) return '1번: 어떻게 교류하는지 써 주세요';
+    if (!f.way) return '2번: 달라지는 것을 하나 골라 주세요';
     if (!f.change.trim()) return '2번: 생활 모습이 어떻게 달라지는지 써 주세요';
     return '';
   }, () => {
     const k = key || store.newKey('a');
-    const v = { from: fromKey, to: toKey, how: f.how.trim(), change: f.change.trim(), by: old ? old.by : { ...S.me }, at: old ? old.at : Date.now() };
+    const v = { from: fromKey, to: toKey, kind: f.kind, how: f.how.trim(), way: f.way, change: f.change.trim(), by: old ? old.by : { ...S.me }, at: old ? old.at : Date.now() };
     if (old) v.edited = { ...S.me, at: Date.now() };
     store.put('arrow', k, v);
     S.arrowMode = null;
     savedToast();
+  });
+  // 달라지는 것을 고르면 떠올릴 물음을 바로 아래에 보여 줍니다(입력칸은 건드리지 않음).
+  const sheet = $('#modal .sheet');
+  sheet.addEventListener('click', (e) => {
+    if (e.target.closest('[data-seg="way"] button')) sheet.querySelector('[data-wayhint]').textContent = wayQ(f.way);
   });
 }
 
@@ -1115,6 +1122,10 @@ const ICON = {
   pinSmall: sv('<path d="M12 22 C12 22 5 14.5 5 9.5 A7 7 0 0 1 19 9.5 C19 14.5 12 22 12 22 Z"/><circle cx="12" cy="9.5" r="2.6"/>', 20),
   arrow: sv('<path d="M4 12 H19 M13 6 L19 12 L13 18"/>', 26),
   arrowSmall: sv('<path d="M4 12 H19 M13 6 L19 12 L13 18"/>', 18),
+  // 교류 화살표(양쪽 화살촉): 목록·창 머리·화살표 창에서 씁니다.
+  both: sv('<path d="M3 12 H21 M8 7 L3 12 L8 17 M16 7 L21 12 L16 17"/>', 26),
+  bothSmall: sv('<path d="M3 12 H21 M8 7 L3 12 L8 17 M16 7 L21 12 L16 17"/>', 18),
+  bothWhite: sv('<path d="M3 12 H21 M8 7 L3 12 L8 17 M16 7 L21 12 L16 17"/>', 28),
   arrowWhite: sv('<path d="M4 12 H19 M13 6 L19 12 L13 18"/>', 28),
   x: sv('<path d="M6 6 L18 18 M18 6 L6 18"/>', 22),
   plus: sv('<path d="M12 5 V19 M5 12 H19"/>', 22),

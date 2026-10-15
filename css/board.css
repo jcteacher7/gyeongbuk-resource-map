@@ -311,3 +311,14 @@ body { word-break: keep-all; overflow-wrap: break-word; }
 /* 자원 올리기 1번: 환경은 둘 다 고를 수 있음 */
 .q .q-note { margin-left: 6px; font-family: var(--body); font-weight: 400; font-size: 14.5px; color: var(--teal); }
 .env + .env { margin-left: 3px; }
+/* 화살표 창: 교류 종류와 달라지는 것 고르기 */
+.seg-kind, .seg-way, .af-main > .ex { margin-left: 26px; margin-right: 26px; }
+.seg-kind .seg button { height: 44px; font-size: 19px; }
+.seg-way .seg { flex-wrap: wrap; gap: 5px; }
+.seg-way .seg button { flex: none; height: 34px; padding: 0 9px; font-size: 16px; border-width: 2px; border-radius: 999px; }
+/* 달라지는 것 16가지: 4칸씩 네 줄로 가지런히, 누르는 곳 40px 이상 */
+.seg-way .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.seg-way .seg button { flex: none; width: 100%; height: 40px; padding: 0 4px; font-size: 17px; border-radius: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg-kind .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.seg-kind .seg button { height: 44px; }
+.af-main > .ex[data-wayhint] { margin-top: 4px; margin-bottom: 2px; font-size: 15px; }
