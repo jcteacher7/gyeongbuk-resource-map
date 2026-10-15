@@ -487,7 +487,7 @@
 
 <section class="ideas kid">
   <h2><span class="cn">3</span>모양은 우리 모둠이 정해요</h2>
-  <p>과거와 현재는 위에 두고, 노란 <b>미래</b> 칸 안의 모양만 바꿔요. 지역들이 <b>서로 이어져 보이면</b> 돼요. 새 모양을 생각해도 좋아요.</p>
+  <p>과거와 현재는 위에 두고, 노란 <b>미래</b> 칸 안의 모양만 바꿔요. 지역들이 <b>서로 이어져 보이면</b> 돼요. 큰 종이(63.5 × 76.2cm)에 <b>사진 네 장과 글이 다 들어가는 모양</b>만 골랐어요. 네모 칸으로 나누면 빨리 만들 수 있어요.</p>
   <div class="ideas-grid" id="ideas"></div>
 </section>
 
@@ -590,33 +590,43 @@
     <rect x="7" y="52" width="186" height="144" rx="8" fill="#FFFCEE" stroke="#E0A100" stroke-width="2"/><rect x="12" y="49" width="26" height="7" rx="3" fill="#B07A00"/>`;
   const claim = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#FFF6D6" stroke="#C93A27" stroke-width="2"/>` +
     [0, 1, 2].map((i) => `<path d="M${x + 6} ${y + 8 + i * (h - 12) / 3} h${w - 12}" stroke="#C9B37A" stroke-width="2.5" stroke-linecap="round"/>`).join('');
+  // 실제 이젤패드(63.5 × 76.2cm)에 사진 네 장(세 지역 A7, 우리 지역 A6)과 글이 다 들어가는 모양만 남겼습니다(2026-10-15).
+  // 칸마다 사진(가로 네모), 글 줄, 아래쪽 "함께" 딱지를 작게 그려 실제 자리를 보여 줍니다.
+  const PHOTO = 'fill="#D6EEF3" stroke="#2A6F7D" stroke-width="1.2"', HPHOTO = 'fill="#FFE6A8" stroke="#C93A27" stroke-width="1.2"';
+  const lines = (x, y, w, n, gap = 7) => Array.from({ length: n }, (_, i) => `<path d="M${x} ${y + i * gap} h${w}" stroke="#9FCFD6" stroke-width="2.5" stroke-linecap="round"/>`).join('');
+  // 세 지역 칸: 사진은 칸 폭의 절반쯤(가로 네모), 옆에 ② 상자, 아래 글 줄, 맨 아래 함께 딱지
+  const region = (x, y, w, h) => {
+    const pw = Math.round(w * .55), ph = Math.round(pw * .7);
+    const ly = y + 6 + ph + 6, n = Math.max(1, Math.floor((y + h - 12 - ly) / 7));
+    return box(x, y, w, h, PAR, 5) + `<rect x="${x + 4}" y="${y + 4}" width="${pw}" height="${ph}" rx="2" ${PHOTO}/>` +
+      `<rect x="${x + 8 + pw}" y="${y + 4}" width="${w - pw - 12}" height="${ph}" rx="2" fill="#fff" stroke="#7FB5BE" stroke-width="1.2" stroke-dasharray="3 2"/>` +
+      lines(x + 5, ly, w - 10, n) + `<rect x="${x + 4}" y="${y + h - 9}" width="${w - 8}" height="5" rx="2" fill="#FFD35C"/>`;
+  };
+  // 달라진 우리 지역: 큰 사진 + 세 줄
+  const hub = (x, y, w, h, side = true) => {
+    if (side) {
+      const ph = h - 14, pw = Math.round(ph / .7);
+      return box(x, y, w, h, HUB, 6) + `<rect x="${x + 5}" y="${y + 9}" width="${pw}" height="${ph - 4}" rx="2" ${HPHOTO}/>` +
+        [0, 1, 2].map((i) => `<rect x="${x + pw + 10}" y="${y + 12 + i * (ph - 8) / 3}" width="12" height="5" rx="2" fill="#C93A27"/>` + lines(x + pw + 26, y + 14.5 + i * (ph - 8) / 3, w - pw - 32, 1)).join('');
+    }
+    const pw = w - 10, ph = Math.round(pw * .7);
+    return box(x, y, w, h, HUB, 6) + `<rect x="${x + 5}" y="${y + 9}" width="${pw}" height="${ph}" rx="2" ${HPHOTO}/>` +
+      [0, 1, 2].map((i) => `<rect x="${x + 5}" y="${y + ph + 15 + i * 9}" width="10" height="5" rx="2" fill="#C93A27"/>` + lines(x + 19, y + ph + 17.5 + i * 9, w - 24, 1)).join('');
+  };
   const IDEAS = [
-    { name: '가운데와 둘레', say: '우리 지역이 가운데, 세 지역이 둘레에.',
-      svg: line([100, 112], [34, 84]) + line([100, 112], [166, 84]) + line([100, 112], [100, 170]) +
-        box(8, 58, 52, 50, PAR) + box(140, 58, 52, 50, PAR) + box(74, 150, 52, 44, PAR) + box(66, 80, 68, 60, HUB) + claim(12, 202, 176, 28) },
-    { name: '길 따라가기', say: '길 위에 지역을 차례로.',
-      svg: `<path d="M38 70 C120 40 190 70 150 104 C110 138 20 120 52 160 C76 190 150 178 162 178" fill="none" stroke="#E7D9A8" stroke-width="16" stroke-linecap="round"/>
-        <path d="M38 70 C120 40 190 70 150 104 C110 138 20 120 52 160 C76 190 150 178 162 178" ${LINK}/>` +
-        box(10, 46, 60, 50, HUB) + box(126, 80, 50, 42, PAR) + box(22, 132, 50, 42, PAR) + box(136, 156, 50, 42, PAR) + claim(12, 206, 110, 24) },
-    { name: '꽃 모양', say: '우리 지역이 꽃 가운데, 세 지역이 꽃잎.',
-      svg: `<path d="M100 150 V200" stroke="#3E9E5C" stroke-width="5" stroke-linecap="round"/>` +
-        dot(52, 82, 27, PAR) + dot(148, 82, 27, PAR) + dot(100, 152, 25, PAR) + dot(100, 104, 31, HUB) + claim(30, 204, 140, 26) },
-    { name: '나무 모양', say: '뿌리는 우리 지역, 열매는 세 지역.',
-      svg: `<path d="M100 168 V120 M100 130 L38 92 M100 124 L100 86 M100 130 L162 92" fill="none" stroke="#9C7A4A" stroke-width="6" stroke-linecap="round"/>` +
-        dot(36, 74, 25, PAR) + dot(100, 66, 25, PAR) + dot(164, 74, 25, PAR) + box(66, 150, 68, 46, HUB) + claim(12, 204, 176, 26) },
-    { name: '퍼즐 맞추기', say: '네 조각이 딱 맞물려요.',
-      svg: box(20, 48, 80, 70, HUB, 4) + box(100, 48, 80, 70, PAR, 4) + box(20, 118, 80, 70, PAR, 4) + box(100, 118, 80, 70, PAR, 4) +
-        dot(100, 83, 9, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"') + dot(60, 118, 9, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2.5"') +
-        dot(140, 118, 9, PAR) + dot(100, 153, 9, PAR) + claim(12, 200, 176, 30) },
-    { name: '지도 위에', say: '경북 모양 위에 그림을 붙여 이어요.',
-      svg: `<path d="M44 64 L70 48 L112 52 L150 46 L170 70 L166 112 L178 150 L150 186 L104 192 L70 176 L50 150 L34 110 Z" fill="#FBF3CC" stroke="#2A6F7D" stroke-width="2" stroke-linejoin="round"/>` +
-        line([62, 84], [150, 96]) + line([62, 84], [70, 138]) + line([62, 84], [146, 156]) +
-        box(36, 62, 52, 44, HUB) + box(130, 78, 42, 36, PAR) + box(50, 122, 42, 36, PAR) + box(126, 140, 42, 36, PAR) + claim(12, 204, 176, 26) },
-    { name: '다리 놓기', say: '세 지역으로 다리를 놓아요.',
-      svg: [70, 118, 166].map((y) => `<path d="M72 ${y} Q104 ${y - 20} 136 ${y}" fill="none" stroke="#9C7A4A" stroke-width="4"/><path d="M72 ${y} H136" stroke="#9C7A4A" stroke-width="3"/>`).join('') +
-        box(10, 52, 62, 136, HUB) + box(136, 50, 54, 40, PAR) + box(136, 98, 54, 40, PAR) + box(136, 146, 54, 40, PAR) + claim(12, 202, 176, 28) },
-    { name: '손잡은 동그라미', say: '네 지역이 둥글게 손을 잡아요.',
-      svg: `<circle cx="100" cy="124" r="62" ${LINK}/>` + dot(100, 62, 26, HUB) + dot(38, 124, 23, PAR) + dot(162, 124, 23, PAR) + dot(100, 186, 23, PAR) + claim(66, 104, 68, 40) },
+    { name: '위아래 나누기', say: '견본과 같은 모양. 위에 세 지역을 나란히, 아래에 우리 지역을 넓게.',
+      svg: line([35, 118], [35, 130]) + line([100, 118], [100, 130]) + line([165, 118], [165, 130]) +
+        region(6, 40, 60, 78) + region(70, 40, 60, 78) + region(134, 40, 60, 78) + hub(6, 130, 188, 62) + claim(12, 202, 176, 28) },
+    { name: '가운데와 둘레', say: '우리 지역이 가운데, 세 지역이 왼쪽·오른쪽·아래에.',
+      svg: line([62, 80], [70, 80]) + line([130, 80], [138, 80]) + line([100, 126], [100, 134]) +
+        region(4, 40, 58, 86) + hub(70, 40, 60, 86, false) + region(138, 40, 58, 86) + region(40, 134, 120, 58) + claim(12, 202, 176, 28) },
+    { name: '다리 놓기', say: '왼쪽에 우리 지역을 크게, 오른쪽 세 지역으로 다리를 놓아요.',
+      svg: [64, 116, 168].map((y) => `<path d="M80 ${y} Q93 ${y - 12} 106 ${y}" fill="none" stroke="#9C7A4A" stroke-width="3"/><path d="M80 ${y} H106" stroke="#9C7A4A" stroke-width="2.5"/>`).join('') +
+        hub(6, 40, 74, 152, false) + region(106, 40, 88, 48) + region(106, 92, 88, 48) + region(106, 144, 88, 48) + claim(12, 202, 176, 28) },
+    { name: '네 칸 퍼즐', say: '미래 칸을 넷으로 나눠요. 한 칸은 우리 지역, 세 칸은 세 지역.',
+      svg: hub(6, 40, 92, 76, false) + region(102, 40, 92, 76) + region(6, 120, 92, 72) + region(102, 120, 92, 72) +
+        dot(100, 78, 6, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2"') + dot(52, 118, 6, 'fill="#FFF0C2" stroke="#C93A27" stroke-width="2"') +
+        dot(148, 118, 6, PAR) + dot(100, 156, 6, PAR) + claim(12, 202, 176, 28) },
   ];
   document.getElementById('ideas').innerHTML = IDEAS.map((d) =>
     `<div class="idea"><svg viewBox="0 0 200 240" role="img" aria-label="${d.name} 배치">${head}<g transform="translate(8 22) scale(.92 .88)">${d.svg}</g></svg><b>${d.name}</b><span>${d.say}</span></div>`).join('');
