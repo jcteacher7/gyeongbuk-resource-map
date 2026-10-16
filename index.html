@@ -8,9 +8,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
-<link rel="stylesheet" href="css/app.css?v=54">
-<link rel="stylesheet" href="css/screens.css?v=54">
-<link rel="stylesheet" href="css/board.css?v=54">
+<script>
+/* ?view=1 로 열면 이 기기를 보기 모드로 바꾼다(끌 때는 기존처럼 길게 눌러 비밀번호) */
+try{var u=new URL(location.href);if(u.searchParams.get('view')==='1'){localStorage.setItem('gb-view','1');u.searchParams.delete('view');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}
+</script>
+<link rel="stylesheet" href="css/app.css?v=55">
+<link rel="stylesheet" href="css/screens.css?v=55">
+<link rel="stylesheet" href="css/board.css?v=55">
 </head>
 <body>
 <div id="stage" class="stage">
@@ -47,6 +51,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </div>
 <noscript>이 앱은 자바스크립트가 켜져 있어야 써요.</noscript>
-<script type="module" src="js/app.js?v=54"></script>
+<script type="module" src="js/app.js?v=55"></script>
 </body>
 </html>
