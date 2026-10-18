@@ -8,7 +8,7 @@ import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=54';
 import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=54';
 import { createTagView } from './tag-view.js?v=54';
 import { createChatView } from './chat-view.js?v=54';
-import { createViewTag, createViewChat } from './view-pages.js?v=56';
+import { createViewTag, createViewChat } from './view-pages.js?v=57';
 import { createTeacher, hashCode } from './teacher.js?v=54';
 
 const $ = (s, r = document) => r.querySelector(s);

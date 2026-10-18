@@ -33,7 +33,7 @@ export function createViewTag(el, ctx) {
             ? list.map((x) => `<div class="tcard">${esc(x.text)}<small>${esc(x.by ? ctx.mask(x.by.n) : '')} · ${esc(ctx.groupName(x.by && x.by.g))}</small></div>`).join('')
             : '<p class="hint">아직 없어요</p>'}</div></div>`;
         }).join('')}</div>
-        ${recv.length ? '' : '<p class="hint vp-note">공개수업에서 발표를 들은 친구들이 TAG를 남기면 여기에 보여요.</p>'}`}
+        ${recv.length ? '' : '<p class="hint vp-note">수업에서 발표를 들은 친구들이 TAG를 남기면 여기에 보여요.</p>'}`}
       </section>
     </div>`;
     if (html === sig) return;
@@ -78,7 +78,7 @@ export function createViewChat(el, ctx) {
         thread += bubble('ai', c.a, `<span class="bwho">${ICON.bot}AI</span>`);
       });
     }
-    if (!thread) thread = '<p class="hint big vp-empty">아직 이 모둠의 대화가 없어요.<br>공개수업에서 모둠이 AI와 이야기하면 여기에 보여요.</p>';
+    if (!thread) thread = '<p class="hint big vp-empty">아직 이 모둠의 대화가 없어요.<br>수업에서 모둠이 AI와 이야기하면 여기에 보여요.</p>';
     const html = `<div class="chat-view vp">
       <aside class="cv-left">
         <div class="tv-targets">${groups.map((g) => `<button type="button" class="tv-target ${group === g.id ? 'on' : ''}" data-vcg="${g.id}">${esc(g.name)}${(store.get('gen', 'g' + g.id) || {}).text ? `<small>${ICON.star}</small>` : ''}</button>`).join('')}</div>
