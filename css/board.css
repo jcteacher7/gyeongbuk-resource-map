@@ -334,3 +334,11 @@ body.viewmode .viewbadge{display:block;position:fixed;left:12px;bottom:12px;z-in
 .viewexit[hidden]{display:none}
 .viewexit{position:fixed;inset:0;z-index:70;background:rgba(20,30,30,.45);display:flex;align-items:center;justify-content:center}
 body.viewmode #arrowBtn, body.viewmode [data-act="add"], body.viewmode [data-act="plan-set"], body.viewmode [data-act="edit-res"], body.viewmode [data-act="edit-arrow"], body.viewmode [data-act="del-res"], body.viewmode [data-act="del-arrow"], body.viewmode [data-act="letter-lock"], body.viewmode [data-act="retry"]{display:none!important}
+/* 보기 모드: TAG·AI 챗봇 볼 수만 있는 화면 */
+.vp .tv-target small { display: inline-flex; align-items: center; }
+.vp .tv-target small svg { width: 20px; height: 20px; color: #E0A100; fill: #FFD35C; }
+.vp .tv-target.on small { color: #fff; }
+.vp .cv-left { gap: 16px; overflow-y: auto; }
+.vp .cv-steps li.todo { color: var(--mute); }
+.vp-empty { margin: auto; text-align: center; line-height: 1.6; }
+.vp-note { margin-top: 14px; }

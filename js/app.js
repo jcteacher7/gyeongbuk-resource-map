@@ -8,6 +8,7 @@ import { LETTERS, ANSWER_CARDS, ANSWER_EXTRA } from '../data/letters.js?v=54';
 import { DEMO_ROSTER, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, GROUP_COLORS, ERA, EXAMPLE_CID, EXAMPLE_RES, EXAMPLE_HINT, ARROW_TIP, EXAMPLE_ARROWS, withDefaults } from './defaults.js?v=54';
 import { createTagView } from './tag-view.js?v=54';
 import { createChatView } from './chat-view.js?v=54';
+import { createViewTag, createViewChat } from './view-pages.js?v=56';
 import { createTeacher, hashCode } from './teacher.js?v=54';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -204,7 +205,9 @@ function renderTop() {
   $('#who').innerHTML = isTeacher() ? `${ICON.key}${S.answerMode ? '정답 예시 닫기' : '선생님 화면으로'}` : VIEW ? '처음으로' : esc(`${groupName(S.me.g)} · ${S.me.n}`);
   const t = texts(), st = stages();
   const tab = (id, label, open) => `<button type="button" class="tab ${S.tab === id ? 'on' : ''} ${open ? '' : 'locked'}" data-tab="${id}">${open ? '' : ICON.lock}${esc(label)}</button>`;
-  const html = (isTeacher() || VIEW)
+  const html = VIEW
+    ? tab('map', t.tabMap, true) + tab('plan', t.tabPlan, true) + tab('tag', t.tabTag, true) + tab('chat', t.tabChat, true)
+    : isTeacher()
     ? tab('map', t.tabMap, true) + tab('plan', t.tabPlan, true)
     : tab('map', t.tabMap, true) + tab('plan', t.tabPlan, !!st.plan) + tab('tag', t.tabTag, !!st.tag) + tab('chat', t.tabChat, !!st.chat);
   if ($('#tabs').innerHTML !== html) $('#tabs').innerHTML = html;
@@ -236,10 +239,10 @@ function renderTabs() {
   }
   ['tag', 'chat'].forEach((id) => {
     const v = $('#view-' + id);
-    const view = id === 'tag' ? tagView : chatView;
+    const view = VIEW ? (id === 'tag' ? vTag : vChat) : (id === 'tag' ? tagView : chatView);
     v.hidden = S.tab !== id;
     if (S.tab !== id) return;
-    if (stages()[id]) {
+    if (VIEW || stages()[id]) {
       if (v.dataset.locked) { delete v.dataset.locked; view.unmount(); }
       view.update();
       return;
@@ -832,7 +835,7 @@ document.addEventListener('click', (e) => {
   const tabB = t.closest('[data-tab]');
   if (tabB) {
     const id = tabB.dataset.tab;
-    if (id !== 'map' && !stages()[id] && !isTeacher()) { toast('선생님이 열어 주면 쓸 수 있어요.'); }
+    if (id !== 'map' && !stages()[id] && !isTeacher() && !VIEW) { toast('선생님이 열어 주면 쓸 수 있어요.'); }
     if (id !== S.tab) {
       S.arrowMode = null; S.selArrow = null; S.planGroup = null;
       if (modal && (modal.type === 'res' || modal.type === 'arrow')) closeModal();
@@ -985,7 +988,7 @@ document.addEventListener('click', (e) => {
 });
 
 // ---------- 선생님 화면 ----------
-let teacher = null, tagView = null, chatView = null;
+let teacher = null, tagView = null, chatView = null, vTag = null, vChat = null;
 let secretTaps = [];
 function secretTap() {
   const now = Date.now();
@@ -1139,7 +1142,7 @@ function start() {
     },
   });
   const ctx = {
-    store, esc, ICON, regions: mapData.regions, exampleCid: EXAMPLE_CID,
+    store, esc, ICON, regions: mapData.regions, exampleCid: EXAMPLE_CID, mask: maskName,
     me: () => S.me,
     roster, groupName, groupColor, texts, stages, tagCfg, chatCfg, toast, letters: LETTERS,
     classStep: () => Math.min(4, Math.max(1, (store.get('cfg', 'chatstep') || {}).step || 1)),
@@ -1159,6 +1162,8 @@ function start() {
   };
   tagView = createTagView($('#view-tag'), ctx);
   chatView = createChatView($('#view-chat'), ctx);
+  vTag = createViewTag($('#view-tag'), ctx);
+  vChat = createViewChat($('#view-chat'), ctx);
   teacher = createTeacher($('#teacher'), ctx);
   store.onChange(requestRender);
   store.start();
@@ -1184,6 +1189,7 @@ function viewOffAsk() {
     if (!saved || (await hashCode(saved.salt, a)) !== saved.hash) { toast('암호가 맞지 않아요.'); inp.value = ''; return; }
     try { localStorage.removeItem('gb-view'); } catch (e) { /* 무시 */ }
     VIEW = false; box.hidden = true; S.me = null;
+    tagView.reset(); tagView.unmount(); chatView.unmount(); vTag.reset(); vChat.reset();
     renderEnter();
     toast('보기 모드를 껐어요.');
   };
