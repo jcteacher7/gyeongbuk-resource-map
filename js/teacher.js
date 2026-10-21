@@ -1,8 +1,8 @@
 // 선생님 화면: 현황, TAG, 챗봇 기록, 모둠 문장 4개, 설정 고치기, 단계 열고 닫기, 지우기.
 // 숨은 입구(들어가기 화면의 제목을 다섯 번 누름)와 네 자리 암호로 가립니다.
 // 아이들이 우연히 들어오는 것을 막는 정도이며 완전한 잠금은 아닙니다.
-import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=56';
-import { esc, timeText, josa, markBlanks } from './util.js?v=56';
+import { TAG_KEYS, DEFAULT_TEXTS, DEFAULT_TAG, DEFAULT_CHAT, withDefaults, splitTemplate } from './defaults.js?v=57';
+import { esc, timeText, josa, markBlanks } from './util.js?v=57';
 
 const TABS = [['status', '현황'], ['tag', 'TAG'], ['board', '챗봇 한눈에'], ['chat', '챗봇 기록'], ['gen', '모둠 문장'], ['settings', '설정'], ['wipe', '지우기']];
 
@@ -15,7 +15,6 @@ export function createTeacher(root, ctx) {
   const { store, regions, ICON } = ctx;
   let tab = 'status';
   let tagFilter = 'all';
-  let showDrafts = false;
   let chatG = 'all';
   let chatN = 'all';
   let big = false;
@@ -87,16 +86,15 @@ export function createTeacher(root, ctx) {
     const r = ctx.roster();
     let list = all('tag');
     if (tagFilter !== 'all') list = list.filter((x) => x.to === tagFilter);
-    const keys = showDrafts ? [...TAG_KEYS, 'D'] : TAG_KEYS;
-    const name = (k) => (k === 'D' ? '질문 초안' : cfg[k].name);
+    const keys = TAG_KEYS;
+    const name = (k) => cfg[k].name;
     return `<div class="t-filter">
         <button type="button" class="chip ${tagFilter === 'all' ? 'on' : ''}" data-tagf="all">전체</button>
         ${r.groups.map((g) => `<button type="button" class="chip ${tagFilter === g.id ? 'on' : ''}" data-tagf="${g.id}">${esc(g.name)} 발표</button>`).join('')}
-        <label class="chk"><input type="checkbox" data-drafts ${showDrafts ? 'checked' : ''}>질문 초안도 보기</label>
       </div>
       <div class="t-tagcols" style="grid-template-columns:repeat(${keys.length},1fr)">${keys.map((k) => {
         const items = list.filter((x) => x.type === k).reverse();
-        return `<div class="tv-col"><div class="tv-col-head"><span class="tchip t-${k}"><b>${k === 'D' ? '초' : k}</b>${esc(name(k))}</span> ${items.length}</div>
+        return `<div class="tv-col"><div class="tv-col-head"><span class="tchip t-${k}"><b>${k}</b>${esc(name(k))}</span> ${items.length}</div>
           <div class="tv-col-list">${items.map((x) => `<div class="tcard">${esc(x.text)}
             <small>${esc(x.by ? `${x.by.n}(${gname(x.by.g)})` : '')} → ${esc(gname(x.to))} · ${timeText(x.at)}</small>
             <button type="button" class="xbtn sm" data-tdel="${esc(x.key)}" aria-label="지우기">${ICON.trash}</button></div>`).join('') || '<p class="hint">없어요</p>'}</div></div>`;
@@ -225,8 +223,7 @@ export function createTeacher(root, ctx) {
       <section class="t-sec"><h3>4. TAG</h3>
         ${TAG_KEYS.map((k) => `<div class="t-grid2"><label>${k} 이름<input class="t-in" data-tag="${k}.name" value="${esc(tg[k].name)}" maxlength="12"></label>
           <label>${k} 입력칸 안내<input class="t-in" data-tag="${k}.hint" value="${esc(tg[k].hint)}" maxlength="60"></label></div>`).join('')}
-        <div class="t-grid2"><label>질문 초안 안내<input class="t-in" data-tag="draftHint" value="${esc(tg.draftHint)}" maxlength="60"></label>
-          <label>한 줄 글자 수<input class="t-in" type="number" min="10" max="200" data-tag="max" value="${tg.max}"></label></div>
+        <div class="t-grid2"><label>한 줄 글자 수<input class="t-in" type="number" min="10" max="200" data-tag="max" value="${tg.max}"></label></div>
         <button type="button" class="btn primary" data-save="tagcfg">TAG 저장</button></section>
 
       <section class="t-sec"><h3>5. 챗봇</h3>
@@ -470,7 +467,6 @@ export function createTeacher(root, ctx) {
     if (w) wipe(w.dataset.wipe);
   });
   root.addEventListener('change', (e) => {
-    if (e.target.matches('[data-drafts]')) { showDrafts = e.target.checked; render(); }
     if (e.target.matches('[data-bai]')) { boardAi = e.target.checked; render(); }
   });
 
