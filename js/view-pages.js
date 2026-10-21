@@ -2,8 +2,8 @@
 // - 입력칸·지우기·보내기 단추가 없고, 서버에 아무것도 쓰지 않습니다.
 // - 아이 이름은 가운데 글자를 가립니다(ctx.mask).
 // - 질문(A) 초안은 쓴 사람만 보는 글이라 보여 주지 않습니다.
-import { TAG_KEYS } from './defaults.js?v=55';
-import { timeText, markBlanks } from './util.js?v=55';
+import { TAG_KEYS } from './defaults.js?v=56';
+import { timeText, markBlanks } from './util.js?v=56';
 
 function groupsWithAll(ctx) { return ctx.roster().groups; }
 

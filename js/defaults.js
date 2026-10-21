@@ -94,7 +94,7 @@ export const DEFAULT_TAG = {
   A: { name: '질문', hint: '궁금한 점을 한 줄로 써요' },
   G: { name: '개선점 제안', hint: '이렇게 하면 더 좋겠다는 점을 한 줄로 써요' },
   draftHint: '발표 전에 제안서를 보며 떠오른 질문을 적어 둬요 (나만 봐요)',
-  max: 50,
+  max: 150,
 };
 
 export const DEFAULT_CHAT = {
