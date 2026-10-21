@@ -2,8 +2,8 @@
 // - 질문(A) 초안은 쓴 사람만 봅니다(화면에서 가리는 정도이며 완전한 잠금은 아님).
 // - 남긴 TAG는 발표 모둠과 선생님, 쓴 사람이 봅니다.
 // - 입력칸이 있는 틀은 한 번만 그리고, 다른 친구 글이 오면 목록만 바꿉니다(한글 입력 보호).
-import { TAG_KEYS } from './defaults.js?v=54';
-import { josa } from './util.js?v=54';
+import { TAG_KEYS } from './defaults.js?v=55';
+import { josa } from './util.js?v=55';
 
 export function createTagView(el, ctx) {
   const { store, esc, ICON } = ctx;
@@ -68,7 +68,8 @@ export function createTagView(el, ctx) {
     const recv = all.filter((x) => x.to === me.g && x.type !== 'D');
     const cnt = el.querySelector('[data-count="recv"]');
     if (cnt) cnt.textContent = recv.length ? recv.length : '';
-    const set = (node, html) => { if (node && node.innerHTML !== html) node.innerHTML = html; };
+    // 고치는 중인 칸이 있는 목록은 다시 그리지 않음(한글 입력 보호)
+    const set = (node, html) => { if (node && !node.querySelector('[data-edit-in]') && node.innerHTML !== html) node.innerHTML = html; };
     if (target === 'mine') {
       TAG_KEYS.forEach((k) => {
         const node = el.querySelector(`[data-col="${k}"]`);
@@ -79,7 +80,7 @@ export function createTagView(el, ctx) {
       });
     } else if (target != null) {
       const mine = all.filter((x) => x.to === target && isMe(x.by));
-      const del = (x) => `<button type="button" class="xbtn sm" data-del="${esc(x.key)}" aria-label="지우기">${ICON.trash}</button>`;
+      const del = (x) => `<button type="button" class="btn small ghost" data-edit="${esc(x.key)}">고치기</button><button type="button" class="xbtn sm" data-del="${esc(x.key)}" aria-label="지우기">${ICON.trash}</button>`;
       set(el.querySelector('[data-list="D"]'), mine.filter((x) => x.type === 'D').map((x) =>
         item(x, `<button type="button" class="btn small ghost" data-use="${esc(x.key)}">질문(A)로 옮기기</button>${del(x)}`)).join(''));
       const tags = mine.filter((x) => x.type !== 'D');
@@ -97,7 +98,48 @@ export function createTagView(el, ctx) {
     ctx.saved(type === 'D' ? '적어 두었어요. 나만 볼 수 있어요.' : '남겼어요!');
   }
 
+  // 내가 남긴 글 고치기: 그 줄만 입력칸으로 바꾸고, 저장하거나 그만두면 목록을 다시 그림
+  function startEdit(key) {
+    const x = store.list('tag').find((y) => y.key === key);
+    const row = el.querySelector(`[data-edit="${CSS.escape(key)}"]`);
+    if (!x || !isMe(x.by) || !row) return;
+    const old = el.querySelector('[data-edit-in]');
+    if (old) { endEdit(); return startEdit(key); }
+    const line = row.closest('.tline');
+    line.classList.add('editing');
+    line.innerHTML = `${x.type === 'D' ? '<span class="tchip t-D">초안</span>' : `<span class="tchip t-${x.type}"><b>${x.type}</b></span>`}
+      <input data-edit-in="${esc(key)}" maxlength="${ctx.tagCfg().max}" autocomplete="off">
+      <button type="button" class="btn small primary" data-edit-save>저장</button>
+      <button type="button" class="btn small ghost" data-edit-cancel>그만두기</button>`;
+    const inp = line.querySelector('input');
+    inp.value = x.text;
+    inp.focus();
+    inp.setSelectionRange(inp.value.length, inp.value.length);
+  }
+  function endEdit() {
+    const inp = el.querySelector('[data-edit-in]');
+    if (inp) inp.removeAttribute('data-edit-in');
+    lists();
+  }
+  function saveEdit() {
+    const inp = el.querySelector('[data-edit-in]');
+    if (!inp) return;
+    const x = store.list('tag').find((y) => y.key === inp.dataset.editIn);
+    const text = inp.value.trim();
+    if (!text) { ctx.toast('글을 비울 수는 없어요. 지우려면 휴지통을 눌러요.'); inp.focus(); return; }
+    if (x && isMe(x.by) && text !== x.text) {
+      const { key, _pending, ...v } = x;
+      store.put('tag', key, { ...v, text, edited: { ...ctx.me(), at: Date.now() } });
+      ctx.saved('고쳤어요!');
+    }
+    endEdit();
+  }
+
   el.addEventListener('click', (e) => {
+    const ed = e.target.closest('[data-edit]');
+    if (ed) { startEdit(ed.dataset.edit); return; }
+    if (e.target.closest('[data-edit-save]')) { saveEdit(); return; }
+    if (e.target.closest('[data-edit-cancel]')) { endEdit(); return; }
     const t = e.target.closest('[data-target]');
     if (t) {
       if (t.classList.contains('off')) { ctx.toast('우리 모둠 발표에는 TAG를 남기지 않아요.'); return; }
@@ -125,7 +167,13 @@ export function createTagView(el, ctx) {
     }
   });
   el.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.target.closest('[data-edit-in]')) {
+      if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+      else if (e.key === 'Escape') endEdit();
+      return;
+    }
+    if (e.key !== 'Enter') return;
     const inp = e.target.closest('input[data-in]');
     if (inp) { e.preventDefault(); send(inp.dataset.in); }
   });

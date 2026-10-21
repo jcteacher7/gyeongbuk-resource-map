@@ -342,3 +342,7 @@ body.viewmode #arrowBtn, body.viewmode [data-act="add"], body.viewmode [data-act
 .vp .cv-steps li.todo { color: var(--mute); }
 .vp-empty { margin: auto; text-align: center; line-height: 1.6; }
 .vp-note { margin-top: 14px; }
+
+/* TAG: 내가 남긴 글 고치기 */
+.tline.editing input { flex: 1; min-width: 0; height: 50px; padding: 0 14px; border: 3px solid var(--coral); border-radius: 14px; background: #fff; font-family: var(--body); font-size: 19px; color: var(--ink); outline: none; }
+.tline .btn.small { flex: none; }
